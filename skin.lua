@@ -1,0 +1,8250 @@
+--LuaCodeHub
+
+function _G.ZoulObbNotiff(message)
+  pcall(function()
+    local bLocOk, loc_util = pcall(require, "common.loc_util")
+    if bLocOk and loc_util then
+      if loc_util.ShowNotice then
+        loc_util.ShowNotice("Mode By ZoulObb: " .. message)
+      end
+    end
+    local bTipsOk, InGameTipsTools = pcall(require, "GameLua.Mod.BaseMod.Common.UI.InGameTipsTools")
+    if bTipsOk and InGameTipsTools then
+      if InGameTipsTools.BattleNormalTips then
+        InGameTipsTools.BattleNormalTips("Moded Pak By ZoulObb: " .. message, 2, 3)
+      end
+    end
+    local bDataOk, GameplayData = pcall(require, "GameLua.GameCore.Data.GameplayData")
+    if bDataOk and GameplayData then
+      local PlayerController = GameplayData.GetPlayerController()
+      if PlayerController then
+        local bLibOk, STExtraBlueprintFunctionLibrary = pcall(import, "STExtraBlueprintFunctionLibrary")
+        if bLibOk and STExtraBlueprintFunctionLibrary then
+          local ChatComponent = STExtraBlueprintFunctionLibrary.GetChatComponentFromController(PlayerController)
+          if ChatComponent then
+            if ChatComponent.AddMsgInClient then
+              ChatComponent:AddMsgInClient("By ZoulObb: " .. message .. ".")
+            end
+          end
+        end
+      end
+    end
+  end)
+end
+
+local _outfitSavePathCache = nil
+local function _getOutfitSavePath()
+    if _outfitSavePathCache then return _outfitSavePathCache end
+    
+    local pid = "default"
+    pcall(function()
+        local Subsystem = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+        local AccountSubsystem = Subsystem:Get("AccountSubsystem")
+        if AccountSubsystem and AccountSubsystem.GetAccountUID then
+            local uid = AccountSubsystem:GetAccountUID()
+            if uid and uid ~= 0 then pid = tostring(uid) end
+        end
+    end)
+    
+    local fileName = "AddOutfit" .. pid .. ".txt"
+
+    local function GetCachePaths(fName)
+        local paths = {
+            "//storage/emulated/0/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "//storage/emulated/0/Android/data/com.tencent.igfit/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "/Documents/ShadowTrackerExtra/Saved/Paks/puffer_temp/" .. fName,
+            "/com.tencent.ig/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "/com.vng.pubgmobile/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "/com.pubg.krmobile/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "/com.rekoo.pubgm/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "/com.pubg.imobile/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "../../ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "../../../ShadowTrackerExtra/Saved/Paks/" .. fName,
+            "../../../../ShadowTrackerExtra/Saved/Paks/" .. fName,
+            fName
+        }
+        if os and os.getenv then
+            local homeDir = os.getenv("HOME")
+            if homeDir and homeDir ~= "" then
+                table.insert(paths, 1, homeDir .. "/Documents/ShadowTrackerExtra/Saved/Paks/" .. fName)
+                table.insert(paths, 2, homeDir .. "/Documents/ShadowTrackerExtra/Saved/Paks/puffer_temp/" .. fName)
+            end
+        end
+        return paths
+    end
+
+    local paths = GetCachePaths(fileName)
+    for _, path in ipairs(paths) do
+        local cleanPath = path:gsub("^%/%/", "/")
+        local file = io.open(cleanPath, "r")
+        if file then
+            file:close()
+            _outfitSavePathCache = cleanPath
+            return _outfitSavePathCache
+        end
+    end
+
+    for _, path in ipairs(paths) do
+        local cleanPath = path:gsub("^%/%/", "/")
+        local file = io.open(cleanPath, "w")
+        if file then
+            file:write("") 
+            file:close()
+            _outfitSavePathCache = cleanPath
+            return _outfitSavePathCache
+        end
+    end
+    _outfitSavePathCache = fileName
+    return _outfitSavePathCache
+end
+
+local function _saveEquippedCache()
+    pcall(function()
+        local cch = _G.AddOutfitEquippedCache
+        if not cch then
+            return
+        end
+
+        local path = _getOutfitSavePath()
+        local lines = {}
+
+        local function addLine(key, value)
+            if value ~= nil then
+                lines[#lines + 1] = key .. "=" .. tostring(value)
+            end
+        end
+
+        local function addPositiveLine(key, value)
+            value = tonumber(value)
+            if value and value > 0 then
+                lines[#lines + 1] = key .. "=" .. tostring(value)
+            end
+        end
+
+        
+        addLine("outfitRes", cch.outfitRes)
+        addLine("outfitIns", cch.outfitIns)
+
+        
+        local clothIds = {}
+
+        for resID in pairs(cch.clothes or {}) do
+            clothIds[#clothIds + 1] = tostring(resID)
+        end
+
+        if #clothIds > 0 then
+            lines[#lines + 1] = "clothes=" .. table.concat(clothIds, ",")
+        end
+
+        
+        local eq = cch.equip or {}
+
+        local equipKeys = {
+            "bag",
+            "helmet",
+            "armor",
+            "parachute",
+            "glider",
+            "bagIns",
+            "helmetIns",
+            "armorIns",
+            "parachuteIns",
+            "gliderIns"
+        }
+
+        for _, key in ipairs(equipKeys) do
+            addLine("equip_" .. key, eq[key])
+        end
+
+        
+        for wid, weapon in pairs(cch.weapons or {}) do
+            if weapon then
+                lines[#lines + 1] =
+                    "weapon_" .. tostring(wid)
+                    .. "="
+                    .. tostring(weapon.resID)
+                    .. ":"
+                    .. tostring(weapon.insID or 0)
+            end
+        end
+
+        
+        pcall(function()
+            if DataMgr and DataMgr.MotionSlotList then
+                local parts = {}
+
+                for _, ins in ipairs(DataMgr.MotionSlotList) do
+                    ins = tonumber(ins)
+
+                    if ins and ins > 0 then
+                        parts[#parts + 1] = tostring(ins)
+                    end
+                end
+
+                if #parts > 0 then
+                    lines[#lines + 1] = "motion=" .. table.concat(parts, ",")
+                end
+            end
+        end)
+
+        
+        pcall(function()
+            local AvatarData = require("client.logic.data.AvatarData")
+            local parts = {}
+            for _, ins in pairs(AvatarData.GetRoleWear()) do
+                ins = tonumber(ins)
+                if ins and ins > 0 then
+                    parts[#parts + 1] = tostring(ins)
+                end
+            end
+            if #parts > 0 then
+                lines[#lines + 1] = "rolewear=" .. table.concat(parts, ",")
+            end
+        end)
+
+        
+        pcall(function()
+            if DataMgr and DataMgr.equipmentSkinInsIDTable then
+                for subType, ins in pairs(DataMgr.equipmentSkinInsIDTable) do
+                    addPositiveLine("equipins_" .. tostring(subType), ins)
+                end
+            end
+        end)
+
+        
+        pcall(function()
+            if DataMgr then
+                addPositiveLine("vst_skin", DataMgr.vst_skin)
+            end
+        end)
+
+        
+        pcall(function()
+            local HT = require("client.logic.lobby.hall_theme_utils")
+            local getThemeInstId = HT.GetThemeInstId
+            local ins = 0
+            if getThemeInstId then
+                ins = tonumber(getThemeInstId()) or 0
+            end
+            if ins > 0 then
+                lines[#lines + 1] = "hall_theme_ins=" .. tostring(ins)
+                local res = tonumber(HT.homeThemeItemId) or 0
+                if res <= 0
+                    and _G.AddOutfit_R
+                    and _G.AddOutfit_R.insToRes
+                then
+                    res = tonumber(_G.AddOutfit_R.insToRes[ins]) or 0
+                end
+                if res > 0 then
+                    lines[#lines + 1] =
+                        "hall_theme_res=" .. tostring(res)
+                end
+            end
+        end)
+
+        
+        pcall(function()
+            if DataMgr and DataMgr.VehicleSlotList then
+                for subType, insList in pairs(DataMgr.VehicleSlotList) do
+                    if type(insList) == "table" then
+                        local parts = {}
+                        for _, ins in ipairs(insList) do
+                            ins = tonumber(ins)
+                            if ins and ins > 0 then
+                                parts[#parts + 1] = tostring(ins)
+                            end
+                        end
+                        if #parts > 0 then
+                            lines[#lines + 1] =
+                                "vehicle_"
+                                .. tostring(subType)
+                                .. "="
+                                .. table.concat(parts, ",")
+                        end
+                    end
+                end
+            end
+        end)
+
+        
+        pcall(function()
+            local GTS
+            if ModuleManager and ModuleManager.GetModule then
+                GTS = ModuleManager.GetModule(ModuleManager.LobbyModuleConfig.GarageThemeSystem)
+            end
+            if GTS and GTS.GarageVehicleInfo then
+                for slot, info in pairs(GTS.GarageVehicleInfo) do
+                    if info and info.inst_id then
+                        lines[#lines + 1] =
+                            "garage_"
+                            .. tostring(slot)
+                            .. "="
+                            .. tostring(info.inst_id)
+                            .. ":"
+                            .. tostring(info.res_id or 0)
+                    end
+                end
+            end
+        end)
+
+        
+        pcall(function()
+            local throwObjects = cch.throwObjects
+            if throwObjects then
+                for st, info in pairs(throwObjects) do
+                    if info and info.resID then
+                        local resID = tonumber(info.resID)
+                        if resID and resID > 0 then
+                            lines[#lines + 1] =
+                                "throw_"
+                                .. tostring(st)
+                                .. "="
+                                .. tostring(resID)
+                                .. ":"
+                                .. tostring(info.insID or 0)
+                        end
+                    end
+                end
+            end
+        end)
+
+        
+        local file = io.open(path, "w+")
+        if not file then
+            return
+        end
+        file:write(table.concat(lines, "\n"))
+        file:close()
+    end)
+end
+
+local function _loadEquippedCache()
+    pcall(function()
+        local path = _getOutfitSavePath()
+        local file = io.open(path, "r")
+        if not file then return end
+
+        local content = file:read("*a")
+        file:close()
+
+        if not content or content == "" then return end
+
+        
+        _G._savedOutfitClothes   = {}
+        _G._savedOutfitRes       = nil
+        _G._savedOutfitIns       = nil
+        _G._savedOutfitEquip     = {}
+        _G._savedVehicleSlotList = {}
+        _G._savedGarageVehicles  = {}
+        _G._savedMotionList      = {}
+        _G._savedRoleWearList    = {}
+        _G._savedEquipIns        = {}
+        _G._savedVstSkin         = nil
+        _G._savedHallThemeIns    = nil
+        _G._savedHallThemeRes    = nil
+        _G._savedThrowObjects    = {}
+
+        local savedEquip = _G._savedOutfitEquip
+        
+        local equipMap = {
+            equip_bag          = "bag",
+            equip_helmet       = "helmet",
+            equip_armor        = "armor",
+            equip_parachute    = "parachute",
+            equip_glider       = "glider",
+            equip_bagIns       = "bagIns",
+            equip_helmetIns    = "helmetIns",
+            equip_armorIns     = "armorIns",
+            equip_parachuteIns = "parachuteIns",
+            equip_gliderIns    = "gliderIns",
+        }
+
+        
+        local function parseIdList(value, target)
+            for id in value:gmatch("([^,]+)") do
+                id = tonumber(id)
+                if id and id > 0 then
+                    target[#target + 1] = id
+                end
+            end
+        end
+        
+        local function parsePair(value)
+            local a, b = value:match("^(.-):(.+)$")
+            if not a then
+                return nil, nil
+            end
+            return tonumber(a), tonumber(b) or 0
+        end
+        
+        for line in content:gmatch("[^\r\n]+") do
+            local key, val = line:match("^(.-)=(.+)$")
+            if key and val then
+                
+                if key == "outfitRes" then
+                    _G._savedOutfitRes = tonumber(val)
+                elseif key == "outfitIns" then
+                    _G._savedOutfitIns = tonumber(val)
+                
+                elseif key == "clothes" then
+                    for id in val:gmatch("([^,]+)") do
+                        id = tonumber(id)
+                        if id and id > 0 then
+                            _G._savedOutfitClothes[id] = true
+                        end
+                    end
+                
+                elseif equipMap[key] then
+                    savedEquip[equipMap[key]] = tonumber(val)
+                
+                elseif key == "motion" then
+                    parseIdList(val, _G._savedMotionList)
+                
+                elseif key == "rolewear" then
+                    parseIdList(val, _G._savedRoleWearList)
+                
+                else
+                    local subType = key:match("^equipins_(%d+)$")
+                    if subType then
+                        subType = tonumber(subType)
+                        local ins = tonumber(val)
+                        if subType and ins then
+                            _G._savedEquipIns[subType] = ins
+                        end
+                    
+                    elseif key == "vst_skin" then
+                        _G._savedVstSkin = tonumber(val)
+                    
+                    elseif key == "hall_theme_ins" then
+                        _G._savedHallThemeIns = tonumber(val)
+                    elseif key == "hall_theme_res" then
+                        _G._savedHallThemeRes = tonumber(val)
+                    
+                    else
+                        local wid = key:match("^weapon_(%d+)$")
+                        if wid then
+                            wid = tonumber(wid)
+                            local resID, insID = parsePair(val)
+                            if wid and resID then
+                                savedEquip["weapon_" .. wid] = {
+                                    resID = resID,
+                                    insID = insID,
+                                }
+                            end
+                        
+                        else
+                            subType = key:match("^vehicle_(%d+)$")
+                            if subType then
+                                subType = tonumber(subType)
+                                local list = {}
+                                parseIdList(val, list)
+                                if subType and #list > 0 then
+                                    _G._savedVehicleSlotList[subType] = list
+                                end
+                            
+                            else
+                                local slot = key:match("^garage_(%d+)$")
+                                if slot then
+                                    slot = tonumber(slot)
+                                    local insID, resID = parsePair(val)
+                                    if slot and insID then
+                                        _G._savedGarageVehicles[slot] = {
+                                            inst_id = insID,
+                                            res_id = resID or 0,
+                                        }
+                                    end
+                                
+                                else
+                                    local st = key:match("^throw_(%d+)$")
+                                    if st then
+                                        st = tonumber(st)
+                                        local resID, insID = parsePair(val)
+                                        if st and resID then
+                                            _G._savedThrowObjects[st] = {
+                                                resID = resID,
+                                                insID = insID,
+                                            }
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+        if not _G.AddOutfitEquippedCache then
+            _G.AddOutfitEquippedCache = {
+                outfitRes = nil,
+                outfitIns = nil,
+                clothes  = {},
+                equip    = {},
+                weapons  = {},
+            }
+        end
+
+        local cch = _G.AddOutfitEquippedCache
+        cch.clothes = cch.clothes or {}
+        cch.equip   = cch.equip or {}
+        cch.weapons = cch.weapons or {}
+        
+        if _G._savedOutfitRes then
+            cch.outfitRes = _G._savedOutfitRes
+            cch.outfitIns = _G._savedOutfitIns
+        end
+        
+        if not _G._addOutfitPersistLoaded
+            and _G._savedOutfitClothes
+        then
+            for resID in pairs(_G._savedOutfitClothes) do
+                cch.clothes[resID] = true
+            end
+        end
+        
+        for key, value in pairs(savedEquip) do
+            local weaponId = key:match("^weapon_(%d+)$")
+            if weaponId then
+                weaponId = tonumber(weaponId)
+                if weaponId then
+                    cch.weapons[weaponId] = value
+                end
+            else
+                cch.equip[key] = value
+            end
+        end
+        
+        if _G._savedThrowObjects then
+            cch.throwObjects = cch.throwObjects or {}
+            for st, info in pairs(_G._savedThrowObjects) do
+                if info and info.resID and info.resID > 0 then
+                    cch.throwObjects[st] = info
+                end
+            end
+        end
+        _G._addOutfitPersistLoaded = true
+        _lastSnapshot = _snapshotCache()
+    end)
+end
+
+local function _snapshotCache()
+    local cch = _G.AddOutfitEquippedCache
+    if not cch then
+        return ""
+    end
+    local parts = {}
+    local function add(value)
+        parts[#parts + 1] = tostring(value or 0)
+    end
+    
+    add(cch.outfitRes)
+    
+    local clothIds = {}
+    for resID in pairs(cch.clothes or {}) do
+        clothIds[#clothIds + 1] = resID
+    end
+    table.sort(clothIds)
+    parts[#parts + 1] = table.concat(clothIds, ",")
+    
+    local eq = cch.equip or {}
+    add(eq.bag)
+    add(eq.helmet)
+    add(eq.armor)
+    add(eq.parachute)
+    add(eq.glider)
+    
+    local weaponIds = {}
+    for wid in pairs(cch.weapons or {}) do
+        weaponIds[#weaponIds + 1] = wid
+    end
+    table.sort(weaponIds)
+    for _, wid in ipairs(weaponIds) do
+        local weapon = cch.weapons[wid]
+        if weapon then
+            parts[#parts + 1] =
+                tostring(wid)
+                .. ":"
+                .. tostring(weapon.resID or 0)
+        end
+    end
+    
+    local throwObjects = cch.throwObjects
+    if throwObjects then
+        local throwIds = {}
+        for st in pairs(throwObjects) do
+            throwIds[#throwIds + 1] = st
+        end
+        table.sort(throwIds)
+        for _, st in ipairs(throwIds) do
+            local info = throwObjects[st]
+            if info then
+                parts[#parts + 1] =
+                    "throw_"
+                    .. tostring(st)
+                    .. ":"
+                    .. tostring(info.resID or 0)
+            end
+        end
+    end
+    return table.concat(parts, "|")
+end
+
+local _lastSnapshot   = ""
+local _saveDirty      = false
+local _saveInProgress = false
+local _lastSaveClock  = 0
+
+local SAVE_MIN_INTERVAL = 2.5
+
+
+local function _flushSave(force)
+    
+    if _saveInProgress then
+        _saveDirty = true
+        return
+    end
+    
+    local now = 0
+    pcall(function() now = os.clock() end)
+    
+    if not force
+        and _lastSaveClock > 0
+        and (now - _lastSaveClock) < SAVE_MIN_INTERVAL
+    then
+        _saveDirty = true
+        return
+    end
+
+    _saveInProgress = true
+    _saveDirty = false
+
+    pcall(function()
+        
+        if _G.AddOutfitSyncCacheBeforeSave then
+            _G.AddOutfitSyncCacheBeforeSave()
+        end
+        
+        _lastSnapshot = _snapshotCache()
+        
+        pcall(_saveEquippedCache)
+        
+        local cch = _G.AddOutfitEquippedCache
+        if cch then
+            local outfitRes = tonumber(cch.outfitRes)
+            local outfitIns = tonumber(cch.outfitIns)
+
+            _G._savedOutfitRes = outfitRes and outfitRes > 0 and outfitRes or nil
+            _G._savedOutfitIns = outfitIns and outfitIns > 0 and outfitIns or nil
+            _G._savedOutfitClothes = {}
+
+            for resID in pairs(cch.clothes or {}) do
+                _G._savedOutfitClothes[resID] = true
+            end
+        end
+    end)
+    
+    pcall(function() _lastSaveClock = os.clock() end)
+    _saveInProgress = false
+end
+
+local _saveDeferred = false
+
+local function _AutoSaveOutfit(force)
+    
+    if force then _flushSave(true) return end
+
+    _saveDirty = true
+    
+    if _saveDeferred then return end
+
+    _saveDeferred = true
+    local function doDeferredFlush()
+        _saveDeferred = false
+        if _saveDirty then
+            _flushSave(false)
+        end
+    end
+    
+    local ok = pcall(_G.SetTimer, 0.5, doDeferredFlush)
+    if not ok then
+        doDeferredFlush()
+    end
+end
+
+
+_G.AddOutfitTryFlushSave = function()
+    if _saveDirty then
+        _flushSave(false)
+    end
+end
+
+
+pcall(function()
+    local WardrobeNewHandler = {}
+    local _bShowNotice = false
+    local _ao_R
+    local function getR()
+        if _ao_R then
+            return _ao_R
+        end
+        _ao_R = _G.AddOutfit_R
+        return _ao_R
+    end
+
+    local function aoIsInjectedIns(ins)
+        ins = tonumber(ins)
+        if not ins then
+            return false
+        end
+        local R = getR()
+        return R
+            and R.insToRes
+            and R.insToRes[ins] ~= nil
+            or false
+    end
+    function WardrobeNewHandler.send_depot_modify_combat_vehicle_req(insID, slotIndex, bShowNotice)
+        insID = tonumber(insID)
+        slotIndex = tonumber(slotIndex) or 1
+        _bShowNotice = bShowNotice
+        
+        if aoIsInjectedIns(insID) then
+            local R = getR()
+            local resID = R and R.insToRes[insID]
+            local itemSubType = 0
+            if resID and CDataTable and CDataTable.GetTableData then
+                local data = CDataTable.GetTableData("Item", resID)
+                itemSubType = data and tonumber(data.ItemSubType or data.itemSubType) or 0
+            end
+            if itemSubType > 0 and DataMgr then
+                DataMgr.VehicleSlotList = DataMgr.VehicleSlotList or {}
+                local slotList = DataMgr.VehicleSlotList[itemSubType] or {}
+                if bShowNotice then
+                    
+                    for i = #slotList, 1, -1 do
+                        if slotList[i] == insID then
+                            table.remove(slotList, i)
+                        end
+                    end
+                    slotList[slotIndex] = insID
+                else
+                    
+                    for i, sid in ipairs(slotList) do
+                        if sid == insID then
+                            table.remove(slotList, i)
+                            break
+                        end
+                    end
+                end
+                DataMgr.VehicleSlotList[itemSubType] =
+                    slotList
+            end
+            
+            pcall(function()
+                local tabSurveillance = require("client.slua.logic.wardrobe.tab_surveillance")
+                if tabSurveillance
+                    and tabSurveillance.VehicleChange
+                then
+                    tabSurveillance.VehicleChange()
+                end
+            end)
+            
+            if EventSystem
+                and EVENTTYPE_WARDROBE
+                and EVENTID_WARDROBE_VEHICLE_SLOT_DATA_CHANGE
+            then
+                EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_VEHICLE_SLOT_DATA_CHANGE)
+            end
+            
+            pcall(_AutoSaveOutfit)
+            return
+        end
+        
+        local NetManager = require("client.network.comm.NetManager")
+        NetManager.SendPkg(1012780591, insID, slotIndex, bShowNotice)
+    end
+
+    function WardrobeNewHandler.on_depot_modify_combat_vehicle_rsp(ret_code, vehicle_info)
+        if ret_code ~= 0
+            and ret_code ~= NetErrorCode_NONE
+        then
+            if _bShowNotice and ShowNotice then
+                ShowNotice(ret_code)
+            end
+            return
+        end
+
+        if vehicle_info and DataMgr then
+            DataMgr.VehicleSlotList = vehicle_info
+        end
+
+        pcall(function()
+            local tabSurveillance = require("client.slua.logic.wardrobe.tab_surveillance")
+            if tabSurveillance
+                and tabSurveillance.VehicleChange
+            then
+                tabSurveillance.VehicleChange()
+            end
+        end)
+
+        if EventSystem
+            and EVENTTYPE_WARDROBE
+            and EVENTID_WARDROBE_VEHICLE_SLOT_DATA_CHANGE
+        then
+            EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_VEHICLE_SLOT_DATA_CHANGE)
+        end
+    end
+
+    function WardrobeNewHandler.send_select_item(insID)
+        local NetManager = require("client.network.comm.NetManager")
+        NetManager.SendPkg(595484784, insID)
+    end
+
+    function WardrobeNewHandler.send_equip_motion_list_req(motion_list)
+        local NetManager = require("client.network.comm.NetManager")
+        NetManager.SendPkg(1124239581, motion_list)
+    end
+
+    package.loaded["client.network.Protocol.WardrobeNewHandler"] = WardrobeNewHandler
+end)
+
+local _ao_ok, _ao_err = pcall(function()
+    
+    do
+        local curMatchID = ""
+
+        pcall(function()
+            local GD = require("GameLua.GameCore.Data.GameplayData")
+            if GD and GD.GetPlayerController then
+                local pc = GD.GetPlayerController()
+                if pc and slua.isValid(pc) then
+                    curMatchID =
+                        tostring(pc.PlayerKey or "")
+                        .. "_"
+                        .. tostring(pc)
+                end
+            end
+        end)
+
+        if curMatchID == "" then
+            _G._AO_MATCH_ID = nil
+        elseif _G._AO_MATCH_ID == curMatchID then
+            return
+        else
+            _G._AO_MATCH_ID = curMatchID
+        end
+    end
+
+    local game_frontend_hud = require("game_frontend_hud")
+
+    local DEBUGG = false
+    
+    local function isInMatchOrGame()
+        local ok, result = pcall(function()
+            if GameStatus
+                and GameStatus.IsInFightingStatus
+                and GameStatus.IsInFightingStatus()
+            then
+                return true
+            end
+
+            if GameStatus
+                and GameStatus.IsInLobbyOrMainCity
+                and not GameStatus.IsInLobbyOrMainCity()
+            then
+                return true
+            end
+            return false
+        end)
+        return ok and result == true
+    end
+    
+    local function log(...)
+        print("[ZoulObb]", ...)
+    end
+
+    local MATCH_CONFIG = {
+        outfitRes = 0,
+        weaponSkins = {},
+        equip = { bag = 0, helmet = 0, armor = 0 },
+    }
+
+    local ITEMS = {}
+    local _itemsLoaded = false
+
+    local function buildNonMaxLevelSet()
+    local nonMax = {}
+    if not (CDataTable and CDataTable.GetTable) then return nonMax end
+    pcall(function()
+        local upTbl = CDataTable.GetTable("ItemUpgradeConfig")
+        if not upTbl then return end
+        local maxLvl, maxItem = {}, {}
+        local groupMembers = {}
+        for _, cfg in pairs(upTbl) do
+            local gid   = tonumber(cfg.GroupID)
+            local lvl   = tonumber(cfg.Level)
+            local itm   = tonumber(cfg.ItemID)
+            if gid and lvl and itm then
+                if not groupMembers[gid] then groupMembers[gid] = {} end
+                groupMembers[gid][#groupMembers[gid] + 1] = itm
+                if not maxLvl[gid] or lvl > maxLvl[gid] then
+                    maxLvl[gid] = lvl
+                    maxItem[gid] = itm
+                end
+            end
+        end
+        for gid, members in pairs(groupMembers) do
+            local topItem = maxItem[gid]
+            for _, itm in ipairs(members) do
+                if itm ~= topItem then nonMax[itm] = true end
+            end
+        end
+    end)
+    
+    local function processXSuitTable(tableName)
+        pcall(function()
+            local tbl = CDataTable.GetTable(tableName)
+            if not tbl then return end
+            local maxStar, maxItem = {}, {}
+            local periodMembers = {}
+            for _, data in pairs(tbl) do
+                local period = tonumber(data.Period or data.period)
+                local star   = tonumber(data.Star or data.star or data.Level or data.level)
+                local itm    = tonumber(data.ItemID or data.itemID or data.ItemId)
+                if period and star and itm then
+                    if not periodMembers[period] then periodMembers[period] = {} end
+                    periodMembers[period][#periodMembers[period] + 1] = itm
+                    if not maxStar[period] or star > maxStar[period] then
+                        maxStar[period] = star
+                        maxItem[period] = itm
+                    end
+                end
+            end
+            for period, members in pairs(periodMembers) do
+                local topItem = maxItem[period]
+                for _, itm in ipairs(members) do
+                    if itm ~= topItem then nonMax[itm] = true end
+                end
+            end
+        end)
+    end
+    
+    processXSuitTable("GoldenSuitUpgradeCfg")
+    processXSuitTable("GoldenSuitUpgradeCfgKJ")
+    processXSuitTable("GoldenSuitUpgradeCfgIN")
+
+    pcall(function()
+        local bpMap = CDataTable.GetTable("BackpackMapping")
+        if not bpMap then return end
+        for _, m in pairs(bpMap) do
+            local lv3 = tonumber(m.SkinItemIDLv3 or 0) or 0
+            local lv1 = tonumber(m.SkinItemIDLv1 or 0) or 0
+            local lv2 = tonumber(m.SkinItemIDLv2 or 0) or 0
+            if lv1 > 0 and lv1 ~= lv3 then nonMax[lv1] = true end
+            if lv2 > 0 and lv2 ~= lv3 then nonMax[lv2] = true end
+        end
+    end)
+    return nonMax
+end
+
+local function refreshItems()
+    if _itemsLoaded then return #ITEMS end
+    if #ITEMS > 0 then return #ITEMS end
+    local ItemTable = CDataTable and CDataTable.GetTable and CDataTable.GetTable("Item")
+    if not ItemTable then return 0 end
+    local nonMax = buildNonMaxLevelSet()
+    local seen, count, skipped = {}, 0, 0
+    for id, v in pairs(ItemTable) do
+        local rid = tonumber(v.ID or v.Id or id)
+        if rid and rid > 0 and not seen[rid] then
+            local bpId = tonumber(v.BPID or v.bpID or v.BpId or 0) or 0
+            local mainTab = tonumber(v.WardrobeMainTab or v.wardrobeMainTab or 0) or 0
+            if bpId ~= 0 or mainTab ~= 0 then
+                seen[rid] = true
+                if nonMax[rid] then
+                    skipped = skipped + 1
+                else
+                    ITEMS[#ITEMS + 1] = rid
+                    count = count + 1
+                end
+            end
+        end
+    end
+    table.sort(ITEMS)
+    if count > 0 then
+        _itemsLoaded = true
+    end
+    return count
+end
+
+local _K = {
+    INS_BASE = 2000000000, PKG_SLOT = 3, MELEE_ID = 108,
+    GUN_SUB = { [101]=true, [102]=true, [103]=true, [104]=true, [105]=true, [106]=true, [107]=true },
+    NET_OK = NetErrorCode_NONE or "ok",
+    GUN_MASTER_SYN_SLOT = 7,
+    THROW_SUB = { [612] = "shoulei", [613] = "smoke", [614] = "stun", [615] = "burn" },
+    THROW_AVATAR_KEY = { shoulei = "GrenadeAvatarShoulei", smoke = "GrenadeAvatarSmoke", stun = "GrenadeAvatarStun", burn = "GrenadeAvatarBurn" },
+}
+
+local R = { insToRes = {}, resToIns = {} }
+local _injectedResSet = {}
+for _, rid in ipairs(ITEMS) do _injectedResSet[rid] = true end
+
+local _C = { cfg = {}, fullSuit = {}, equipSlot = {}, weaponId = {}, itemTab = {}, vehicleItems = {}, pageMatch = {} }
+
+local _S = {
+    matchApplied = false, matchTimer = nil, matchOutfitDone = false,
+    avatarItemsRegistered = false, weaponApplied = false, weaponDiagDone = false,
+    lastWeaponResID = 0, weaponSpawnHooked = false, bootstrapNotified = false,
+    globalFrame = 0, weaponHookGuardUntil = 0, equipSkinApplying = false,
+    injectedDone = false, lastAppliedWeaponID = 0, lastAppliedSkinID = 0,
+    bootstrapped = false, lobbyApplied = false,
+}
+
+_G.AddOutfitSkinIdMappings = _G.AddOutfitSkinIdMappings or {}
+_G.AddOutfitLastAppliedSkin = _G.AddOutfitLastAppliedSkin or {}
+_G.AddOutfitLastLobbyOutfitRes = _G.AddOutfitLastLobbyOutfitRes or nil
+
+_K.ST_TOP     = (ENUM_ITEM_SUBTYPE and ENUM_ITEM_SUBTYPE.Package_Slot) or 403
+_K.ST_PANTS   = (ENUM_ITEM_SUBTYPE and ENUM_ITEM_SUBTYPE.Pants_Slot) or 404
+_K.ST_SHOES   = (ENUM_ITEM_SUBTYPE and ENUM_ITEM_SUBTYPE.Shoes_Slot) or 405
+_K.ST_UNDER_T = (ENUM_ITEM_SUBTYPE and ENUM_ITEM_SUBTYPE.UnderCloth) or 450
+_K.ST_UNDER_P = (ENUM_ITEM_SUBTYPE and ENUM_ITEM_SUBTYPE.UnderPants) or 451
+_K.WARDROBE_TAB_SUIT, _K.WARDROBE_TAB_CLOTHES = 10, 3
+_K.WARDROBE_TAB_TROUSERS, _K.WARDROBE_TAB_SHOES = 4, 5
+_K.WARDROBE_TAB_BAG, _K.WARDROBE_TAB_HELMET, _K.WARDROBE_TAB_ARMOR = 15, 16, 17
+_K.WARDROBE_TAB_GUN, _K.WARDROBE_TAB_PARACHUTE = 9, 7
+_K.WARDROBE_TAB_GLIDER = 20
+_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_PAGE_WEAPON, _K.WARDROBE_PAGE_PARACHUTE, _K.WARDROBE_PAGE_VEHICLE = 1, 4, 5, 6
+pcall(function()
+    local wm = require("client.slua.umg.Wardrobe.wardrobe_macro")
+    local t = wm.ENUM_WardrobeSubTabString
+    _K.WARDROBE_TAB_SUIT = t.ENUM_WardrobeSubTabString_suit
+    _K.WARDROBE_TAB_CLOTHES = t.ENUM_WardrobeSubTabString_clothes
+    _K.WARDROBE_TAB_TROUSERS = t.ENUM_WardrobeSubTabString_trousers
+    _K.WARDROBE_TAB_SHOES = t.ENUM_WardrobeSubTabString_shoes
+    _K.WARDROBE_TAB_BAG = t.ENUM_WardrobeSubTabString_bag
+    _K.WARDROBE_TAB_HELMET = t.ENUM_WardrobeSubTabString_helmet
+    _K.WARDROBE_TAB_ARMOR = t.ENUM_WardrobeSubTabString_armor
+    _K.WARDROBE_TAB_GUN = t.ENUM_WardrobeSubTabString_gun
+    _K.WARDROBE_TAB_PARACHUTE = t.ENUM_WardrobeSubTabString_parachute
+    _K.WARDROBE_TAB_GLIDER = t.ENUM_WardrobeSubTabString_effect
+    _K.WARDROBE_PAGE_AVATAR = wm.ENUM_WardrobePageTypeId.ENUM_WardrobePageType_Avatar
+    _K.WARDROBE_PAGE_WEAPON = wm.ENUM_WardrobePageTypeId.ENUM_WardrobePageType_Weapon
+    _K.WARDROBE_PAGE_PARACHUTE = wm.ENUM_WardrobePageTypeId.ENUM_WardrobePageType_Parachute
+    _K.WARDROBE_PAGE_VEHICLE = wm.ENUM_WardrobePageTypeId.ENUM_WardrobePageType_Vehicle
+end)
+
+local FULL_SUIT_CLEAR_ST = {
+    [_K.ST_TOP] = true, [_K.ST_PANTS] = true, [_K.ST_SHOES] = true,
+    [_K.ST_UNDER_T] = true, [_K.ST_UNDER_P] = true,
+}
+
+local function cache()
+    _G.AddOutfitEquippedCache = _G.AddOutfitEquippedCache or {
+        outfitRes = nil, outfitIns = nil,
+        clothes = {},
+        equip = {},
+        weapons = {},
+    }
+    return _G.AddOutfitEquippedCache
+end
+
+local function cfg(resID)
+    if not resID or not CDataTable or not CDataTable.GetTableData then return nil end
+    resID = tonumber(resID)
+    if not resID then return nil end
+    if _C.cfg[resID] ~= nil then return _C.cfg[resID] end
+    local c = CDataTable.GetTableData("Item", resID)
+    _C.cfg[resID] = c
+    return c
+end
+
+local function subType(c)
+    return c and (c.ItemSubType or c.itemSubType) or nil
+end
+
+local function isThrowObjectRes(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    local c = cfg(resID)
+    if not c then return nil end
+    local st = tonumber(c.ItemSubType or c.itemSubType or 0)
+    if _K.THROW_SUB[st] then return st end
+    return nil
+end
+
+local function saveThrowObject(resID, insID)
+    resID, insID = tonumber(resID), tonumber(insID)
+    if not resID then return end
+    local st = isThrowObjectRes(resID)
+    if not st then return end
+    local cch = cache()
+    cch.throwObjects = cch.throwObjects or {}
+    cch.throwObjects[st] = { resID = resID, insID = insID or R.resToIns[resID] or 0 }
+end
+
+local function isInjectedIns(ins)
+    return ins and R.insToRes[tonumber(ins)] ~= nil
+end
+
+local function isInjectedRes(res)
+    return res and (R.resToIns[tonumber(res)] ~= nil or _injectedResSet[tonumber(res)])
+end
+
+local function weaponIdFromSkin(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    if _C.weaponId[resID] ~= nil then return _C.weaponId[resID] end
+    local m = CDataTable and CDataTable.GetTableData and CDataTable.GetTableData("WeaponSkinMapping", resID)
+    local wid = m and (m.WeaponID or m.WeaponId) or nil
+    _C.weaponId[resID] = wid
+    return wid
+end
+
+local function isHallThemeRes(resID)
+    resID = tonumber(resID)
+    if not resID then return false end
+    local c = cfg(resID)
+    if not c then return false end
+    local it = tonumber(c.ItemType or c.itemType or 0)
+    if ENUM_ITEM_TYPE and ENUM_ITEM_TYPE.Hall_Theme then
+        return it == ENUM_ITEM_TYPE.Hall_Theme
+    end
+    return it == 202
+end
+
+local function getEquipSkinSlot(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    if _C.equipSlot[resID] ~= nil then return _C.equipSlot[resID] end
+    local slot = nil
+    local itemCfg = cfg(resID)
+    if itemCfg then
+        local st = tonumber(itemCfg.ItemSubType or itemCfg.itemSubType or 0)
+        local it = tonumber(itemCfg.ItemType or itemCfg.itemType or 0)
+        if st == 501 or st == 504 then slot = "bag"
+        elseif st == 502 or st == 505 then slot = "helmet"
+        elseif st == 503 or st == 506 then slot = "armor"
+        elseif it == 4 and st == 701 then slot = "parachute"
+        elseif it == 4 and (st == 413 or st == 414 or st == 415) then slot = "glider" end
+    end
+    if not slot then
+        if resID >= 1502000000 and resID < 1503000000 then slot = "helmet"
+        elseif resID >= 1505000000 and resID < 1506000000 then slot = "helmet"
+        elseif resID >= 1501000000 and resID < 1502000000 then slot = "bag"
+        elseif resID >= 1504000000 and resID < 1505000000 then slot = "bag" end
+    end
+    _C.equipSlot[resID] = slot
+    return slot
+end
+
+local function wardrobeTab(resID, depotData)
+    if depotData and depotData.subTabType then return tonumber(depotData.subTabType) end
+    local c = cfg(resID)
+    return c and tonumber(c.WardrobeTab or c.wardrobeTab) or nil
+end
+
+local function wardrobeMainTab(resID, depotData)
+    if depotData and depotData.mainTabType then return tonumber(depotData.mainTabType) end
+    local c = cfg(resID)
+    return c and tonumber(c.WardrobeMainTab or c.wardrobeMainTab) or _K.WARDROBE_PAGE_AVATAR
+end
+
+local function getInjectedItemTab(resID, depotData)
+    resID = tonumber(resID)
+    if not resID then return nil, nil end
+    if _C.itemTab[resID] then
+        return _C.itemTab[resID][1], _C.itemTab[resID][2]
+    end
+    local c = cfg(resID)
+    local st = c and tonumber(c.ItemSubType or c.itemSubType) or 0
+
+    local equipSlot = getEquipSkinSlot(resID)
+    local result
+    if equipSlot == "bag" then result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_BAG}
+    elseif equipSlot == "helmet" then result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_HELMET}
+    elseif equipSlot == "armor" then result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_ARMOR}
+    elseif equipSlot == "parachute" then result = {_K.WARDROBE_PAGE_PARACHUTE, _K.WARDROBE_TAB_PARACHUTE}
+     elseif equipSlot == "glider" then result = {_K.WARDROBE_PAGE_PARACHUTE, _K.WARDROBE_TAB_GLIDER}
+     elseif weaponIdFromSkin(resID) then result = {_K.WARDROBE_PAGE_WEAPON, _K.WARDROBE_TAB_GUN}
+     else
+        local mainTab = wardrobeMainTab(resID, depotData)
+        local subTab = wardrobeTab(resID, depotData)
+        if subTab and subTab > 0 then result = {mainTab, subTab}
+        elseif st == _K.ST_PANTS then result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_TROUSERS}
+        elseif st == _K.ST_SHOES then result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_SHOES}
+        elseif st == _K.ST_TOP then
+            if isFullSuitRes(resID, depotData) then result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_SUIT}
+        else result = {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_CLOTHES} end
+        elseif st == 400 or st == 408 or st == 409 or st == 410 then
+            result = {_K.WARDROBE_PAGE_PARACHUTE, _K.WARDROBE_TAB_PARACHUTE}
+        else
+            result = {mainTab, subTab or 0}
+        end
+     end
+    _C.itemTab[resID] = result
+    return result[1], result[2]
+end
+
+local function injectedMatchesPage(resID, depotData, mainTab, subTab)
+    local itemMain, itemSub = getInjectedItemTab(resID, depotData)
+    if itemMain ~= mainTab or itemSub ~= subTab then return false end
+    if subTab == _K.WARDROBE_TAB_SUIT or subTab == _K.WARDROBE_TAB_CLOTHES then
+        local st = depotData and depotData.itemSubType or subType(cfg(resID))
+        if st == _K.ST_TOP then
+            local full = isFullSuitRes(resID, depotData)
+            if subTab == _K.WARDROBE_TAB_SUIT then return full end
+            if subTab == _K.WARDROBE_TAB_CLOTHES then return not full end
+        end
+    end
+    return true
+end
+
+local function isFullSuitRes(resID, depotData)
+    resID = tonumber(resID)
+    if not resID or resID <= 0 then return false end
+    if _C.fullSuit[resID] ~= nil then return _C.fullSuit[resID] end
+    local result = false
+    pcall(function()
+        local LogicXSuit = require("client.slua.logic.XSuit.logic_xsuit")
+        if LogicXSuit.IsXSuit(resID) then result = true end
+    end)
+    if not result then
+        local tab = wardrobeTab(resID, depotData)
+        if tab == _K.WARDROBE_TAB_SUIT then result = true end
+    end
+    _C.fullSuit[resID] = result
+    return result
+end
+
+local function getClothKind(resID, depotData)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    local st = subType(cfg(resID))
+    if st == _K.ST_TOP then
+        return isFullSuitRes(resID, depotData) and "full_suit" or "top"
+    end
+    if st == _K.ST_PANTS then return "pants" end
+    if st == _K.ST_SHOES then return "shoes" end
+    if st == _K.ST_UNDER_T then return "under_top" end
+    if st == _K.ST_UNDER_P then return "under_pants" end
+    return nil
+end
+
+local function subTypesToClearForKind(kind)
+    if kind == "full_suit" then return FULL_SUIT_CLEAR_ST end
+    if kind == "top" then return { [_K.ST_TOP] = true } end
+    if kind == "pants" then return { [_K.ST_PANTS] = true } end
+    if kind == "shoes" then return { [_K.ST_SHOES] = true } end
+    if kind == "under_top" then return { [_K.ST_UNDER_T] = true } end
+    if kind == "under_pants" then return { [_K.ST_UNDER_P] = true } end
+    return nil
+end
+
+local function isBodyClothSubType(st)
+    st = tonumber(st)
+    return st == _K.ST_TOP or st == _K.ST_PANTS or st == _K.ST_SHOES or st == _K.ST_UNDER_T or st == _K.ST_UNDER_P
+end
+
+local _outfitMergeCache = { key = nil, items = nil }
+local _weaponSkinResMergeCache = { key = nil, res = nil }
+local _convertCache = {}
+
+local function getConvertedAvatarCustom(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    if _convertCache[resID] ~= nil then return _convertCache[resID] end
+    local AvatarData = require("client.logic.data.AvatarData")
+    local converted = AvatarData.ConvertToAvatarCustom({ resID, 0, 0 })
+    _convertCache[resID] = converted
+    return converted
+end
+
+local function invalidateSocialWearCache()
+    local s = _G.AddOutfitSocialState
+    if s then
+        s.wearPatchKey, s.snapshotKey, s.fullSnapshot, s.lastHandSkin = nil, nil, nil, nil
+    end
+    _outfitMergeCache.key = nil
+    _outfitMergeCache.items = nil
+    _weaponSkinResMergeCache.key = nil
+    _weaponSkinResMergeCache.res = nil
+end
+
+
+local EQUIP_LEVEL_SETS = {
+    [1502000382] = { lv1 = 1502001382, lv2 = 1502002382, lv3 = 1502003382, slot = "helmet" },
+}
+local _equipLevelByRes = {}
+local function registerEquipLevelSet(catalog, lv1, lv2, lv3, slot)
+    catalog = tonumber(catalog)
+    if not catalog then return end
+    local set = {
+        catalog = catalog,
+        lv1 = tonumber(lv1) or 0,
+        lv2 = tonumber(lv2) or 0,
+        lv3 = tonumber(lv3) or 0,
+        slot = slot or "helmet",
+    }
+    EQUIP_LEVEL_SETS[catalog] = set
+    for _, rid in ipairs({ catalog, set.lv1, set.lv2, set.lv3 }) do
+        if rid and rid > 0 then _equipLevelByRes[rid] = set end
+    end
+end
+for catalog, set in pairs(EQUIP_LEVEL_SETS) do
+    registerEquipLevelSet(catalog, set.lv1, set.lv2, set.lv3, set.slot)
+end
+_G.AddOutfitRegisterEquipLevelSet = registerEquipLevelSet
+
+local EQUIP_LEVEL_RANGES = {
+    { base = 1502000000, slot = "helmet" },
+    { base = 1501000000, slot = "bag"    },
+}
+
+local function findEquipLevelRange(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    for _, r in ipairs(EQUIP_LEVEL_RANGES) do
+        if resID >= r.base and resID < r.base + 1000000 then return r end
+    end
+    return nil
+end
+
+local function detectLevelFromPattern(resID)
+    resID = tonumber(resID)
+    if not resID then return nil, nil end
+    local r = findEquipLevelRange(resID)
+    if not r then return nil, nil end
+    if resID < r.base + 1000 or resID >= r.base + 4000 then return nil, nil end
+    local tail = resID - r.base
+    local levelDigit = math.floor(tail / 1000)
+    if levelDigit >= 1 and levelDigit <= 3 then
+        return levelDigit, r.base + (tail - levelDigit * 1000)
+    end
+    return nil, nil
+end
+
+local function buildPatternLevelSet(catalog)
+    catalog = tonumber(catalog)
+    if not catalog then return nil end
+    local r = findEquipLevelRange(catalog)
+    if not r then return nil end
+    local tail = catalog - r.base
+    if tail < 0 or tail >= 1000 then return nil end
+    return {
+        catalog = catalog,
+        lv1 = catalog + 1000,
+        lv2 = catalog + 2000,
+        lv3 = catalog + 3000,
+        slot = r.slot,
+    }
+end
+
+local function getEquipLevelSet(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    local set = _equipLevelByRes[resID]
+    if set then return set end
+    local level, catalog = detectLevelFromPattern(resID)
+    if catalog then
+        if EQUIP_LEVEL_SETS[catalog] then return EQUIP_LEVEL_SETS[catalog] end
+        if level then return buildPatternLevelSet(catalog) end
+    end
+    
+    local direct = buildPatternLevelSet(resID)
+    if direct then
+        _equipLevelByRes[resID] = direct
+        if direct.lv1 > 0 then _equipLevelByRes[direct.lv1] = direct end
+        if direct.lv2 > 0 then _equipLevelByRes[direct.lv2] = direct end
+        if direct.lv3 > 0 then _equipLevelByRes[direct.lv3] = direct end
+    end
+    return direct
+end
+
+local function normalizeEquipCatalogRes(resID)
+    resID = tonumber(resID)
+    if not resID or resID <= 0 then return 0 end
+    local set = getEquipLevelSet(resID)
+    if set then return set.catalog end
+    return resID
+end
+
+local function detectLevelFromEquipRes(resID)
+    resID = tonumber(resID)
+    if not resID then return nil end
+    local set = getEquipLevelSet(resID)
+    if set then
+        if resID == set.lv1 then return 1
+        elseif resID == set.lv2 then return 2
+        elseif resID == set.lv3 then return 3 end
+    end
+    local level = detectLevelFromPattern(resID)
+    return level
+end
+
+local function mapEquipLevelSet(set, level)
+    if not set then return 0 end
+    level = tonumber(level) or 3
+    if level == 1 then return set.lv1 or 0
+    elseif level == 2 then return set.lv2 or 0 end
+    return set.lv3 or 0
+end
+
+local function mapEquipSkinRes(resID, level)
+    resID, level = tonumber(resID), tonumber(level) or 3
+    if not resID or resID <= 0 then return 0 end
+    local catalogRes = normalizeEquipCatalogRes(resID)
+    local set = getEquipLevelSet(catalogRes)
+    if set then
+        local mapped = mapEquipLevelSet(set, level)
+        if mapped > 0 then return mapped end
+    end
+    local mapped = 0
+    pcall(function()
+        local itemMappingCfg = CDataTable.GetTableData("BackpackMapping", catalogRes)
+        if itemMappingCfg then
+            if level == 1 then mapped = tonumber(itemMappingCfg.SkinItemIDLv1) or 0
+            elseif level == 2 then mapped = tonumber(itemMappingCfg.SkinItemIDLv2) or 0
+            else mapped = tonumber(itemMappingCfg.SkinItemIDLv3) or 0 end
+        end
+        if mapped <= 0 and DataMgr and DataMgr.GetEquipmentItemIDByResID then
+            mapped = tonumber(DataMgr.GetEquipmentItemIDByResID(level, catalogRes)) or 0
+        end
+    end)
+    if mapped > 0 then return mapped end
+    if isInjectedRes(catalogRes) then return catalogRes end
+    return 0
+end
+
+local function buildEquipSkinLists(resID)
+    resID = normalizeEquipCatalogRes(resID)
+    return {
+        mapEquipSkinRes(resID, 1),
+        mapEquipSkinRes(resID, 2),
+        mapEquipSkinRes(resID, 3),
+    }
+end
+
+local function ensureMatchEquipCache()
+    local cch = cache()
+    local eq = MATCH_CONFIG.equip or {}
+    if (not cch.equip.bag or cch.equip.bag <= 0) and eq.bag and eq.bag > 0 then
+        cch.equip.bag = eq.bag
+    end
+    if (not cch.equip.helmet or cch.equip.helmet <= 0) and eq.helmet and eq.helmet > 0 then
+        cch.equip.helmet = eq.helmet
+    end
+    if (not cch.equip.armor or cch.equip.armor <= 0) and eq.armor and eq.armor > 0 then
+        cch.equip.armor = eq.armor
+    end
+    if (not cch.equip.parachute or cch.equip.parachute <= 0) and eq.parachute and eq.parachute > 0 then
+        cch.equip.parachute = eq.parachute
+    end
+    if (not cch.equip.glider or cch.equip.glider <= 0) and eq.glider and eq.glider > 0 then
+        cch.equip.glider = eq.glider
+    end
+end
+
+local function syncMatchConfigFromCache()
+    local cch = cache()
+    if cch.outfitRes and cch.outfitRes > 0 then
+        MATCH_CONFIG.outfitRes = cch.outfitRes
+    else
+        MATCH_CONFIG.outfitRes = 0
+    end
+    MATCH_CONFIG.weaponSkins = MATCH_CONFIG.weaponSkins or {}
+    for wid, w in pairs(cch.weapons or {}) do
+        if w.resID and w.resID > 0 then
+            MATCH_CONFIG.weaponSkins[wid] = w.resID
+        end
+    end
+    MATCH_CONFIG.equip = MATCH_CONFIG.equip or {}
+    for _, slot in ipairs({ "bag", "helmet", "armor", "parachute", "glider" }) do
+        if cch.equip[slot] and cch.equip[slot] > 0 then
+            MATCH_CONFIG.equip[slot] = cch.equip[slot]
+        end
+    end
+end
+
+local function restorePersistedVehicles()
+    if not _G._addOutfitPersistLoaded then return end
+    pcall(function()
+        if _G._savedVehicleSlotList and DataMgr then
+            DataMgr.VehicleSlotList = DataMgr.VehicleSlotList or {}
+            for subType, insList in pairs(_G._savedVehicleSlotList) do
+                if insList and #insList > 0 then
+                    DataMgr.VehicleSlotList[subType] = insList
+                end
+            end
+        end
+    end)
+    pcall(function()
+        if _G._savedGarageVehicles then
+            local GTS = ModuleManager.GetModule(ModuleManager.LobbyModuleConfig.GarageThemeSystem)
+            if GTS then
+                GTS.GarageVehicleInfo = GTS.GarageVehicleInfo or {}
+                for slot, info in pairs(_G._savedGarageVehicles) do
+                    if info and info.inst_id then
+                        GTS.GarageVehicleInfo[slot] = info
+                    end
+                end
+            end
+        end
+    end)
+end
+
+local function restorePersistedMotions()
+    if not _G._addOutfitPersistLoaded then return end
+    pcall(function()
+        if not _G._savedMotionList or #_G._savedMotionList == 0 then return end
+        if not DataMgr then return end
+        DataMgr.MotionSlotList = {}
+        for i, ins in ipairs(_G._savedMotionList) do
+            DataMgr.MotionSlotList[i] = ins
+        end
+        if EventSystem and EVENTTYPE_MOTION and EVENTID_MOTION_UPDATE_SLOT_LIST then
+            EventSystem:postEvent(EVENTTYPE_MOTION, EVENTID_MOTION_UPDATE_SLOT_LIST)
+        end
+    end)
+end
+
+local function restorePersistedEquipIns()
+    if not _G._addOutfitPersistLoaded then return end
+    pcall(function()
+        if not DataMgr then return end
+        if _G._savedEquipIns then
+            DataMgr.equipmentSkinInsIDTable = DataMgr.equipmentSkinInsIDTable or {}
+            for subType, ins in pairs(_G._savedEquipIns) do
+                if ins and ins > 0 then
+                    DataMgr.equipmentSkinInsIDTable[subType] = ins
+                end
+            end
+        end
+        if _G._savedVstSkin and _G._savedVstSkin > 0 then
+            DataMgr.vst_skin = _G._savedVstSkin
+        end
+    end)
+end
+
+local function restorePersistedThrowObjects()
+    if not _G._addOutfitPersistLoaded then return end
+    pcall(function()
+        if not _G._savedThrowObjects then return end
+        local cch = cache()
+        cch.throwObjects = cch.throwObjects or {}
+        for st, info in pairs(_G._savedThrowObjects) do
+            if info.resID and info.resID > 0 then
+                cch.throwObjects[st] = info
+            end
+        end
+    end)
+end
+
+local GAME_HELMET_LEVEL = {
+    [502001] = 1, [502004] = 1,
+    [502002] = 2, [502005] = 2,
+    [502003] = 3,
+}
+local GAME_BAG_LEVEL = {
+    [501001] = 1, [501004] = 1,
+    [501002] = 2, [501005] = 2,
+    [501003] = 3,
+}
+
+local function detectEquipLevelFromBaseId(baseId, catalogResID)
+    baseId, catalogResID = tonumber(baseId), tonumber(catalogResID)
+    if not baseId or baseId <= 0 then return nil end
+    local level
+    pcall(function()
+        catalogResID = catalogResID and normalizeEquipCatalogRes(catalogResID) or catalogResID
+        if catalogResID then
+            local set = getEquipLevelSet(catalogResID)
+            if set then
+                if baseId == set.lv1 then level = 1
+                elseif baseId == set.lv2 then level = 2
+                elseif baseId == set.lv3 then level = 3 end
+            end
+            if not level then
+                local m = CDataTable.GetTableData("BackpackMapping", catalogResID)
+                if m then
+                    if tonumber(m.SkinItemIDLv1) == baseId then level = 1
+                    elseif tonumber(m.SkinItemIDLv2) == baseId then level = 2
+                    elseif tonumber(m.SkinItemIDLv3) == baseId then level = 3 end
+                end
+            end
+        end
+        if not level then
+            local patLevel, patCatalog = detectLevelFromPattern(baseId)
+            if patLevel and (not catalogResID or patCatalog == catalogResID) then
+                level = patLevel
+            end
+        end
+        if not level then level = GAME_HELMET_LEVEL[baseId] or GAME_BAG_LEVEL[baseId] end
+        if not level and baseId >= 1505000001 and baseId <= 1505000003 then
+            level = baseId - 1505000000
+        end
+        if not level then
+            pcall(function()
+                local BU = require("GameLua.Mod.BaseMod.GamePlay.Backpack.BackpackUtils")
+                if BU.GetEquipmentHelmetLevel then
+                    local hl = BU.GetEquipmentHelmetLevel(baseId)
+                    if hl and hl >= 1 and hl <= 3 then level = hl end
+                end
+                if not level and BU.GetEquipmentBagLevel then
+                    local bl = BU.GetEquipmentBagLevel(baseId)
+                    if bl and bl >= 1 and bl <= 3 then level = bl end
+                end
+            end)
+        end
+    end)
+    return level
+end
+
+local function isBaseEquipItemId(itemId)
+    itemId = tonumber(itemId)
+    if not itemId or itemId <= 0 then return false end
+    if GAME_HELMET_LEVEL[itemId] or GAME_BAG_LEVEL[itemId] then return true end
+    if itemId >= 1505000001 and itemId <= 1505000100 then return true end
+    if itemId >= 1501000000 and itemId < 1502000000 then return true end
+    if itemId >= 502001 and itemId <= 502999 then return true end
+    if itemId >= 501001 and itemId <= 501999 then return true end
+    return false
+end
+
+local function resolveMatchEquipSkin(catalogResID, baseItemID)
+    catalogResID = normalizeEquipCatalogRes(catalogResID)
+    if not catalogResID or catalogResID <= 0 then return 0 end
+    local level = detectEquipLevelFromBaseId(baseItemID, catalogResID) or 3
+    return mapEquipSkinRes(catalogResID, level)
+end
+
+local function getEquipDisplayLevel(resID, slot)
+    local wornLevel = detectLevelFromEquipRes(resID)
+    if wornLevel then return wornLevel end
+    pcall(function()
+        local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+        if slot == "bag" then wornLevel = fbd:GetBagLevel() or 3
+        elseif slot == "helmet" then wornLevel = fbd:GetHelmetLevel() or 3 end
+    end)
+    return wornLevel or 3
+end
+
+local function syncEquipLevelFromRes(resID, slot)
+    local level = detectLevelFromEquipRes(resID)
+    if not level then return end
+    pcall(function()
+        local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+        if slot == "helmet" then
+            fbd:SetHelmetLevel(level)
+        elseif slot == "bag" then
+            fbd:SetBagLevel(level)
+        end
+    end)
+end
+
+local function saveEquipSkin(resID, insID)
+    resID, insID = tonumber(resID), tonumber(insID)
+    if not resID then return end
+    local slot = getEquipSkinSlot(resID)
+    if not slot then return end
+    local cch = cache()
+    cch.equip[slot] = resID
+    if insID then cch.equip[slot .. "Ins"] = insID end
+    MATCH_CONFIG.equip = MATCH_CONFIG.equip or {}
+    MATCH_CONFIG.equip[slot] = resID
+    _S.matchApplied = false
+    invalidateSocialWearCache()
+    log("Equipment memory", slot, resID)
+    pcall(_AutoSaveOutfit)
+end
+
+local function saveClothPiece(resID)
+    resID = tonumber(resID)
+    if not resID then return end
+    local cch = cache()
+    cch.clothes[resID] = true
+    _S.matchApplied = false
+    invalidateSocialWearCache()
+    pcall(_AutoSaveOutfit)
+end
+
+local function clearClothesForKind(kind)
+    local clearMap = subTypesToClearForKind(kind)
+    if not clearMap then return end
+    local cch = cache()
+    for resID in pairs(cch.clothes) do
+        local st = subType(cfg(resID))
+        if st and clearMap[st] then cch.clothes[resID] = nil end
+    end
+    if kind == "full_suit" then
+        cch.outfitRes, cch.outfitIns = nil, nil
+    end
+end
+
+local function saveWeaponToCache(weaponID, resID, insID)
+    weaponID, resID, insID = tonumber(weaponID), tonumber(resID), tonumber(insID)
+    if not weaponID or not resID or resID <= 0 then return end
+    local cch = cache()
+    cch.weapons[weaponID] = { resID = resID, insID = insID or 0 }
+    _G.AddOutfitLastAppliedSkin = {}
+    _S.matchApplied = false
+    invalidateSocialWearCache()
+    log("A Memory of Dwelling", weaponID, "→", resID)
+    pcall(_AutoSaveOutfit)
+end
+
+local function cacheWeaponSkinFromIns(weaponID, insID)
+    weaponID, insID = tonumber(weaponID), tonumber(insID)
+    if not weaponID or not insID or insID <= 0 then return end
+    if isInjectedIns(insID) then
+        saveWeaponToCache(weaponID, R.insToRes[insID], insID)
+        return
+    end
+    pcall(function()
+        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+        local d = wd:GetValidHallDepotItemDataByInsID(insID) or wd:GetHallDepotItemDataByInsID(insID)
+        if d and d.resID and tonumber(d.resID) > 0 then
+            saveWeaponToCache(weaponID, tonumber(d.resID), insID)
+        end
+    end)
+end
+
+local function saveEquip(resID, insID)
+    resID, insID = tonumber(resID), tonumber(insID)
+    if not resID or not insID then return end
+    local c = cfg(resID)
+    local st = subType(c)
+    local kind = getClothKind(resID)
+    local cch = cache()
+    if kind == "full_suit" then
+        clearClothesForKind("full_suit")
+        cch.outfitRes, cch.outfitIns = resID, insID
+        _G.AddOutfitLastLobbyOutfitRes = resID
+        invalidateSocialWearCache()
+    elseif kind then
+        if cch.outfitRes and isFullSuitRes(cch.outfitRes) then
+            cch.outfitRes, cch.outfitIns = nil, nil
+            _G.AddOutfitLastLobbyOutfitRes = nil
+        end
+        clearClothesForKind(kind)
+        saveClothPiece(resID)
+    elseif getEquipSkinSlot(resID) then
+        saveEquipSkin(resID, insID)
+    elseif _K.GUN_SUB[st] then
+        local wid = weaponIdFromSkin(resID)
+        if not wid then
+            pcall(function()
+                local wgl = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+                wid = wgl.GetCurGunID and wgl:GetCurGunID() or nil
+                if not wid and wgl.GetCurrentGunID then
+                    wid = wgl:GetCurrentGunID()
+                end
+            end)
+        end
+        if wid then saveWeaponToCache(wid, resID, insID) end
+    elseif st == _K.MELEE_ID then
+        saveWeaponToCache(_K.MELEE_ID, resID, insID)
+    elseif isThrowObjectRes(resID) then
+        saveThrowObject(resID, insID)
+    elseif isInjectedRes(resID) then
+        local mt = wardrobeMainTab(resID)
+        if mt ~= _K.WARDROBE_PAGE_VEHICLE then
+            saveClothPiece(resID)
+        end
+    end
+    _S.matchApplied = false
+    pcall(_AutoSaveOutfit)
+end
+
+local _lastSyncWeaponCache = 0
+local function syncWeaponCacheFromLobby()
+    local now = 0
+    pcall(function() now = os.clock() end)
+    if (now - _lastSyncWeaponCache) < 0.3 then return end  
+    _lastSyncWeaponCache = now
+    local cch = cache()
+    pcall(function()
+        local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+        local bag = fbd.GetCurrentFashionBag and fbd:GetCurrentFashionBag()
+        if bag then
+            if bag.bag_skin and tonumber(bag.bag_skin) > 0 then
+                local rid = isInjectedIns(bag.bag_skin) and R.insToRes[bag.bag_skin] or (function()
+                    local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                    local d = wd:GetHallDepotItemDataByInsID(bag.bag_skin)
+                    return d and tonumber(d.resID)
+                end)()
+                if rid and isInjectedRes(rid) then cch.equip.bag = rid end
+            end
+            if bag.helmet_skin and tonumber(bag.helmet_skin) > 0 then
+                local rid = isInjectedIns(bag.helmet_skin) and R.insToRes[bag.helmet_skin] or (function()
+                    local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                    local d = wd:GetHallDepotItemDataByInsID(bag.helmet_skin)
+                    return d and tonumber(d.resID)
+                end)()
+                if rid and isInjectedRes(rid) then cch.equip.helmet = rid end
+            end
+            if bag.weapon_skin_list then
+                for weaponID, entry in pairs(bag.weapon_skin_list) do
+                    cacheWeaponSkinFromIns(weaponID, entry and (entry.skin_id or entry.skinId))
+                end
+            end
+        end
+    end)
+    pcall(function()
+        local Arm = require("client.logic.armory.logic_armory")
+        if Arm.rsp_list and Arm.rsp_list.install_list then
+            for weaponID, entry in pairs(Arm.rsp_list.install_list) do
+                cacheWeaponSkinFromIns(weaponID, entry and entry.skin_id)
+            end
+        end
+    end)
+    pcall(function()
+        if DataMgr and DataMgr.equipmentSkinInsIDTable then
+            local function ridFromIns(ins)
+                ins = tonumber(ins)
+                if not ins or ins <= 0 then return nil end
+                if isInjectedIns(ins) then return R.insToRes[ins] end
+                local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                local d = wd:GetHallDepotItemDataByInsID(ins)
+                return d and tonumber(d.resID)
+            end
+            local bagRid = ridFromIns(DataMgr.equipmentSkinInsIDTable[504])
+            if bagRid and isInjectedRes(bagRid) then cch.equip.bag = bagRid end
+            local helmRid = ridFromIns(DataMgr.equipmentSkinInsIDTable[505])
+            if helmRid and isInjectedRes(helmRid) then cch.equip.helmet = helmRid end
+            local armorRid = ridFromIns(DataMgr.equipmentSkinInsIDTable[506])
+            if armorRid and isInjectedRes(armorRid) then cch.equip.armor = armorRid end
+        end
+    end)
+end
+
+local _lastSyncClothesCache = 0
+local function syncClothesCacheFromLobby()
+    local now = 0
+    pcall(function() now = os.clock() end)
+    if (now - _lastSyncClothesCache) < 0.3 then return end  
+    _lastSyncClothesCache = now
+    local cch = cache()
+    pcall(function()
+        local inLobby = false
+        if GameStatus and GameStatus.IsInLobbyOrMainCity and GameStatus.IsInLobbyOrMainCity() then
+            inLobby = true
+        end
+
+        if inLobby and not _G._addOutfitPersistLoaded then
+            cch.outfitRes = nil
+            cch.outfitIns = nil
+            _G.AddOutfitLastLobbyOutfitRes = nil
+            cch.clothes = {}
+        end
+
+        local AvatarData = require("client.logic.data.AvatarData")
+        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+        for _, ins in pairs(AvatarData.GetRoleWear()) do
+            ins = tonumber(ins)
+            if ins and ins > 0 then
+                local resID = isInjectedIns(ins) and R.insToRes[ins] or (function()
+                    local d = wd:GetHallDepotItemDataByInsID(ins)
+                    return d and tonumber(d.resID)
+                end)()
+                if resID and isInjectedRes(resID) then
+                    if isFullSuitRes(resID) then
+                        cch.outfitRes, cch.outfitIns = resID, ins
+                        _G.AddOutfitLastLobbyOutfitRes = resID
+                    elseif not getEquipSkinSlot(resID) and not weaponIdFromSkin(resID) then
+                        cch.clothes[resID] = true
+                    elseif getEquipSkinSlot(resID) then
+                        local slot = getEquipSkinSlot(resID)
+                        cch.equip[slot] = resID
+                        cch.equip[slot .. "Ins"] = ins
+                    end
+                end
+            end
+        end
+
+        pcall(function()
+            local fashionbag_data = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+            local paraInsID = tonumber(fashionbag_data:GetParachute())
+            if paraInsID and paraInsID > 0 then
+                local paraResID
+                if isInjectedIns(paraInsID) then
+                    paraResID = R.insToRes[paraInsID]
+                else
+                    local d = wd:GetHallDepotItemDataByInsID(paraInsID)
+                    paraResID = d and tonumber(d.resID)
+                end
+                if paraResID and paraResID > 0 then
+                    cch.equip.parachute = paraResID
+                    cch.equip.parachuteIns = paraInsID
+                    MATCH_CONFIG.equip = MATCH_CONFIG.equip or {}
+                    MATCH_CONFIG.equip.parachute = paraResID
+                end
+            end
+        end)
+]]
+        
+        pcall(function()
+            local fashionbag_data = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+            local gliderInsID = tonumber(fashionbag_data:GetAircraftOrGliding())
+            if gliderInsID and gliderInsID > 0 then
+                local gliderResID
+                if isInjectedIns(gliderInsID) then
+                    gliderResID = R.insToRes[gliderInsID]
+                else
+                    local d = wd:GetHallDepotItemDataByInsID(gliderInsID)
+                    gliderResID = d and tonumber(d.resID)
+                end
+                if gliderResID and gliderResID > 0 then
+                    cch.equip.glider = gliderResID
+                    cch.equip.gliderIns = gliderInsID
+                    MATCH_CONFIG.equip = MATCH_CONFIG.equip or {}
+                    MATCH_CONFIG.equip.glider = gliderResID
+                end
+            end
+        end)
+    end)
+end
+
+local function syncClothesCacheFromLive()
+    local cch = cache()
+    pcall(function()
+        local AvatarData = require("client.logic.data.AvatarData")
+        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+        for _, ins in pairs(AvatarData.GetRoleWear()) do
+            ins = tonumber(ins)
+            if ins and ins > 0 then
+                local resID = isInjectedIns(ins) and R.insToRes[ins] or (function()
+                    local d = wd:GetHallDepotItemDataByInsID(ins)
+                    return d and tonumber(d.resID)
+                end)()
+                if resID and isInjectedRes(resID) then
+                    if isFullSuitRes(resID) then
+                        cch.outfitRes, cch.outfitIns = resID, ins
+                        _G.AddOutfitLastLobbyOutfitRes = resID
+                    elseif not getEquipSkinSlot(resID) and not weaponIdFromSkin(resID) then
+                        cch.clothes[resID] = true
+                    else
+                        local slot = getEquipSkinSlot(resID)
+                        if slot then
+                            cch.equip[slot] = resID
+                            cch.equip[slot .. "Ins"] = ins
+                        end
+                    end
+                end
+            end
+        end
+        pcall(function()
+            local fashionbag_data = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+            
+            local paraInsID = tonumber(fashionbag_data:GetParachute())
+            if paraInsID and paraInsID > 0 then
+                local paraResID = isInjectedIns(paraInsID) and R.insToRes[paraInsID] or (function()
+                    local d = wd:GetHallDepotItemDataByInsID(paraInsID)
+                    return d and tonumber(d.resID)
+                end)()
+                if paraResID and paraResID > 0 then
+                    cch.equip.parachute = paraResID
+                    cch.equip.parachuteIns = paraInsID
+                end
+            end
+            ]]
+            local gliderInsID = tonumber(fashionbag_data:GetAircraftOrGliding())
+            if gliderInsID and gliderInsID > 0 then
+                local gliderResID = isInjectedIns(gliderInsID) and R.insToRes[gliderInsID] or (function()
+                    local d = wd:GetHallDepotItemDataByInsID(gliderInsID)
+                    return d and tonumber(d.resID)
+                end)()
+                if gliderResID and gliderResID > 0 then
+                    cch.equip.glider = gliderResID
+                    cch.equip.gliderIns = gliderInsID
+                end
+            end
+        end)
+    end)
+end
+
+local function syncThrowObjectCacheFromLobby()
+    local cch = cache()
+    pcall(function()
+        local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+        local bag = fbd.GetCurrentFashionBag and fbd:GetCurrentFashionBag()
+        if not bag or not bag.throw_object_list then return end
+        cch.throwObjects = cch.throwObjects or {}
+        for subType, insID in pairs(bag.throw_object_list) do
+            insID = tonumber(insID)
+            subType = tonumber(subType)
+            if insID and insID > 0 and subType and _K.THROW_SUB[subType] then
+                local resID
+                if isInjectedIns(insID) then
+                    resID = R.insToRes[insID]
+                else
+                    local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                    local d = wd:GetHallDepotItemDataByInsID(insID)
+                    resID = d and tonumber(d.resID)
+                end
+                if resID and isInjectedRes(resID) then
+                    cch.throwObjects[subType] = { resID = resID, insID = insID }
+                end
+            end
+        end
+    end)
+end
+
+local function syncAllCacheFromLive()
+    syncWeaponCacheFromLobby()
+    syncClothesCacheFromLive()
+    syncThrowObjectCacheFromLobby()
+    ensureMatchEquipCache()
+    syncMatchConfigFromCache()
+end
+
+_G.AddOutfitSyncCacheBeforeSave = syncAllCacheFromLive
+
+local function snapshotLobbyWear()
+    syncWeaponCacheFromLobby()
+    syncClothesCacheFromLobby()
+    syncThrowObjectCacheFromLobby()
+    ensureMatchEquipCache()
+end
+
+local function getCachedWeaponSkin(weaponID)
+    weaponID = tonumber(weaponID) or 0
+    if weaponID <= 0 then return nil end
+    syncWeaponCacheFromLobby()
+    local w = cache().weapons[weaponID]
+    if w and w.resID and w.resID > 0 then return w.resID end
+        return nil
+    end
+
+local function getMatchWeaponSkin(weaponID)
+    weaponID = tonumber(weaponID) or 0
+    local fromCache = getCachedWeaponSkin(weaponID)
+    if fromCache then return fromCache end
+    if MATCH_CONFIG.weaponSkins then
+        local fixed = tonumber(MATCH_CONFIG.weaponSkins[weaponID])
+        if fixed and fixed > 0 then return fixed end
+    end
+    return nil
+end
+
+local _ticker
+pcall(function() _ticker = require("common.time_ticker") end)
+local function later(sec, fn)
+    if _G.SetTimer then pcall(_G.SetTimer, sec, fn) return end
+    if _ticker and _ticker.AddTimer then pcall(_ticker.AddTimer, sec, fn) end
+end
+
+local function getEntity()
+    local ok, dc = pcall(require, "client.slua.logic.wardrobe.logic_wardrobe_data_center")
+        if not ok or not dc then return nil end
+        local ok2, e = pcall(dc.GetWardrobeData, EWardrobeDataSource and EWardrobeDataSource.Wardrobe or nil)
+        if ok2 and e then return e end
+        ok2, e = pcall(dc.GetWardrobeData)
+        return ok2 and e or nil
+    end
+
+    local function alreadyHave(entity, resID)
+        local arr = entity.ResIDToIndexArrayMap and entity.ResIDToIndexArrayMap[resID]
+        if not arr then return false end
+        for _, idx in pairs(arr) do
+            local d = entity._data[idx]
+            if d and d.count and d.count > 0 then return true end
+        end
+        return false
+    end
+
+    local function ensureDepotTabFields(entity, data, resID)
+        if not data then return end
+        pcall(function()
+            if entity and entity.LoadConfigForData and CDataTable.GetTableData then
+                entity:LoadConfigForData(data, CDataTable.GetTableData)
+            end
+        end)
+        local equipSlot = getEquipSkinSlot(resID)
+        if equipSlot == "bag" then
+            data.mainTabType = _K.WARDROBE_PAGE_AVATAR
+            data.subTabType = _K.WARDROBE_TAB_BAG
+        elseif equipSlot == "helmet" then
+            data.mainTabType = _K.WARDROBE_PAGE_AVATAR
+            data.subTabType = _K.WARDROBE_TAB_HELMET
+        elseif equipSlot == "armor" then
+            data.mainTabType = _K.WARDROBE_PAGE_AVATAR
+            data.subTabType = _K.WARDROBE_TAB_ARMOR
+        end
+        local c = cfg(resID)
+        if c then data.itemSubType = tonumber(c.ItemSubType or c.itemSubType) or data.itemSubType end
+        if c then
+            local wmTab = tonumber(c.WardrobeMainTab or c.wardrobeMainTab) or 0
+            if wmTab == _K.WARDROBE_PAGE_VEHICLE then
+                data.mainTabType = _K.WARDROBE_PAGE_VEHICLE
+                data.subTabType = tonumber(c.WardrobeTab or c.wardrobeTab) or data.subTabType
+            end
+        end
+    end
+
+    local function depotResID(v)
+        return v and tonumber(v.resID or v.res_id) or nil
+    end
+
+    local function injectedEquipAllowed(resID, mainTab, subTab)
+        local slot = getEquipSkinSlot(resID)
+        if slot == "bag" then
+            return mainTab == _K.WARDROBE_PAGE_AVATAR and subTab == _K.WARDROBE_TAB_BAG
+        end
+        if slot == "helmet" then
+            return mainTab == _K.WARDROBE_PAGE_AVATAR and subTab == _K.WARDROBE_TAB_HELMET
+        end
+        if slot == "armor" then
+            return mainTab == _K.WARDROBE_PAGE_AVATAR and subTab == _K.WARDROBE_TAB_ARMOR
+        end
+        if slot == "parachute" then
+            return mainTab == _K.WARDROBE_PAGE_PARACHUTE and subTab == _K.WARDROBE_TAB_PARACHUTE
+        end
+        if slot == "glider" then
+            return mainTab == _K.WARDROBE_PAGE_PARACHUTE and subTab == _K.WARDROBE_TAB_GLIDER
+        end
+        return nil
+    end
+
+    local function injectOne(entity, resID, insID)
+        if alreadyHave(entity, resID) then
+            R.resToIns[resID] = R.resToIns[resID] or insID
+            R.insToRes[insID] = resID
+            pcall(function()
+                local data = entity.GetDataByInsID and entity:GetDataByInsID(R.resToIns[resID])
+                if data then ensureDepotTabFields(entity, data, resID) end
+            end)
+            return true
+        end
+        entity:AddData({
+            instid = insID, res_id = resID, count = 1,
+            lock_cnt = 0, isnew = 0, valid_hours = 0, expire_ts = 0,
+        })
+        pcall(function()
+            local data = entity.GetDataByInsID and entity:GetDataByInsID(insID)
+            if data then
+                ensureDepotTabFields(entity, data, resID)
+            end
+        end)
+        R.insToRes[insID] = resID
+        R.resToIns[resID] = insID
+        return true
+    end
+
+    local function injectArmory(resID, insID)
+        local wid = weaponIdFromSkin(resID)
+            if not wid then return end
+            local Arm = require("client.logic.armory.logic_armory")
+            Arm.rsp_list = Arm.rsp_list or { skin_list = {}, install_list = {} }
+            Arm.rsp_list.skin_list = Arm.rsp_list.skin_list or {}
+            if not Arm.rsp_list.skin_list[wid] then Arm.rsp_list.skin_list[wid] = {} end
+            Arm.rsp_list.skin_list[wid][resID] = { is_open = 1 }
+            Arm.WardrobeInsList = Arm.WardrobeInsList or {}
+            Arm.WardrobeInsList[resID] = insID
+        end
+
+        local function injectAll(entity)
+            if _S.injectedDone then return true end
+            refreshItems()
+            entity = entity or getEntity()
+            if not entity or not entity.bInit then return false end
+
+            if next(_C.fullSuit) == nil then
+                pcall(function()
+                    for _, rid in ipairs(ITEMS) do
+                        local c = cfg(rid)
+                        if c then
+                            local st = tonumber(c.ItemSubType or c.itemSubType) or 0
+                            if st == _K.ST_TOP then
+                                local tab = tonumber(c.WardrobeTab or c.wardrobeTab) or 0
+                                if tab == _K.WARDROBE_TAB_SUIT then
+                                    _C.fullSuit[rid] = true
+                                else
+                                    pcall(function()
+                                        local LogicXSuit = require("client.slua.logic.XSuit.logic_xsuit")
+                                        if LogicXSuit.IsXSuit(rid) then _C.fullSuit[rid] = true end
+                                    end)
+                                end
+                            end
+                            local wmTab = tonumber(c.WardrobeMainTab or c.wardrobeMainTab) or 0
+                            if wmTab == _K.WARDROBE_PAGE_VEHICLE then
+                                _C.vehicleItems[#_C.vehicleItems + 1] = rid
+                            end
+                        end
+                        getEquipSkinSlot(rid)
+                        weaponIdFromSkin(rid)
+                    end
+                    for _, rid in ipairs(ITEMS) do
+                        getInjectedItemTab(rid)
+                    end
+                    local allTabs = {
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_SUIT},
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_CLOTHES},
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_TROUSERS},
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_SHOES},
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_BAG},
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_HELMET},
+                        {_K.WARDROBE_PAGE_AVATAR, _K.WARDROBE_TAB_ARMOR},
+                        {_K.WARDROBE_PAGE_WEAPON, _K.WARDROBE_TAB_GUN},
+                        {_K.WARDROBE_PAGE_PARACHUTE, _K.WARDROBE_TAB_PARACHUTE},
+                        {_K.WARDROBE_PAGE_PARACHUTE, _K.WARDROBE_TAB_GLIDER},
+                        {_K.WARDROBE_PAGE_VEHICLE, 0},
+                    }
+                    
+                    for k in pairs(_C.pageMatch) do _C.pageMatch[k] = nil end
+                end)
+            end
+
+            local n = 0
+            for i, resID in ipairs(ITEMS) do
+                local insID = _K.INS_BASE + i
+                if injectOne(entity, resID, insID) then
+                    n = n + 1
+                    local c = cfg(resID)
+                    if _K.GUN_SUB[subType(c)] or subType(c) == _K.MELEE_ID then
+                        injectArmory(resID, insID)
+                    end
+                end
+            end
+            if n > 0 then
+                _S.injectedDone = true
+                _G.AddOutfit_R = R
+                log("injection", n, "items")
+            end
+            return n > 0
+        end
+
+        local function injectAllSources()
+            return injectAll(getEntity())
+        end
+
+        local function refreshWardrobe()
+            pcall(function()
+                if EventSystem and EVENTTYPE_WARDROBE then
+                    if EVENTID_WARDROBE_UPDATE_ITEM_LIST then
+                        EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_ITEM_LIST)
+                    end
+                    if EVENTID_WARDROBE_UPDATE_AVATAR_LIST then
+                        EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_AVATAR_LIST)
+                    end
+                    if EVENTID_WARDROBE_UPDATE_GUN_LIST then
+                        EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_GUN_LIST, -1)
+                    end
+                end
+            end)
+        end
+
+        local function findWornInsBySubType(st)
+            st = tonumber(st)
+            if not st then return nil end
+            local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+            local AvatarData = require("client.logic.data.AvatarData")
+            for _, ins in pairs(AvatarData.GetRoleWear()) do
+                ins = tonumber(ins)
+                if ins and ins > 0 then
+                    local d = wd:GetHallDepotItemDataByInsID(ins)
+                    if d and tonumber(d.itemSubType) == st then
+                        return ins, d.resID
+                    end
+                end
+            end
+            return nil
+        end
+
+        local function removeRoleWearBySubTypes(stMap)
+            if not stMap then return end
+            local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+            local AvatarData = require("client.logic.data.AvatarData")
+            for _, ins in pairs(AvatarData.GetRoleWear()) do
+                ins = tonumber(ins)
+                if ins and ins > 0 then
+                    local d = wd:GetHallDepotItemDataByInsID(ins)
+                    if d and stMap[tonumber(d.itemSubType)] then
+                        AvatarData.RemoveRoleWearDataByValue(ins)
+                    end
+                end
+            end
+        end
+
+        local function clearFashionBagSlots(stMap)
+            if not stMap then return end
+            pcall(function()
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                local wfu = require("client.slua.logic.wardrobe.fashionbag.wardrobe_fashion_utils")
+                local bag = fbd.GetCurrentFashionBag and fbd:GetCurrentFashionBag()
+                if not bag or not bag.rolewear_list then return end
+                for st, _ in pairs(stMap) do
+                    local idx = wfu.GetRoleWearIndexBySubType and wfu:GetRoleWearIndexBySubType(st)
+                    if idx then bag.rolewear_list[idx] = 0 end
+                end
+            end)
+        end
+
+        local function syncFashionBagRolewear()
+            pcall(function()
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                fbd:SaveRolewearToFashionBag(fbd:GetFashionBagUseIndex())
+            end)
+        end
+
+        local function ensureKnapsackExtInfo()
+            pcall(function()
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                local idx = fbd:GetFashionBagUseIndex()
+                if not fbd:GetKnapsackExtInfoByIndex(idx) then
+                    fbd:SetKnapsackExtInfoByIndex(idx, {})
+                end
+            end)
+        end
+
+        local function getEquipSubType(resID, slot)
+            local c = cfg(resID)
+            if c then
+                local st = tonumber(c.ItemSubType or c.itemSubType)
+                if st then return st end
+            end
+            if slot == "bag" then return ENUM_ITEM_SUBTYPE.Backpack end
+            if slot == "helmet" then return ENUM_ITEM_SUBTYPE.Helmet_NoLevel end
+            return nil
+        end
+
+        local function softRemoveEquipVisual(oldResID, slot)
+            oldResID = normalizeEquipCatalogRes(oldResID)
+            if not oldResID or oldResID <= 0 or not slot then return end
+            pcall(function()
+                local TAM = require("client.logic.avatar.logic_team_avatar_manager")
+                local AvatarData = require("client.logic.data.AvatarData")
+                for lvl = 1, 3 do
+                    local displayRes = mapEquipSkinRes(oldResID, lvl)
+                    if displayRes > 0 then
+                        TAM.ChangeAvatarEquipment(tostring(DataMgr.roleData.uid),
+                            AvatarData.CreateAvatarCustom(displayRes), false)
+                    end
+                end
+            end)
+        end
+
+        local function applyEquipVisual(resID, insID, slot)
+            pcall(function()
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                local HT = require("client.logic.lobby.hall_theme_utils")
+                local TAM = require("client.logic.avatar.logic_team_avatar_manager")
+                local AvatarData = require("client.logic.data.AvatarData")
+                local lds = require("client.slua.logic.wardrobe.logic_display_setting")
+                local lav = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                syncEquipLevelFromRes(resID, slot)
+                local level = getEquipDisplayLevel(resID, slot)
+                local catalogRes = normalizeEquipCatalogRes(resID)
+                local itemSt = getEquipSubType(catalogRes, slot)
+                if itemSt then lav:AddToWearInfo(itemSt, insID, catalogRes, 0, 0) end
+                lav:AvatarChange(catalogRes, true)
+                local displayRes = mapEquipSkinRes(catalogRes, level)
+                if displayRes > 0 then
+                    TAM.ChangeAvatarEquipment(tostring(DataMgr.roleData.uid),
+                        AvatarData.CreateAvatarCustom(displayRes), true)
+                end
+                if lds.data then
+                    if slot == "bag" then lds.data.OpenBag = true end
+                    if slot == "helmet" then lds.data.OpenHelmet = true end
+                end
+                if slot == "helmet" then
+                    fbd:SetHeadShow(insID)
+                    local WRH = require("client.network.Protocol.WardRobeHandler")
+                    WRH.send_depot_set_head_show_req(insID)
+                end
+                if slot == "bag" then HT.PutOnBag(fbd:GetFashionBagUseIndex()) end
+            end)
+        end
+
+        local takeOffEquipSkinVisual, takeOffClothVisual, takeOffWeaponSkinVisual
+
+        local function takeOffItem(insID)
+            insID = tonumber(insID)
+            if not insID or insID <= 0 then return false end
+            local resID = R.insToRes[insID]
+            if not resID then return false end
+
+            local cch = cache()
+            local kind = getClothKind(resID)
+            local slot = getEquipSkinSlot(resID)
+            local wid  = weaponIdFromSkin(resID)
+            local handled = false
+
+            if slot then
+                local oldRes = cch.equip[slot] or resID
+                takeOffEquipSkinVisual(slot, oldRes, insID)
+                cch.equip[slot]          = nil
+                cch.equip[slot .. "Ins"] = nil
+                if MATCH_CONFIG.equip then MATCH_CONFIG.equip[slot] = 0 end
+                handled = true
+            elseif kind then
+                takeOffClothVisual(resID, insID, kind)
+                if kind == "full_suit" then
+                    cch.outfitRes, cch.outfitIns = nil, nil
+                    _G.AddOutfitLastLobbyOutfitRes = nil
+                else
+                    cch.clothes[resID] = nil
+                end
+                handled = true
+            elseif wid then
+                takeOffWeaponSkinVisual(wid, resID, insID)
+                cch.weapons[wid] = nil
+                _G.AddOutfitLastAppliedSkin = {}
+                _S.weaponApplied = false
+                _S.weaponDiagDone = false
+                _S.lastAppliedWeaponID = 0
+                _S.lastAppliedSkinID = 0
+                buildSkinMappings()
+                handled = true
+            elseif isHallThemeRes(resID) then
+                pcall(function()
+                    local HT = require("client.logic.lobby.hall_theme_utils")
+                    HT.homeThemeItemId = 0
+                    HT.SetThemeInstId(0)
+                    local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                    local idx = fbd:GetFashionBagUseIndex()
+                    local bag = fbd:GetCurrentFashionBag()
+                    if bag and bag.avatar_show then
+                        bag.avatar_show[HT.knapsack_ext_background] = nil
+                    end
+                end)
+                handled = true
+            end
+
+            if not handled then return false end
+
+            _S.matchApplied = false
+            _S.matchOutfitDone = false
+            invalidateSocialWearCache()
+            pcall(_AutoSaveOutfit)
+            return true
+        end
+
+        takeOffEquipSkinVisual = function(slot, resID, insID)
+            if not slot then return end
+            resID, insID = tonumber(resID), tonumber(insID)
+            if _S.equipSkinApplying then return end
+            _S.equipSkinApplying = true
+            pcall(function()
+                if resID and resID > 0 then softRemoveEquipVisual(resID, slot) end
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                local lds = require("client.slua.logic.wardrobe.logic_display_setting")
+                local lav = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                local HT = require("client.logic.lobby.hall_theme_utils")
+                local itemSt = resID and getEquipSubType(resID, slot)
+                if itemSt and insID and insID > 0 then
+                    pcall(function() lav:SetCurrentWearPreview(itemSt, nil) end)
+                end
+                if slot == "bag" then
+                    fbd:SetBagSkin(0)
+                    if lds.data then lds.data.OpenBag = false end
+                    HT.PutOnBag(fbd:GetFashionBagUseIndex())
+                elseif slot == "helmet" then
+                    fbd:SetHelmetSkin(0)
+                    if lds.data then lds.data.OpenHelmet = false end
+                    fbd:SetHeadShow(0)
+                elseif slot == "armor" then
+                    pcall(function()
+                        local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                        wl:on_putdown_rsp(_K.NET_OK, { res_id = resID or 0, instid = insID or 0, count = 1 }, nil)
+                    end)
+                end
+                if DataMgr and DataMgr.equipmentSkinInsIDTable then
+                    local subKey = (slot == "bag") and 504 or (slot == "helmet") and 505 or (slot == "armor") and 506
+                    if subKey then DataMgr.equipmentSkinInsIDTable[subKey] = 0 end
+                end
+                syncFashionBagRolewear()
+            end)
+            _S.equipSkinApplying = false
+        end
+
+        takeOffClothVisual = function(resID, insID, kind)
+            resID, insID = tonumber(resID), tonumber(insID)
+            if not resID or not insID then return end
+            kind = kind or getClothKind(resID)
+            local clearMap = subTypesToClearForKind(kind)
+            if not clearMap then return end
+            pcall(function()
+                removeRoleWearBySubTypes(clearMap)
+                clearFashionBagSlots(clearMap)
+                local WRH = require("client.network.Protocol.WardRobeHandler")
+                WRH.on_depot_put_down_rsp(_K.NET_OK, { res_id = resID, count = 1, instid = insID }, nil)
+                local av = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                local TAM = require("client.logic.avatar.logic_team_avatar_manager")
+                local AvatarData = require("client.logic.data.AvatarData")
+                local uid = tostring(DataMgr.roleData.uid)
+                local itemSt = subType(cfg(resID)) or _K.ST_TOP
+                if kind == "full_suit" then
+                    itemSt = _K.ST_TOP
+                    for st in pairs(clearMap) do
+                        local oIns, oRes = findWornInsBySubType(st)
+                        if oIns and oRes and oRes > 0 then
+                            TAM.ChangeAvatarEquipment(uid, AvatarData.CreateAvatarCustom(oRes), false)
+                        end
+                    end
+                end
+                TAM.ChangeAvatarEquipment(uid, AvatarData.CreateAvatarCustom(resID), false)
+                pcall(function() AvatarData.RemoveRoleWearDataByValue(insID) end)
+                pcall(function() av:SetCurrentWearPreview(itemSt, nil) end)
+                later(0.05, function()
+                    pcall(function() av:ProcessTakeOff() end)
+                    syncFashionBagRolewear()
+                    pcall(function()
+                        local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                        wl:on_putdown_rsp(_K.NET_OK, { res_id = resID, instid = insID, count = 1 }, nil)
+                    end)
+                    if av.InitCurrentWearPreviewMap then av:InitCurrentWearPreviewMap(true) end
+                end)
+            end)
+        end
+
+        takeOffWeaponSkinVisual = function(weaponID, resID, insID)
+            weaponID, resID, insID = tonumber(weaponID), tonumber(resID), tonumber(insID)
+            if not weaponID then return end
+            pcall(function()
+                local Arm = require("client.logic.armory.logic_armory")
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                local HT = require("client.logic.lobby.hall_theme_utils")
+                local wgl = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+                
+                if Arm.rsp_list and Arm.rsp_list.install_list then
+                    Arm.rsp_list.install_list[weaponID] = nil
+                end
+                
+                if fbd.UpdateCurrentFashionBagWeaponSkin then
+                    fbd:UpdateCurrentFashionBagWeaponSkin(weaponID, 0)
+                end
+                local bag = fbd.GetCurrentFashionBag and fbd:GetCurrentFashionBag()
+                if bag and bag.weapon_skin_list then
+                    bag.weapon_skin_list[weaponID] = nil
+                end
+
+                local bagIdx = fbd:GetFashionBagUseIndex()
+                HT.proc_skin_list_chg("weapon_skin", weaponID, 0, bagIdx, {})
+                wgl:SetGunID(weaponID)
+                if wgl.UpdateCurrentGunAvatar then
+                    wgl:UpdateCurrentGunAvatar(weaponID, 0)
+                end
+
+                if EventSystem and EVENTTYPE_ARMORY and EVENTID_ARMORY_EQUIP_STAT_CHANGE then
+                    EventSystem:postEvent(EVENTTYPE_ARMORY, EVENTID_ARMORY_EQUIP_STAT_CHANGE, 0)
+                end
+                if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN then
+                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN, 0)
+                end
+                if EventSystem and EVENTID_WARDROBE_UPDATE_GUN_LIST then
+                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_GUN_LIST, weaponID)
+                end
+                log("Removing the weapon", weaponID)
+            end)
+        end
+
+        local function putOnThrowObject(insID)
+            insID = tonumber(insID)
+            if not insID or not isInjectedIns(insID) then return end
+            local resID = R.insToRes[insID]
+            if not resID then return end
+            local st = isThrowObjectRes(resID)
+            if not st then return end
+            pcall(function()
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                fbd:PutOnThrowObjectSkin(insID)
+            end)
+            saveThrowObject(resID, insID)
+            pcall(_AutoSaveOutfit)
+            log("Wearing a bomb", st, resID)
+        end
+
+        local function putOnEquipSkin(insID)
+            insID = tonumber(insID)
+            local resID = R.insToRes[insID]
+            if not resID then return end
+            local slot = getEquipSkinSlot(resID)
+            if not slot then return end
+            if _S.equipSkinApplying then return end
+            _S.equipSkinApplying = true
+            pcall(function()
+                local cch = cache()
+                local oldResID = cch.equip[slot]
+                local oldInsID = cch.equip[slot .. "Ins"]
+                ensureKnapsackExtInfo()
+                local item = { res_id = resID, instid = insID, count = 1, color = 0, pattern = 0 }
+                local oldItem = nil
+                if oldInsID and oldInsID > 0 and oldResID and oldResID > 0 then
+                    oldItem = { res_id = oldResID, instid = oldInsID, count = 1, color = 0, pattern = 0 }
+                end
+                local HT = require("client.logic.lobby.hall_theme_utils")
+                if slot == "helmet" then
+                    HT.ProcPutOnHelmet(item, oldItem)
+                elseif slot == "bag" then
+                    HT.ProcPutOnBagSkin(item, oldItem)
+                elseif slot == "parachute" then
+                    local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                    local lav = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                    local origAddToWearInfo = lav.AddToWearInfo
+                    lav.AddToWearInfo = function(self2, subType, ...)
+                        if tonumber(subType) == 701 then return end
+                        return origAddToWearInfo(self2, subType, ...)
+                    end
+                    pcall(function()
+                        wl:on_puton_rsp(_K.NET_OK, item, oldItem, 1, insID, 0)
+                    end)
+                    lav.AddToWearInfo = origAddToWearInfo
+                elseif slot == "glider" then
+                    local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                    local lav = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                    local origAddToWearInfo = lav.AddToWearInfo
+                    lav.AddToWearInfo = function(self2, subType, ...)
+                        local st = tonumber(subType)
+                        if st == 413 or st == 414 or st == 415 then return end
+                        return origAddToWearInfo(self2, subType, ...)
+                    end
+                    pcall(function()
+                        wl:on_puton_rsp(_K.NET_OK, item, oldItem, 1, insID, 0)
+                    end)
+                    lav.AddToWearInfo = origAddToWearInfo
+                else
+                    local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                    wl:on_puton_rsp(_K.NET_OK, item, oldItem, 1, insID, 0)
+                end
+                saveEquipSkin(resID, insID)
+                if oldResID and oldResID > 0 and oldResID ~= resID then
+                    softRemoveEquipVisual(oldResID, slot)
+                end
+
+                if slot ~= "parachute" and slot ~= "glider" then
+                    applyEquipVisual(resID, insID, slot)
+                end
+                invalidateSocialWearCache()
+                log("Putting on gear", slot, resID)
+            end)
+            _S.equipSkinApplying = false
+        end
+
+        local function putOnCloth(insID)
+            insID = tonumber(insID)
+            local resID = R.insToRes[insID]
+            if not resID then return end
+            local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+            local d = wd:GetHallDepotItemDataByInsID(insID)
+            if not d then return end
+
+            local kind = getClothKind(resID, d)
+            if not kind then return end
+
+            local cch = cache()
+            local switchingFromSuit = (kind ~= "full_suit") and cch.outfitRes and isFullSuitRes(cch.outfitRes)
+            local switchingToSuit = (kind == "full_suit") and not cch.outfitRes and next(cch.clothes) ~= nil
+
+            local clearMap
+            if switchingFromSuit then
+                clearMap = FULL_SUIT_CLEAR_ST
+            else
+                clearMap = subTypesToClearForKind(kind)
+            end
+            if not clearMap then return end
+
+            local itemSt = subType(cfg(resID)) or _K.ST_TOP
+
+            local function doPutOn()
+                local oldIns, oldRes = findWornInsBySubType(itemSt)
+                removeRoleWearBySubTypes(clearMap)
+                clearFashionBagSlots(clearMap)
+                saveEquip(resID, insID)
+
+                local slot = _K.PKG_SLOT
+                pcall(function()
+                    local wfu = require("client.slua.logic.wardrobe.fashionbag.wardrobe_fashion_utils")
+                    local idx = wfu.GetRoleWearIndexBySubType and wfu:GetRoleWearIndexBySubType(itemSt)
+                    if idx then slot = idx end
+                end)
+
+                local olditem
+                if oldIns and oldIns ~= insID then
+                    olditem = { res_id = oldRes or R.insToRes[oldIns], count = 1, instid = oldIns }
+                end
+
+                local WRH = require("client.network.Protocol.WardRobeHandler")
+                local item = { res_id = resID, count = 1, instid = insID }
+                WRH.on_depot_put_on_rsp(_K.NET_OK, item, olditem, slot, insID, oldIns or 0)
+
+                pcall(function()
+                    local av = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                    av:AddToWearInfo(itemSt, insID, resID, 0, 0)
+                    local displayResID = resID
+                    local LogicXSuit = require("client.slua.logic.XSuit.logic_xsuit")
+                    if LogicXSuit.IsXSuit(displayResID) then
+                        displayResID = LogicXSuit.GetItemShowID(insID) or displayResID
+                    end
+                    av:AvatarChange(displayResID, true, 0, 0)
+                    later(0.05, function()
+                        pcall(function() av:ProcessTakeOff() end)
+                        syncFashionBagRolewear()
+                    end)
+                end)
+                log("clothes", kind, resID)
+            end
+
+            if switchingFromSuit then
+                local suitRes = cch.outfitRes
+                local suitIns = cch.outfitIns
+                cch.outfitRes, cch.outfitIns = nil, nil
+                _G.AddOutfitLastLobbyOutfitRes = nil
+                if suitRes and suitIns then
+                    pcall(function() takeOffClothVisual(suitRes, suitIns, "full_suit") end)
+                    later(0.15, doPutOn)
+                else
+                    doPutOn()
+                end
+            elseif switchingToSuit then
+                local toTakeOff = {}
+                for clothRes in pairs(cch.clothes) do
+                    local clothIns = R.resToIns[clothRes]
+                    local clothKind = getClothKind(clothRes)
+                    if clothIns and clothKind then
+                        toTakeOff[#toTakeOff + 1] = { resID = clothRes, insID = clothIns, kind = clothKind }
+                    end
+                end
+                for _, c in ipairs(toTakeOff) do
+                    cch.clothes[c.resID] = nil
+                    pcall(function() takeOffClothVisual(c.resID, c.insID, c.kind) end)
+                end
+                later(0.15, doPutOn)
+            else
+                doPutOn()
+            end
+        end
+
+        local function equipWeaponSkin(weaponID, insID)
+            weaponID, insID = tonumber(weaponID), tonumber(insID)
+            if not weaponID or not insID or not isInjectedIns(insID) then return end
+            local resID = R.insToRes[insID]
+            saveEquip(resID, insID)
+
+            local Arm = require("client.logic.armory.logic_armory")
+            local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+            local HT = require("client.logic.lobby.hall_theme_utils")
+            local wgl = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+
+            injectArmory(resID, insID)
+            Arm.rsp_list.install_list = Arm.rsp_list.install_list or {}
+            Arm.rsp_list.install_list[weaponID] = { skin_id = insID }
+            if fbd.UpdateCurrentFashionBagWeaponSkin then
+                fbd:UpdateCurrentFashionBagWeaponSkin(weaponID, insID)
+            end
+
+            local bagIdx = fbd:GetFashionBagUseIndex()
+            HT.proc_skin_list_chg("weapon_skin", weaponID, insID, bagIdx, {})
+
+            wgl:SetGunID(weaponID)
+            wgl:UpdateCurrentGunAvatar(weaponID, insID)
+
+            if EventSystem and EVENTTYPE_ARMORY and EVENTID_ARMORY_EQUIP_STAT_CHANGE then
+                EventSystem:postEvent(EVENTTYPE_ARMORY, EVENTID_ARMORY_EQUIP_STAT_CHANGE, resID)
+            end
+            if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN then
+                EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN, resID)
+            end
+            log("Weapon Housing", weaponID, resID, insID)
+        end
+
+        local function putOnHallTheme(insID)
+            insID = tonumber(insID)
+            if not insID or not isInjectedIns(insID) then return end
+            local resID = R.insToRes[insID]
+            if not resID or not isHallThemeRes(resID) then return end
+            local item = { res_id = resID, count = 1, instid = insID }
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                wl:on_puton_rsp(_K.NET_OK, item, nil, 1, insID, 0)
+            end)
+            pcall(_AutoSaveOutfit)
+            log("Theme Loop", resID, insID)
+        end
+
+        local function restorePersistedHallTheme()
+            if not _G._addOutfitPersistLoaded then return end
+            local ins = tonumber(_G._savedHallThemeIns)
+            if not ins or ins <= 0 then return end
+            later(2.5, function()
+                if isInjectedIns(ins) then putOnHallTheme(ins) end
+            end)
+        end
+
+        local SOCIAL = _G.AddOutfitSocialState or {}
+        _G.AddOutfitSocialState = SOCIAL
+        SOCIAL.debGen = SOCIAL.debGen or 0
+
+        local function socialDebounce(sec, fn)
+            SOCIAL.debGen = (SOCIAL.debGen or 0) + 1
+            local gen = SOCIAL.debGen
+            later(sec, function()
+                if gen ~= SOCIAL.debGen then return end
+                pcall(fn)
+            end)
+        end
+
+        local function getLobbyCurPage()
+            local p = nil
+            pcall(function()
+                local LMC = require("client.slua.logic.lobby.Main.Lobby_Main_Control")
+                if LMC.GetCurPage then p = LMC.GetCurPage() end
+            end)
+            return p
+        end
+
+        local function getWeaponSkinResFast()
+            local cch = cache()
+            local wid = tonumber(DataMgr.Weapon_ID) or 0
+            local w = wid > 0 and cch.weapons[wid] or nil
+            if w and w.resID and w.resID > 0 then return w.resID end
+            for _, ww in pairs(cch.weapons) do
+                if ww.resID and ww.resID > 0 then return ww.resID end
+            end
+            return nil
+        end
+
+        local function resolveLobbyWeaponSkinRes()
+            local wid = tonumber(DataMgr.Weapon_ID) or 0
+            local skin = getWeaponSkinResFast()
+            if skin and skin > 0 then return skin end
+            if wid > 0 then
+                local fromMatch = getMatchWeaponSkin(wid)
+                if fromMatch and fromMatch > 0 then return fromMatch end
+            end
+            return nil
+        end
+
+        local function rememberLobbyOutfitRes(resID)
+            resID = tonumber(resID)
+            if not resID or resID <= 0 or not isFullSuitRes(resID) then return end
+            _G.AddOutfitLastLobbyOutfitRes = resID
+            local cch = cache()
+            if not cch.outfitRes or cch.outfitRes <= 0 then
+                cch.outfitRes = resID
+                if isInjectedRes(resID) then cch.outfitIns = R.resToIns[resID] end
+            end
+        end
+
+        local function resolveLobbyOutfitRes()
+            local cch = cache()
+            if tonumber(cch.outfitRes) and cch.outfitRes > 0 then return cch.outfitRes end
+            if tonumber(_G.AddOutfitLastLobbyOutfitRes) and _G.AddOutfitLastLobbyOutfitRes > 0 then
+                return tonumber(_G.AddOutfitLastLobbyOutfitRes)
+            end
+            if MATCH_CONFIG.outfitRes and tonumber(MATCH_CONFIG.outfitRes) > 0 then
+                return tonumber(MATCH_CONFIG.outfitRes)
+            end
+            for resID in pairs(cch.clothes) do
+                if isFullSuitRes(resID) then return resID end
+            end
+            return nil
+        end
+
+        local function collectAllClothResIDs()
+            local ids = {}
+            local cch = cache()
+            if tonumber(cch.outfitRes) and cch.outfitRes > 0 then
+                ids[cch.outfitRes] = true
+            end
+            for resID in pairs(cch.clothes) do
+                if not getEquipSkinSlot(resID) and not weaponIdFromSkin(resID) then
+                    ids[resID] = true
+                end
+            end
+            return ids
+        end
+
+        local function wearPatchKey()
+            local outfit = resolveLobbyOutfitRes() or 0
+            local skin = resolveLobbyWeaponSkinRes() or 0
+            local cch = cache()
+            local eq = (cch.equip.bag or 0) .. "_" .. (cch.equip.helmet or 0)
+            return outfit .. "_" .. skin .. "_" .. eq
+        end
+
+        local function applyInjectedPspace(roleData)
+            if not roleData then return end
+            roleData.bshow = true
+            roleData.pspace_wear_ext = roleData.pspace_wear_ext or {}
+            local outfitRes = resolveLobbyOutfitRes()
+            if outfitRes and outfitRes > 0 then
+                roleData.pspace_wear_ext[ENUM_AVATAR_SHOW_TYPE.SHOW_POS_CLOTH] = { outfitRes, 0, 0 }
+            end
+            local skinRes = resolveLobbyWeaponSkinRes()
+            if skinRes and skinRes > 0 then
+                roleData.pspace_wear_ext[ENUM_AVATAR_SHOW_TYPE.SHOW_POS_WEAPON] = { 0, 0, 0 }
+                roleData.pspace_wear_ext[ENUM_AVATAR_SHOW_TYPE.SHOW_POS_WEAPONSKIN] = { skinRes, 0, 0 }
+                roleData.depot_show_info = roleData.depot_show_info or {}
+                if roleData.depot_show_info.weapon == nil then roleData.depot_show_info.weapon = true end
+            end
+        end
+
+        local function patchSelfWearCache(force)
+            local key = wearPatchKey()
+            if not force and SOCIAL.wearPatchKey == key then return false end
+            SOCIAL.wearPatchKey = key
+            local myUid = tonumber(DataMgr.roleData.uid)
+            if not myUid then return false end
+            pcall(function()
+                local BD = ModuleManager.GetModule(ModuleManager.DataModuleConfig.BasicDataAvatarWearInfo)
+                local d = BD:GetCacheData(myUid)
+                if d then applyInjectedPspace(d) end
+            end)
+            return true
+        end
+
+        local function requestSocialAvatarRefresh()
+            pcall(function()
+                if EventSystem and EVENTTYPE_LOBBY_SOCIAL and EVENTID_SOCIAL_LOBBY_REFRESH_AVATAR then
+                    EventSystem:postEvent(EVENTTYPE_LOBBY_SOCIAL, EVENTID_SOCIAL_LOBBY_REFRESH_AVATAR)
+                end
+            end)
+        end
+
+        local function onSocialWearDirty(forceRefresh)
+            SOCIAL.lastHandSkin = nil
+            if patchSelfWearCache(forceRefresh) then requestSocialAvatarRefresh() end
+        end
+
+        local _myUidCached
+        local function isMyWearData(wearData)
+            if not wearData then return false end
+            if not _myUidCached then
+                pcall(function() _myUidCached = tonumber(DataMgr.roleData.uid) end)
+            end
+            return _myUidCached and tonumber(wearData.uid) == _myUidCached
+        end
+
+        local function mergeInjectedWeaponIntoWearData(wearData)
+            if not isMyWearData(wearData) then return end
+            local cch = cache()
+            local wKey = ""
+            for wid, w in pairs(cch.weapons) do wKey = wKey .. wid .. ":" .. (w.resID or 0) .. "," end
+            wKey = wKey .. "|" .. tostring(DataMgr.Weapon_ID or 0)
+            local skinRes
+            if _weaponSkinResMergeCache.key == wKey then
+                skinRes = _weaponSkinResMergeCache.res
+            else
+                skinRes = resolveLobbyWeaponSkinRes()
+                _weaponSkinResMergeCache.key = wKey
+                _weaponSkinResMergeCache.res = skinRes
+            end
+            if not skinRes or skinRes <= 0 then return end
+            wearData.mainWeaponInfo = wearData.mainWeaponInfo or {
+                weaponResId = 0, weaponSkinId = 0,
+                diyInfo = { diyWeaponId = 0, diyDefaultScheme = false, diyScheme = nil },
+            }
+            wearData.mainWeaponInfo.weaponSkinId = skinRes
+            wearData.mainWeaponInfo.weaponResId = 0
+        end
+
+        local function getOutfitMergeItems()
+            local cch = cache()
+            local clothKey = ""
+            for resID in pairs(cch.clothes) do clothKey = clothKey .. resID .. "," end
+            local key = (cch.outfitRes or 0) .. "_" .. clothKey .. "_" .. (cch.equip.bag or 0) .. "_" .. (cch.equip.helmet or 0)
+            if _outfitMergeCache.key == key and _outfitMergeCache.items then
+                return _outfitMergeCache.items
+            end
+            local outfitRes = resolveLobbyOutfitRes()
+            local AvatarData = require("client.logic.data.AvatarData")
+            local items = {}
+            if outfitRes and outfitRes > 0 and isFullSuitRes(outfitRes) then
+                rememberLobbyOutfitRes(outfitRes)
+                local converted = AvatarData.ConvertToAvatarCustom({ outfitRes, 0, 0 })
+                if converted then items[#items + 1] = converted end
+                for resID in pairs(collectAllClothResIDs()) do
+                    if resID ~= outfitRes and not isFullSuitRes(resID)
+                        and not isBodyClothSubType(subType(cfg(resID))) then
+                        local cv = AvatarData.ConvertToAvatarCustom({ resID, 0, 0 })
+                        if cv then items[#items + 1] = cv end
+                    end
+                end
+            else
+                for resID in pairs(collectAllClothResIDs()) do
+                    if not isFullSuitRes(resID) then
+                        local converted = AvatarData.ConvertToAvatarCustom({ resID, 0, 0 })
+                        if converted then items[#items + 1] = converted end
+                    end
+                end
+            end
+            _outfitMergeCache.key = key
+            _outfitMergeCache.items = items
+            return items
+        end
+
+        local function mergeInjectedOutfitIntoWearData(wearData)
+            if not isMyWearData(wearData) then return end
+            local outfitRes = resolveLobbyOutfitRes()
+            local items = getOutfitMergeItems()
+            if #items == 0 then return end
+            if outfitRes and outfitRes > 0 and isFullSuitRes(outfitRes) then
+                local newList = {}
+                for _, e in ipairs(wearData.WearInfoList or {}) do
+                    if not (e and e.ItemID and isBodyClothSubType(subType(cfg(e.ItemID)))) then
+                        newList[#newList + 1] = e
+                    end
+                end
+                for _, item in ipairs(items) do
+                    newList[#newList + 1] = item
+                end
+                wearData.WearInfoList = newList
+            else
+                wearData.WearInfoList = wearData.WearInfoList or {}
+                for _, item in ipairs(items) do
+                    wearData.WearInfoList[#wearData.WearInfoList + 1] = item
+                end
+            end
+        end
+
+        local function mergeInjectedEquipIntoWearData(wearData)
+            if not isMyWearData(wearData) then return end
+            local cch = cache()
+            wearData.depot_show_info = wearData.depot_show_info or {}
+            if cch.equip.bag and cch.equip.bag > 0 then
+                local catalogBag = normalizeEquipCatalogRes(cch.equip.bag)
+                local bagLevel = getEquipDisplayLevel(cch.equip.bag, "bag")
+                wearData.depot_show_info.bag = true
+                wearData.bagSkinInsId = mapEquipSkinRes(catalogBag, bagLevel)
+                wearData.skin_info = wearData.skin_info or {}
+                wearData.skin_info.bag_skin = cch.equip.bagIns or R.resToIns[cch.equip.bag] or cch.equip.bag
+                wearData.skin_info.bag_level = bagLevel
+            end
+            if cch.equip.helmet and cch.equip.helmet > 0 then
+                local catalogHelm = normalizeEquipCatalogRes(cch.equip.helmet)
+                local helmLevel = getEquipDisplayLevel(cch.equip.helmet, "helmet")
+                local helmDisplay = mapEquipSkinRes(catalogHelm, helmLevel)
+                wearData.depot_show_info.helmet = true
+                wearData.helmet_skin = helmDisplay
+                wearData.headShow = helmDisplay
+                wearData.skin_info = wearData.skin_info or {}
+                wearData.skin_info.helmet_skin = cch.equip.helmetIns or R.resToIns[cch.equip.helmet] or cch.equip.helmet
+                wearData.skin_info.head_show = wearData.skin_info.helmet_skin
+                wearData.skin_info.helmet_level = helmLevel
+            end
+        end
+
+        local function mergeInjectedIntoWearData(wearData)
+            if not wearData then return end
+            mergeInjectedWeaponIntoWearData(wearData)
+            mergeInjectedOutfitIntoWearData(wearData)
+            mergeInjectedEquipIntoWearData(wearData)
+        end
+
+        local function reapplyAccessoryIns(insID)
+            insID = tonumber(insID)
+            local resID = R.insToRes[insID]
+            if not resID then return end
+            local c = cfg(resID)
+            local st = subType(c)
+            saveClothPiece(resID)
+            local itemSt = st
+            local oldIns, oldRes
+            if itemSt then
+                oldIns, oldRes = findWornInsBySubType(itemSt)
+                if oldIns == insID then oldIns, oldRes = nil, nil end
+                removeRoleWearBySubTypes({ [itemSt] = true })
+            end
+            local WRH = require("client.network.Protocol.WardRobeHandler")
+            local olditem
+            if oldIns then
+                olditem = { res_id = oldRes or R.insToRes[oldIns], count = 1, instid = oldIns }
+            end
+            WRH.on_depot_put_on_rsp(_K.NET_OK, { res_id = resID, count = 1, instid = insID }, olditem, 1, insID, oldIns or 0)
+            pcall(function()
+                local av = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                if oldIns and itemSt then av:SetCurrentWearPreview(itemSt, nil) end
+                if itemSt then av:AddToWearInfo(itemSt, insID, resID, 0, 0) end
+                av:AvatarChange(resID, true, 0, 0)
+                av:ProcessTakeOff()
+                syncFashionBagRolewear()
+            end)
+        end
+
+        local function reapplyInjectedIns(insID)
+            insID = tonumber(insID)
+            if not insID or not isInjectedIns(insID) then return end
+            local resID = R.insToRes[insID]
+            if not resID then return end
+            if isHallThemeRes(resID) then
+                putOnHallTheme(insID)
+            elseif getEquipSkinSlot(resID) then
+                putOnEquipSkin(insID)
+            elseif getClothKind(resID) then
+                putOnCloth(insID)
+            elseif weaponIdFromSkin(resID) then
+                equipWeaponSkin(weaponIdFromSkin(resID), insID)
+            elseif _K.GUN_SUB[subType(cfg(resID))] then
+                local cch = cache()
+                local foundWid = nil
+                for wid, w in pairs(cch.weapons or {}) do
+                    if w.resID == resID then foundWid = wid; break end
+                end
+                if foundWid then equipWeaponSkin(foundWid, insID) end
+            elseif subType(cfg(resID)) == _K.MELEE_ID then
+                equipWeaponSkin(_K.MELEE_ID, insID)
+            elseif isThrowObjectRes(resID) then
+                putOnThrowObject(insID)
+            else
+                reapplyAccessoryIns(insID)
+            end
+        end
+
+        local function reapplyLobbyEquipped()
+            if not GameStatus or not GameStatus.IsInLobbyOrMainCity or not GameStatus.IsInLobbyOrMainCity() then
+                return
+            end
+            if _S.lobbyApplied then return end
+            _S.lobbyApplied = true
+            later(2.0, function() _S.lobbyApplied = false end)
+
+            restorePersistedVehicles()
+            restorePersistedMotions()
+            restorePersistedEquipIns()
+            restorePersistedThrowObjects()
+            restorePersistedHallTheme()
+            syncMatchConfigFromCache()
+
+            if not _G._addOutfitPersistLoaded then
+                snapshotLobbyWear()
+            end
+            local cch = cache()
+            if not _G._addOutfitPersistLoaded and _G._savedOutfitClothes then
+                for resID in pairs(_G._savedOutfitClothes) do
+                    cch.clothes[resID] = true
+                end
+            end
+            if not _G._addOutfitPersistLoaded and _G._savedOutfitRes and (not cch.outfitRes or cch.outfitRes <= 0) then
+                cch.outfitRes = _G._savedOutfitRes
+                cch.outfitIns = _G._savedOutfitIns or R.resToIns[_G._savedOutfitRes]
+            end
+            syncMatchConfigFromCache()
+
+            local applyStep = 0
+            local function scheduleApply(fn)
+                applyStep = applyStep + 1
+                later(applyStep * 0.12, fn)
+            end
+
+            if not _G._addOutfitPersistLoaded and _G._savedRoleWearList and #_G._savedRoleWearList > 0 then
+                for _, insID in ipairs(_G._savedRoleWearList) do
+                    local id = insID
+                    scheduleApply(function() reapplyInjectedIns(id) end)
+                end
+            elseif cch.outfitIns and isInjectedIns(cch.outfitIns) then
+                scheduleApply(function() putOnCloth(cch.outfitIns) end)
+            else
+                for resID in pairs(cch.clothes) do
+                    local ins = R.resToIns[resID]
+                    local rid = resID
+                    if ins and isInjectedIns(ins) then
+                        scheduleApply(function()
+                            if getClothKind(rid) then
+                                putOnCloth(ins)
+                            else
+                                reapplyAccessoryIns(ins)
+                            end
+                        end)
+                    end
+                end
+            end
+            for wid, w in pairs(cch.weapons) do
+                local weaponID, entry = wid, w
+                scheduleApply(function()
+                    if entry.insID and isInjectedIns(entry.insID) then
+                        equipWeaponSkin(weaponID, entry.insID)
+                    elseif entry.resID and R.resToIns[entry.resID] and isInjectedIns(R.resToIns[entry.resID]) then
+                        equipWeaponSkin(weaponID, R.resToIns[entry.resID])
+                    end
+                end)
+            end
+            for _, slot in ipairs({ "bag", "helmet", "armor", "parachute", "glider" }) do
+                local resID = cch.equip[slot]
+                local insID = cch.equip[slot .. "Ins"]
+                scheduleApply(function()
+                    if insID and isInjectedIns(insID) then
+                        putOnEquipSkin(insID)
+                    elseif resID and R.resToIns[resID] then
+                        putOnEquipSkin(R.resToIns[resID])
+                    end
+                end)
+            end
+            if cch.throwObjects then
+                for st, info in pairs(cch.throwObjects) do
+                    local tInfo = info
+                    scheduleApply(function()
+                        if tInfo.insID and isInjectedIns(tInfo.insID) then
+                            putOnThrowObject(tInfo.insID)
+                        elseif tInfo.resID and R.resToIns[tInfo.resID] and isInjectedIns(R.resToIns[tInfo.resID]) then
+                            putOnThrowObject(R.resToIns[tInfo.resID])
+                        end
+                    end)
+                end
+            end
+            later(math.max(applyStep * 0.12 + 0.3, 0.5), function()
+                syncMatchConfigFromCache()
+                pcall(_AutoSaveOutfit, true)
+            end)
+
+            pcall(function()
+                if _G._addOutfitPersistLoaded then return end
+                local GTS = ModuleManager.GetModule(ModuleManager.LobbyModuleConfig.GarageThemeSystem)
+                if not GTS then return end
+                local maxSlots = GTS:GetMaxPositionNum()
+                GTS.GarageVehicleInfo = GTS.GarageVehicleInfo or {}
+                local usedIns = {}
+                for slot, info in pairs(GTS.GarageVehicleInfo) do
+                    if info and info.inst_id then
+                        usedIns[tonumber(info.inst_id)] = true
+                    end
+                end
+                local changed = false
+                for slot = 1, maxSlots do
+                    if not GTS.GarageVehicleInfo[slot] then
+                        for _, resID in ipairs(_C.vehicleItems) do
+                            if isInjectedRes(resID) then
+                                local insID = R.resToIns[resID]
+                                if insID and not usedIns[insID] then
+                                    GTS.GarageVehicleInfo[slot] = { inst_id = insID, res_id = resID }
+                                    usedIns[insID] = true
+                                    changed = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+                if changed then
+                    if EventSystem and EVENTTYPE_LOBBY_THEME and EVENTID_GARAGE_VEHICLE_DATA_CHANGE then
+                        EventSystem:postEvent(EVENTTYPE_LOBBY_THEME, EVENTID_GARAGE_VEHICLE_DATA_CHANGE)
+                    end
+                end
+            end)
+        end
+
+        local function initHooks()
+        local function hookLobbySwipePersistence()
+            pcall(function()
+                local AC = require("client.slua.logic.avatar.avatar_common")
+                local oGetWear = AC.GetWearDataFromRoleData
+                AC.GetWearDataFromRoleData = function(roleData)
+                    local wearData = oGetWear(roleData)
+                    if wearData and roleData and tonumber(roleData.uid) == tonumber(DataMgr.roleData.uid) then
+                        mergeInjectedIntoWearData(wearData)
+                    end
+                    return wearData
+                end
+                local oUp = AC.UpdateAvatar
+                AC.UpdateAvatar = function(avatar, wearData, isShowWeapon, isShowHelmet, isShowBag)
+                    if isMyWearData(wearData) then mergeInjectedIntoWearData(wearData) end
+                    return oUp(avatar, wearData, isShowWeapon, isShowHelmet, isShowBag)
+                end
+            end)
+            pcall(function()
+                if EventSystem and EventSystem.registEvent and EVENTTYPE_LOBBY and EVENTID_SWITCHTO_PAGE_END then
+                    EventSystem:registEvent(EVENTTYPE_LOBBY, EVENTID_SWITCHTO_PAGE_END, function(_, _, _, toPage)
+                        if ENUM_LobbyPageType and toPage == ENUM_LobbyPageType.Mid then
+                            socialDebounce(0.5, reapplyLobbyEquipped)
+                        end
+                    end)
+                end
+            end)
+        end
+
+        local function hookCDataTableCache()
+            pcall(function()
+                if not CDataTable or CDataTable._lava_cached then return end
+                CDataTable._lava_cached = true
+                local origGetTableData = CDataTable.GetTableData
+                CDataTable.GetTableData = function(tableName, resID, ...)
+                    if tableName == "Item" then
+                        resID = tonumber(resID)
+                        if resID and _C.cfg[resID] ~= nil then
+                            return _C.cfg[resID]
+                        end
+                        local result = origGetTableData(tableName, resID, ...)
+                        if resID then
+                            _C.cfg[resID] = result
+                        end
+                        return result
+                    end
+                    return origGetTableData(tableName, resID, ...)
+                end
+            end)
+        end
+
+        local function hookDepotInit()
+            pcall(function()
+                local WDE = require("client.slua.logic.wardrobe.WardrobeDataEntity")
+                local orig = WDE.InitData
+                WDE.InitData = function(self, pkg)
+                    orig(self, pkg)
+                    injectAll(self)
+                    refreshWardrobe()
+                end
+            end)
+        end
+
+        local function hookWardrobeData()
+            pcall(function()
+                local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                local function wrapGet(name)
+                    local o = wd[name]
+                    if not o then return end
+                    wd[name] = function(self, insID, ...)
+                        insID = tonumber(insID)
+                        if isInjectedIns(insID) then
+                            local e = getEntity()
+                            if e then return e:GetDataByInsID(insID) end
+                        end
+                        return o(self, insID, ...)
+                    end
+                end
+                wrapGet("GetHallDepotItemDataByInsID")
+                wrapGet("GetValidHallDepotItemDataByInsID")
+                local function wrapBool(name)
+                    local o = wd[name]
+                    if not o then return end
+                    wd[name] = function(self, id, ...)
+                        if isInjectedRes(tonumber(id)) or isInjectedIns(tonumber(id)) then return true end
+                        return o(self, id, ...)
+                    end
+                end
+                wrapBool("HasItem")
+                wrapBool("HasValidItem")
+                wrapBool("CheckHasPermanentItem")
+                if not wd._lava_global_equip then
+                    wd._lava_global_equip = true
+                    local origGetEquipped = wd.GetEquippedSkinIDByWeaponID
+                    wd.GetEquippedSkinIDByWeaponID = function(self, weaponID)
+                        local w = cache().weapons[tonumber(weaponID)]
+                        if w and w.resID and w.resID > 0 then return w.resID end
+                        return origGetEquipped(self, weaponID)
+                    end
+                end
+                if not wd._lava_global_equip_ins then
+                    wd._lava_global_equip_ins = true
+                    if wd.GetEquippedSkinInsIDByWeaponID then
+                        local origGetEquippedIns = wd.GetEquippedSkinInsIDByWeaponID
+                        wd.GetEquippedSkinInsIDByWeaponID = function(self, weaponID)
+                            local w = cache().weapons[tonumber(weaponID)]
+                            if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then return w.insID end
+                            return origGetEquippedIns(self, weaponID)
+                        end
+                    end
+                    if wd.GetWeaponSkinInsID then
+                        local origGetWSI = wd.GetWeaponSkinInsID
+                        wd.GetWeaponSkinInsID = function(self, weaponID)
+                            local w = cache().weapons[tonumber(weaponID)]
+                            if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then return w.insID end
+                            return origGetWSI(self, weaponID)
+                        end
+                    end
+                end
+            end)
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                local oPutDownReq = wl.wardrobe_put_down_req
+                if oPutDownReq then
+                    wl.wardrobe_put_down_req = function(self, ins_id, unequip_by_server)
+                        ins_id = tonumber(ins_id)
+                        if isInjectedIns(ins_id) then
+                            local resID = R.insToRes[ins_id]
+                            takeOffItem(ins_id)
+                            pcall(function()
+                                self:on_putdown_rsp(_K.NET_OK, {
+                                    instid = ins_id,
+                                    res_id = resID or 0,
+                                }, nil)
+                            end)
+                            pcall(function()
+                                if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_PUT_DOWN_DATA then
+                                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_PUT_DOWN_DATA, {
+                                        instid = ins_id,
+                                        res_id = resID or 0,
+                                        count = 1,
+                                    })
+                                end
+                            end)
+                            refreshWardrobe()
+                            return
+                        end
+                        return oPutDownReq(self, ins_id, unequip_by_server)
+                    end
+                end
+            end)
+        end
+
+        local function hookPageFilter()
+            pcall(function()
+                local SubTab = require("client.slua.umg.Wardrobe.subtab_item_list_base")
+                if SubTab._lava_prefilter then return end
+                SubTab._lava_prefilter = true
+                local origGet = SubTab.GetArrayHallDepotItemInfo
+                SubTab.GetArrayHallDepotItemInfo = function(self)
+                    local allData = origGet(self)
+                    if not allData or not next(allData) then return allData end
+                    local pageId = self.subTabConfig and self.subTabConfig.pageId
+                    local subTabId = self.subTabConfig and self.subTabConfig.subTabId
+                    if not pageId or not subTabId then return allData end
+                    local result = {}
+                    for _, data in pairs(allData) do
+                        local resID = depotResID(data)
+                        if resID and isInjectedRes(resID) then
+                            local itemMain, itemSub = getInjectedItemTab(resID, data)
+                            if itemMain == pageId then
+                                if pageId == _K.WARDROBE_PAGE_AVATAR then
+                                    if subTabId == _K.WARDROBE_TAB_SUIT or subTabId == _K.WARDROBE_TAB_CLOTHES then
+                                        local st = data.itemSubType or subType(cfg(resID))
+                                        if st == _K.ST_TOP then
+                                            local full = isFullSuitRes(resID, data)
+                                            if (subTabId == _K.WARDROBE_TAB_SUIT and full) or
+                                            (subTabId == _K.WARDROBE_TAB_CLOTHES and not full) then
+                                                result[#result + 1] = data
+                                            end
+                                        end
+                                    elseif itemSub == subTabId then
+                                        result[#result + 1] = data
+                                    end
+                                elseif itemSub == subTabId then
+                                    result[#result + 1] = data
+                                end
+                            end
+                        else
+                            result[#result + 1] = data
+                        end
+                    end
+                    return result
+                end
+            end)
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                local o1 = wl.IsValidCurrentPageItem
+                wl.IsValidCurrentPageItem = function(self, mainTab, subTab, v, t)
+                    local resID = depotResID(v)
+                    if resID and isInjectedRes(resID) then
+                        local cacheKey = resID .. "_" .. mainTab .. "_" .. subTab
+                        if _C.pageMatch[cacheKey] ~= nil then
+                            return _C.pageMatch[cacheKey]
+                        end
+                        local result
+                        if not (v.expireTS == 0 or not t or t < v.expireTS) then
+                            result = false
+                        else
+                            local equipOk = injectedEquipAllowed(resID, mainTab, subTab)
+                            if equipOk ~= nil then
+                                result = equipOk
+                            elseif weaponIdFromSkin(resID) then
+                                result = mainTab == _K.WARDROBE_PAGE_WEAPON and subTab == _K.WARDROBE_TAB_GUN
+                            elseif mainTab == _K.WARDROBE_PAGE_VEHICLE then
+                                local c = cfg(resID)
+                                local wmTab = c and tonumber(c.WardrobeMainTab or c.wardrobeMainTab) or 0
+                                if wmTab ~= mainTab and v.mainTabType ~= mainTab then
+                                    result = false
+                                else
+                                    local wTab = c and tonumber(c.WardrobeTab or c.wardrobeTab) or nil
+                                    local vTab = v.subTabType and tonumber(v.subTabType) or nil
+                                    if wTab and wTab == subTab then result = true
+                                    elseif vTab and vTab == subTab then result = true
+                                    else result = o1(self, mainTab, subTab, v, t) end
+                                end
+                            elseif mainTab == _K.WARDROBE_PAGE_AVATAR then
+                                local st = v.itemSubType or subType(cfg(resID))
+                                if st == _K.ST_TOP then
+                                    local full = isFullSuitRes(resID, v)
+                                    if subTab == _K.WARDROBE_TAB_SUIT and full then result = true
+                                    elseif subTab == _K.WARDROBE_TAB_CLOTHES and not full then result = true
+                                    else result = false end
+                                elseif st == _K.ST_PANTS and subTab == _K.WARDROBE_TAB_TROUSERS then
+                                    result = true
+                                elseif st == _K.ST_SHOES and subTab == _K.WARDROBE_TAB_SHOES then
+                                    result = true
+                                elseif v.subTabType == subTab then
+                                    result = true
+                                else
+                                    result = false
+                                end
+                            else
+                                result = o1(self, mainTab, subTab, v, t)
+                            end
+                        end
+                        _C.pageMatch[cacheKey] = result
+                        return result
+                    end
+                    return o1(self, mainTab, subTab, v, t)
+                end
+                local o2 = wl.IsCanUse
+                wl.IsCanUse = function(self, resId)
+                    if isInjectedRes(resId) then return true end
+                    return o2(self, resId)
+                end
+                local o4 = wl.GetWardrobeInsIdByResId
+                wl.GetWardrobeInsIdByResId = function(self, resid)
+                    resid = tonumber(resid)
+                    if isInjectedRes(resid) then return R.resToIns[resid] end
+                    return o4(self, resid)
+                end
+            end)
+        end
+
+        local function hookArmory()
+            pcall(function()
+                local Arm = require("client.logic.armory.logic_armory")
+                if not Arm._lava_global_own then
+                    Arm._lava_global_own = true
+                    local origIsOwn = Arm.IsSkinOwn
+                    Arm.IsSkinOwn = function(weaponID, skinID)
+                        if isInjectedRes(skinID) then return 1 end
+                        return origIsOwn(weaponID, skinID)
+                    end
+                end
+                if not Arm._lava_global_get_install then
+                    Arm._lava_global_get_install = true
+                    if Arm.get_install_skin then
+                        local origGetInstall = Arm.get_install_skin
+                        Arm.get_install_skin = function(weaponID)
+                            local w = cache().weapons[tonumber(weaponID)]
+                            if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then
+                                return { skin_id = w.insID }
+                            end
+                            return origGetInstall(weaponID)
+                        end
+                    end
+                    if Arm.GetInstallSkinInsID then
+                        local origGetInstall2 = Arm.GetInstallSkinInsID
+                        Arm.GetInstallSkinInsID = function(weaponID)
+                            local w = cache().weapons[tonumber(weaponID)]
+                            if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then
+                                return w.insID
+                            end
+                            return origGetInstall2(weaponID)
+                        end
+                    end
+                end
+                local oi = Arm.install_weapon_skin
+                Arm.install_weapon_skin = function(cd, wid, ins)
+                    ins = tonumber(ins)
+                    if isInjectedIns(ins) then
+                        wid = tonumber(weaponIdFromSkin(R.insToRes[ins]) or wid)
+                        equipWeaponSkin(wid, ins)
+                        return
+                    end
+                    return oi(cd, wid, ins)
+                end
+                local function hookArmoryUninstall(fnName)
+                    local orig = Arm[fnName]
+                    if not orig then return end
+                    Arm[fnName] = function(cd, wid, ins, ...)
+                        ins = tonumber(ins)
+                        wid = tonumber(wid)
+                        if ins and isInjectedIns(ins) then
+                            local resID = R.insToRes[ins]
+                            wid = weaponIdFromSkin(resID) or wid
+                            if takeOffItem(ins) then
+                                refreshWardrobe()
+                                return
+                            end
+                        elseif wid and wid > 0 then
+                            local cch = cache()
+                            local w = cch.weapons[wid]
+                            if w and w.insID and isInjectedIns(w.insID) then
+                                if takeOffItem(w.insID) then
+                                    refreshWardrobe()
+                                    return
+                                end
+                            end
+                        end
+                        return orig(cd, wid, ins, ...)
+                    end
+                end
+                hookArmoryUninstall("uninstall_weapon_skin")
+                hookArmoryUninstall("remove_weapon_skin")
+            end)
+        end
+
+        local function hookLobbyTheme()
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                if wl._lava_hooked_hall_theme then return end
+                wl._lava_hooked_hall_theme = true
+                local origPutOn = wl.wardrobe_puton_req
+                wl.wardrobe_puton_req = function(self, insID, extra)
+                    insID = tonumber(insID)
+                    if insID and isInjectedIns(insID) and isHallThemeRes(R.insToRes[insID]) then
+                        putOnHallTheme(insID)
+                        return
+                    end
+                    return origPutOn(self, insID, extra)
+                end
+            end)
+        end
+
+        local function hookPutOn()
+            pcall(function()
+                local WRH = require("client.network.Protocol.WardRobeHandler")
+                local o = WRH.send_depot_put_on_req
+                WRH.send_depot_put_on_req = function(insID, extra)
+                    insID = tonumber(insID)
+                    if isInjectedIns(insID) then
+                        local resID = R.insToRes[insID]
+                        local c = cfg(resID)
+                        local st = subType(c)
+                        if getEquipSkinSlot(resID) then
+                            putOnEquipSkin(insID)
+                            return
+                        end
+                        if getClothKind(resID) then
+                            putOnCloth(insID)
+                            return
+                        end
+                        if _K.GUN_SUB[st] then
+                            local wid = weaponIdFromSkin(resID)
+                            if not wid then
+                                pcall(function()
+                                    local wgl = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+                                    wid = wgl.GetCurGunID and wgl:GetCurGunID() or nil
+                                    if not wid and wgl.GetCurrentGunID then
+                                        wid = wgl:GetCurrentGunID()
+                                    end
+                                end)
+                            end
+                            if wid then equipWeaponSkin(wid, insID) end
+                            return
+                        end
+                        if st == _K.MELEE_ID then
+                            equipWeaponSkin(_K.MELEE_ID, insID)
+                            return
+                        end
+                        if isHallThemeRes(resID) then
+                            putOnHallTheme(insID)
+                            return
+                        end
+                        if isThrowObjectRes(resID) then
+                            local st = isThrowObjectRes(resID)
+                            local cch = cache()
+                            local oldThrow = cch.throwObjects and cch.throwObjects[st]
+                            local oldInsID = oldThrow and oldThrow.insID or 0
+                            local oldResID = oldThrow and oldThrow.resID or 0
+                            putOnThrowObject(insID)
+                            local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                            local bagIndex = fbd:GetFashionBagUseIndex()
+                            local olditem
+                            if oldInsID and oldInsID ~= insID and oldInsID ~= 0 then
+                                olditem = { res_id = oldResID, count = 1, instid = oldInsID }
+                            end
+                            WRH.on_depot_put_on_rsp(_K.NET_OK, { res_id = resID, count = 1, instid = insID }, olditem, bagIndex, insID, oldInsID, extra)
+                            return
+                        end
+                        local mainTab = wardrobeMainTab(resID)
+                        if mainTab == _K.WARDROBE_PAGE_VEHICLE then
+                            local item = { res_id = resID, count = 1, instid = insID }
+                            WRH.on_depot_put_on_rsp(_K.NET_OK, item, nil, 1, insID, 0, extra)
+                            return
+                        end
+                        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                        if wd:GetHallDepotItemDataByInsID(insID) then
+                            local itemSt = st or subType(cfg(resID))
+                            local oldIns, oldRes
+                            if itemSt then
+                                oldIns, oldRes = findWornInsBySubType(itemSt)
+                                if oldIns == insID then oldIns, oldRes = nil, nil end
+                                removeRoleWearBySubTypes({ [itemSt] = true })
+                            end
+                            saveClothPiece(resID)
+                            local olditem
+                            if oldIns then
+                                olditem = { res_id = oldRes or R.insToRes[oldIns], count = 1, instid = oldIns }
+                            end
+                            WRH.on_depot_put_on_rsp(_K.NET_OK, { res_id = resID, count = 1, instid = insID }, olditem, 1, insID, oldIns or 0, extra)
+                            pcall(function()
+                                local av = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                                if oldIns and itemSt then av:SetCurrentWearPreview(itemSt, nil) end
+                                if itemSt then av:AddToWearInfo(itemSt, insID, resID, 0, 0) end
+                                av:AvatarChange(resID, true, 0, 0)
+                                av:ProcessTakeOff()
+                                syncFashionBagRolewear()
+                            end)
+                            pcall(_AutoSaveOutfit)
+                        end
+                        return
+                    end
+                    return o(insID, extra)
+                end
+            end)
+
+            pcall(function()
+                local WRH = require("client.network.Protocol.WardRobeHandler")
+                local oPutDown = WRH.send_depot_put_down_req
+                WRH.send_depot_put_down_req = function(insID, extra)
+                    insID = tonumber(insID)
+                    if isInjectedIns(insID) then
+                        local resID = R.insToRes[insID]
+                        local removed = takeOffItem(insID)
+                        if removed then
+                            local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                            pcall(function()
+                                wl:on_putdown_rsp(_K.NET_OK, {
+                                    res_id = resID or 0,
+                                    instid = insID,
+                                    count  = 1,
+                                }, nil)
+                            end)
+                            pcall(function()
+                                if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_PUT_DOWN_DATA then
+                                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_PUT_DOWN_DATA, {
+                                        instid = insID,
+                                        res_id = resID or 0,
+                                        count = 1,
+                                    })
+                                end
+                            end)
+                            refreshWardrobe()
+                            return
+                        end
+                    end
+                    return oPutDown(insID, extra)
+                end
+            end)
+
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                local oPutDownReq = wl.wardrobe_put_down_req
+                if oPutDownReq then
+                    wl.wardrobe_put_down_req = function(self, ins_id, unequip_by_server)
+                        ins_id = tonumber(ins_id)
+                        if isInjectedIns(ins_id) then
+                            local resID = R.insToRes[ins_id]
+                            takeOffItem(ins_id)
+                            pcall(function()
+                                self:on_putdown_rsp(_K.NET_OK, {
+                                    instid = ins_id,
+                                    res_id = resID or 0,
+                                }, nil)
+                            end)
+                            pcall(function()
+                                if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_PUT_DOWN_DATA then
+                                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_PUT_DOWN_DATA, {
+                                        instid = ins_id,
+                                        res_id = resID or 0,
+                                        count = 1,
+                                    })
+                                end
+                            end)
+                            refreshWardrobe()
+                            return
+                        end
+                        return oPutDownReq(self, ins_id, unequip_by_server)
+                    end
+                end
+            end)
+
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                local oEquipSlot = wl.EquipSlotVehicle
+                if oEquipSlot and not wl._lava_hooked_equip_slot_vehicle then
+                    wl._lava_hooked_equip_slot_vehicle = true
+                    wl.EquipSlotVehicle = function(self, resid, dragVehicleInsID, Index)
+                        dragVehicleInsID = tonumber(dragVehicleInsID)
+                        if dragVehicleInsID and isInjectedIns(dragVehicleInsID) then
+                            local resID = R.insToRes[dragVehicleInsID]
+                            local c = cfg(resID)
+                            local itemSubType = c and tonumber(c.ItemSubType or c.itemSubType) or 0
+                            if itemSubType and itemSubType > 0 then
+                                DataMgr.VehicleSlotList = DataMgr.VehicleSlotList or {}
+                                local slotList = DataMgr.VehicleSlotList[itemSubType] or {}
+                                local idx = Index or 1
+                                for i = #slotList, 1, -1 do
+                                    if slotList[i] == dragVehicleInsID then
+                                        table.remove(slotList, i)
+                                    end
+                                end
+                                slotList[idx] = dragVehicleInsID
+                                DataMgr.VehicleSlotList[itemSubType] = slotList
+                                if DataMgr.vehicleSkinInsIDTable then
+                                    DataMgr.vehicleSkinInsIDTable[resID] = DataMgr.vehicleSkinInsIDTable[resID] or dragVehicleInsID
+                                end
+                            end
+                            DataMgr.UpdateVehicleSkin(itemSubType, dragVehicleInsID)
+                            pcall(function()
+                                local tabSurveillance = require("client.slua.logic.wardrobe.tab_surveillance")
+                                if tabSurveillance and tabSurveillance.VehicleChange then
+                                    tabSurveillance.VehicleChange()
+                                end
+                            end)
+                            if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_VEHICLE_SLOT_DATA_CHANGE then
+                                EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_VEHICLE_SLOT_DATA_CHANGE)
+                            end
+                            return
+                        end
+                        return oEquipSlot(self, resid, dragVehicleInsID, Index)
+                    end
+                end
+            end)
+
+            pcall(function()
+                local GarageThemeSystem = ModuleManager.GetModule(ModuleManager.LobbyModuleConfig.GarageThemeSystem)
+                if GarageThemeSystem and not GarageThemeSystem._lava_hooked_equip_vehicle then
+                    GarageThemeSystem._lava_hooked_equip_vehicle = true
+                    local oEquip = GarageThemeSystem.EquipVehicle
+                    GarageThemeSystem.EquipVehicle = function(self, Position, InsID)
+                        InsID = tonumber(InsID)
+                        if InsID and isInjectedIns(InsID) then
+                            self:OnEquipVehicle(Position, InsID)
+                            return
+                        end
+                        return oEquip(self, Position, InsID)
+                    end
+                    local oBatch = GarageThemeSystem.BatchEquipVehicle
+                    GarageThemeSystem.BatchEquipVehicle = function(self, InsIDList)
+                        if InsIDList and type(InsIDList) == "table" then
+                            local hasInjected = false
+                            local filtered = {}
+                            for slot, ins in pairs(InsIDList) do
+                                if isInjectedIns(tonumber(ins)) then
+                                    hasInjected = true
+                                    self:OnEquipVehicle(slot, tonumber(ins))
+                                else
+                                    filtered[slot] = ins
+                                end
+                            end
+                            if hasInjected and not next(filtered) then
+                                return
+                            end
+                            InsIDList = filtered
+                        end
+                        return oBatch(self, InsIDList)
+                    end
+
+                    local oReceive = GarageThemeSystem.OnReceiveGarageData
+                    GarageThemeSystem.OnReceiveGarageData = function(self, VehicleInfo)
+                        local injectedSlots = {}
+                        if self.GarageVehicleInfo then
+                            for slot, info in pairs(self.GarageVehicleInfo) do
+                                if info and info.inst_id and isInjectedIns(tonumber(info.inst_id)) then
+                                    injectedSlots[slot] = info
+                                end
+                            end
+                        end
+                        oReceive(self, VehicleInfo)
+                        for slot, info in pairs(injectedSlots) do
+                            if not self.GarageVehicleInfo[slot] then
+                                self.GarageVehicleInfo[slot] = info
+                            end
+                        end
+                    end
+
+                    local oGetInfo = GarageThemeSystem.GetGarageVehicleInfo
+                    GarageThemeSystem.GetGarageVehicleInfo = function(self)
+                        if not self.bDataReceived and self.GarageVehicleInfo and next(self.GarageVehicleInfo) then
+                            return self.GarageVehicleInfo
+                        end
+                        return oGetInfo(self)
+                    end
+
+                    local oGetShowList = GarageThemeSystem.GetGarageShowCarInsIDList
+                    if oGetShowList then
+                        GarageThemeSystem.GetGarageShowCarInsIDList = function(self, VehicleType)
+                            local List = oGetShowList(self, VehicleType) or {}
+                            for _, resID in ipairs(_C.vehicleItems) do
+                                if isInjectedRes(resID) and #List < self:GetMaxPositionNum() then
+                                    local c = cfg(resID)
+                                    if c then
+                                        local itemSubType = tonumber(c.ItemSubType or c.itemSubType) or 0
+                                        local taxonomy = CDataTable.GetTableDataByFilter("WardrobeVehiclesTaxonomy", "ItemSubType", itemSubType)
+                                        if taxonomy and taxonomy.UseInGarage == 1 and taxonomy.CategoryID == VehicleType then
+                                            local insID = R.resToIns[resID]
+                                            if insID then
+                                                local alreadyIn = false
+                                                for _, existingIns in ipairs(List) do
+                                                    if tonumber(existingIns) == tonumber(insID) then
+                                                        alreadyIn = true
+                                                        break
+                                                    end
+                                                end
+                                                if not alreadyIn then
+                                                    table.insert(List, insID)
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                            return List
+                        end
+                    end
+                end
+            end)
+        end
+
+        local function hookMotionEquip()
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                if wl._lava_hooked_motion then return end
+                wl._lava_hooked_motion = true
+
+                local origEquip = wl.EquipMotion
+                wl.EquipMotion = function(self, instid, dst_slot)
+                    instid = tonumber(instid)
+                    if instid and isInjectedIns(instid) then
+                        local insSlot = 0
+                        for i, v in ipairs(DataMgr.MotionSlotList) do
+                            if v == instid then insSlot = i; break end
+                        end
+                        if insSlot > 0 then
+                            local curIns = DataMgr.MotionSlotList[dst_slot]
+                            if curIns == instid then return end
+                            DataMgr.MotionSlotList[insSlot] = curIns or 0
+                            DataMgr.MotionSlotList[dst_slot] = instid
+                        else
+                            while #DataMgr.MotionSlotList < dst_slot do
+                                table.insert(DataMgr.MotionSlotList, 0)
+                            end
+                            DataMgr.MotionSlotList[dst_slot] = instid
+                        end
+                        if EventSystem and EVENTTYPE_MOTION and EVENTID_MOTION_UPDATE_SLOT_LIST then
+                            EventSystem:postEvent(EVENTTYPE_MOTION, EVENTID_MOTION_UPDATE_SLOT_LIST)
+                        end
+                        pcall(_AutoSaveOutfit)
+                        return
+                    end
+                    return origEquip(self, instid, dst_slot)
+                end
+
+                local origUnequip = wl.unequip_motion_req
+                wl.unequip_motion_req = function(self, instid, slot)
+                    instid = tonumber(instid)
+                    if instid and isInjectedIns(instid) then
+                        for i, v in ipairs(DataMgr.MotionSlotList) do
+                            if v == instid then
+                                table.remove(DataMgr.MotionSlotList, i)
+                                break
+                            end
+                        end
+                        if EventSystem and EVENTTYPE_MOTION and EVENTID_MOTION_UPDATE_SLOT_LIST then
+                            EventSystem:postEvent(EVENTTYPE_MOTION, EVENTID_MOTION_UPDATE_SLOT_LIST)
+                        end
+                        pcall(_AutoSaveOutfit)
+                        return
+                    end
+                    return origUnequip(self, instid, slot)
+                end
+            end)
+        end
+
+        local _emoteSlotKey = nil
+        local _emoteSlotCache = {}
+        local function getInjectedEmotes()
+            local slotList = DataMgr and DataMgr.MotionSlotList or {}
+            local key = table.concat(slotList, ",")
+            if key == _emoteSlotKey then return _emoteSlotCache end
+            _emoteSlotKey = key
+            _emoteSlotCache = {}
+            for _, insID in ipairs(slotList) do
+                insID = tonumber(insID)
+                if insID and insID > 0 and isInjectedIns(insID) then
+                    local resID = R.insToRes[insID]
+                    if resID then
+                        local c = cfg(resID)
+                        if c and tonumber(c.ItemType) == 22 then
+                            _emoteSlotCache[#_emoteSlotCache + 1] = {
+                                resID = resID,
+                                name = c.ItemName or "",
+                                icon = c.ItemSmallIcon or c.ItemIcon or ""
+                            }
+                        end
+                    end
+                end
+            end
+            return _emoteSlotCache
+        end
+
+        local function hookIngameEmote()
+            pcall(function()
+                local QEU = require("GameLua.Mod.BaseMod.Client.Emote.QuickExpressionUtils")
+                if QEU._lava_hooked then return end
+                QEU._lava_hooked = true
+
+                local origGetList = QEU.GetShowExpressionList
+                QEU.GetShowExpressionList = function()
+                    local tShowEmoteList, nWeaponEmoteId = origGetList()
+                    tShowEmoteList = tShowEmoteList or {}
+                    local emotes = getInjectedEmotes()
+                    if #emotes > 0 then
+                        local existingIDs = {}
+                        for _, existing in pairs(tShowEmoteList) do
+                            if existing.DefineID then
+                                existingIDs[tonumber(existing.DefineID.TypeSpecificID) or 0] = true
+                            end
+                        end
+                        for _, em in ipairs(emotes) do
+                            if not existingIDs[em.resID] then
+                                tShowEmoteList[#tShowEmoteList + 1] = {
+                                    DefineID = {TypeSpecificID = em.resID},
+                                    Name = em.name
+                                }
+                            end
+                        end
+                    end
+                    return tShowEmoteList, nWeaponEmoteId
+                end
+            end)
+
+            pcall(function()
+                local QE = require("GameLua.Mod.BaseMod.Client.Emote.QuickExpression")
+                if QE._lava_hooked_img then return end
+                QE._lava_hooked_img = true
+
+                local origGetImg = QE.GetEmoteImagePalthMap
+                QE.GetEmoteImagePalthMap = function(self, ...)
+                    origGetImg(self, ...)
+                    local emotes = getInjectedEmotes()
+                    for _, em in ipairs(emotes) do
+                        if em.icon ~= "" then
+                            self.ItemIDToImagePathMap[em.resID] = em.icon
+                        end
+                    end
+                end
+            end)
+
+            pcall(function()
+                local le = require("GameLua.Mod.Library.GamePlay.Avatar.Emote.logic_emote")
+                if le._lava_hooked_exist then return end
+                le._lava_hooked_exist = true
+
+                local origExist = le.IsEmoteExist
+                le.IsEmoteExist = function(EmoteID)
+                    if isInjectedRes(tonumber(EmoteID)) then return true end
+                    return origExist(EmoteID)
+                end
+
+                local origDownloaded = le.CheckEmoteDownloaded
+                if origDownloaded then
+                    le.CheckEmoteDownloaded = function(EmoteID, bUseCache, bLobby, bForeceLobby)
+                        if isInjectedRes(tonumber(EmoteID)) then return true end
+                        return origDownloaded(EmoteID, bUseCache, bLobby, bForeceLobby)
+                    end
+                end
+            end)
+        end
+
+        local function hookFashionBag()
+            pcall(function()
+                local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                if fbd._lava_hooked_bag then return end
+                fbd._lava_hooked_bag = true
+                local function onFashionBagSkinChanged(skin, slot)
+                    skin = tonumber(skin)
+                    if _S.equipSkinApplying or not skin or skin <= 0 or not isInjectedIns(skin) then return end
+                    local rid = R.insToRes[skin]
+                    if not rid or not isInjectedRes(rid) then return end
+                    local cch = cache()
+                    local oldRes = cch.equip[slot]
+                    if oldRes and oldRes > 0 and oldRes ~= rid then
+                        softRemoveEquipVisual(oldRes, slot)
+                    end
+                    saveEquipSkin(rid, skin)
+                    if slot ~= "parachute" and slot ~= "glider" then
+                        applyEquipVisual(rid, skin, slot)
+                    end
+                end
+                local origBag = fbd.SetBagSkin
+                fbd.SetBagSkin = function(self, skin)
+                    local r = origBag(self, skin)
+                    onFashionBagSkinChanged(skin, "bag")
+                    return r
+                end
+                local origHelm = fbd.SetHelmetSkin
+                fbd.SetHelmetSkin = function(self, skin)
+                    local r = origHelm(self, skin)
+                    onFashionBagSkinChanged(skin, "helmet")
+                    return r
+                end
+                local function reInjectThrowObjects(bagIndex)
+                    pcall(function()
+                        local cch = cache()
+                        if not cch.throwObjects then return end
+                        local bags = fbd.GetFashionBags and fbd:GetFashionBags()
+                        if not bags or not bags.bags then return end
+                        local bag = bags.bags[bagIndex]
+                        if not bag then return end
+                        bag.throw_object_list = bag.throw_object_list or {}
+                        for st, info in pairs(cch.throwObjects) do
+                            if info.insID and info.insID > 0 and _K.THROW_SUB[st] then
+                                bag.throw_object_list[st] = info.insID
+                            end
+                        end
+                    end)
+                end
+                local origUpdateAll = fbd.UpdateAllFashionBagExtraInfos
+                if origUpdateAll then
+                    fbd.UpdateAllFashionBagExtraInfos = function(self, all_knapsack_ext_info)
+                        origUpdateAll(self, all_knapsack_ext_info)
+                        if all_knapsack_ext_info then
+                            for i, _ in pairs(all_knapsack_ext_info) do
+                                reInjectThrowObjects(i)
+                            end
+                        end
+                    end
+                end
+                local origUpdateOne = fbd.UpdateFashionBagExtraInfoByIndex
+                if origUpdateOne then
+                    fbd.UpdateFashionBagExtraInfoByIndex = function(self, index, knapsack_ext_info)
+                        origUpdateOne(self, index, knapsack_ext_info)
+                        if index then reInjectThrowObjects(index) end
+                    end
+                end
+            end)
+            pcall(function()
+                if not DataMgr or DataMgr._lava_hooked_equip_skin then return end
+                DataMgr._lava_hooked_equip_skin = true
+                local orig = DataMgr.UpdateEquipmentSkin
+                DataMgr.UpdateEquipmentSkin = function(itemSubType, putOnId)
+                    putOnId = tonumber(putOnId)
+                    if putOnId and putOnId > 0 and isInjectedIns(putOnId) and not _S.equipSkinApplying then
+                        putOnEquipSkin(putOnId)
+                    elseif putOnId == 0 then
+                        local slot = (itemSubType == ENUM_ITEM_SUBTYPE.Backpack) and "bag"
+                            or (itemSubType == ENUM_ITEM_SUBTYPE.Helmet_NoLevel) and "helmet" or nil
+                        if slot then
+                            local cch = cache()
+                            takeOffEquipSkinVisual(slot, cch.equip[slot], cch.equip[slot .. "Ins"])
+                            cch.equip[slot]          = nil
+                            cch.equip[slot .. "Ins"] = nil
+                            if MATCH_CONFIG.equip then MATCH_CONFIG.equip[slot] = 0 end
+                            _S.matchApplied = false
+                            invalidateSocialWearCache()
+                            pcall(_AutoSaveOutfit)
+                        end
+                    end
+                    return orig(itemSubType, putOnId)
+                end
+            end)
+        end
+
+        local function hookBackpackValid()
+            if _G.DEV_WARDROBE_BP_HOOKED then return end
+            _G.DEV_WARDROBE_BP_HOOKED = true
+            pcall(function()
+                local BU = import("BackpackUtils")
+                if BU and BU.GetBPIDByResID then
+                    local orig = BU.GetBPIDByResID
+                    BU.GetBPIDByResID = function(resID)
+                        resID = tonumber(resID)
+                        if resID and isInjectedRes(resID) then
+                            local bp = orig(resID)
+                            if bp and bp > 0 then return bp end
+                            return resID
+                        end
+                        return orig(resID)
+                    end
+                end
+            end)
+            pcall(function()
+                local AU = import("AvatarUtils")
+                if AU and AU.GetBPIDByResID then
+                    local orig = AU.GetBPIDByResID
+                    AU.GetBPIDByResID = function(resID, ...)
+                        resID = tonumber(resID)
+                        if resID and isInjectedRes(resID) then
+                            local bp = orig(resID, ...)
+                            if bp and bp > 0 then return bp end
+                            return resID
+                        end
+                        return orig(resID, ...)
+                    end
+                end
+            end)
+        end
+
+        local function hookAvatarValid()
+            pcall(function()
+                local CAC = require("GameLua.Mod.Library.GamePlay.Avatar.Component.CharacterAvatarComponent")
+                if not CAC._lava_hooked_check_valid then
+                    CAC._lava_hooked_check_valid = true
+                    local orig = CAC.CheckItemValid
+                    CAC.CheckItemValid = function(self, resID)
+                        if isInjectedRes(resID) then return true end
+                        return orig(self, resID)
+                    end
+                end
+                if not CAC._lava_hooked_puton then
+                    CAC._lava_hooked_puton = true
+                    local origPutOn = CAC.PutOnCustomEquipmentByID
+                    CAC.PutOnCustomEquipmentByID = function(self, resID, CustomData)
+                        
+                        if self.IsSelf and not self:IsSelf() then
+                            return origPutOn(self, resID, CustomData)
+                        end
+                        resID = tonumber(resID)
+                        if resID and isInjectedRes(resID) then
+                            local ok, result = pcall(function()
+                                local ItemDefineID = FItemDefineID(4, resID)
+                                local EAvatarCustomType = import("EAvatarCustomType")
+                                local AvatarCustom = FAvatarCustomDefault()
+                                if CustomData then AvatarCustom = CustomData end
+                                AvatarCustom.CustomType = EAvatarCustomType.AvatarCustomCharacter
+                                return self:HandleEquipItem(ItemDefineID, AvatarCustom)
+                            end)
+                            if ok and result == true then return true end
+                            if ok and result ~= false and result ~= nil then return result end
+                        end
+                        return origPutOn(self, resID, CustomData)
+                    end
+                end
+            end)
+        end
+
+        local function isInLobby()
+            local ok, r = pcall(function()
+                return GameStatus and GameStatus.IsInLobbyOrMainCity and GameStatus.IsInLobbyOrMainCity() == true
+            end)
+            return ok and r == true
+        end
+
+        local function isInRealMatch()
+            local ok, r = pcall(function()
+                return GameStatus and GameStatus.IsInFightingStatus and GameStatus.IsInFightingStatus() == true
+            end)
+            return ok and r == true
+        end
+
+        local function isInGamePlay()
+            if isInLobby() then return false end
+            if isInRealMatch() then return true end
+            local ok, r = pcall(function()
+                local SingleTrainTool = require("GameLua.Mod.SingleTraining.GamePlay.Data.SingleTrainTool")
+                return SingleTrainTool.IsSelfInTraining and SingleTrainTool.IsSelfInTraining()
+            end)
+            if ok and r then return true end
+            local char = getLocalChar()
+            return char and slua.isValid(char) and slua.isValid(char.CharacterAvatarComp2_BP)
+        end
+
+        local function getPlayerController()
+            local ok, GD = pcall(require, "GameLua.GameCore.Data.GameplayData")
+            if ok and GD and GD.GetPlayerController then
+                local pc = GD.GetPlayerController()
+                if pc and slua.isValid(pc) then return pc end
+            end
+            local pc = nil
+            pcall(function()
+                if slua_GameFrontendHUD and slua_GameFrontendHUD.GetPlayerController then
+                    pc = slua_GameFrontendHUD:GetPlayerController()
+                end
+            end)
+            return pc and slua.isValid(pc) and pc or nil
+        end
+
+        function getLocalChar()
+            local ok, GD = pcall(require, "GameLua.GameCore.Data.GameplayData")
+            if ok and GD and GD.GetPlayerCharacter then
+                local char = GD.GetPlayerCharacter()
+                if char and slua.isValid(char) then return char end
+            end
+            local pc = getPlayerController()
+            if pc then
+                local char = nil
+                pcall(function()
+                    if pc.GetPlayerCharacterSafety then char = pc:GetPlayerCharacterSafety() end
+                    if (not char or not slua.isValid(char)) and pc.GetPawn then char = pc:GetPawn() end
+                    if (not char or not slua.isValid(char)) and pc.K2_GetPawn then char = pc:K2_GetPawn() end
+                end)
+                if char and slua.isValid(char) then return char end
+            end
+            return nil
+        end
+
+        local function Notify(msg)
+            if not DEBUGG or isInMatchOrGame() then return end
+            msg = "[AddOutfit] " .. tostring(msg)
+            log(msg:gsub("^%[AddOutfit%] ", ""))
+            pcall(function()
+                if ShowNotice then ShowNotice(msg, false, 10) end
+            end)
+        end
+
+        local function getDesiredOutfit()
+            if MATCH_CONFIG.outfitRes and tonumber(MATCH_CONFIG.outfitRes) > 0 then
+                return tonumber(MATCH_CONFIG.outfitRes)
+            end
+            local cch = cache()
+            if tonumber(cch.outfitRes) and cch.outfitRes > 0 then return cch.outfitRes end
+            if tonumber(_G.AddOutfitLastLobbyOutfitRes) and _G.AddOutfitLastLobbyOutfitRes > 0 then
+                return tonumber(_G.AddOutfitLastLobbyOutfitRes)
+            end
+            return nil
+        end
+
+        local function getWearSlotForResID(resID)
+            resID = tonumber(resID)
+            if not resID then return nil end
+            local itemCfg = cfg(resID)
+            if not itemCfg then return 3 end
+            local st = tonumber(itemCfg.ItemSubType or itemCfg.itemSubType or 0)
+            if st == 401 then return 1 end
+            if st == 402 then return 2 end
+            if st == 403 then return 3 end
+            if st == 404 then return 4 end
+            if st == 405 then return 5 end
+            if st == 407 then return 6 end
+            if st == 400 or st == 408 then return 9 end
+            if st == 409 or st == 410 then return 10 end
+            if getEquipSkinSlot(resID) then return nil end
+            if weaponIdFromSkin(resID) then return nil end
+            return 3
+        end
+
+        local function makeWearEntry(resID)
+            local ENUM = ENUM_AVATAR_DATA_TYPE or { ItemID = 1, ColorID = 2, PatternID = 3 }
+            return { [ENUM.ItemID] = resID, [ENUM.ColorID] = 0, [ENUM.PatternID] = 0 }
+        end
+
+        local function isApplySuccess(r) return r ~= false end
+        
+        local function refreshMatchAvatar(comp)
+            if not slua.isValid(comp) then return end
+            pcall(function() if comp.ProcessAvatarRectify then comp:ProcessAvatarRectify() end end)
+            pcall(function() if comp.OnRep_BodySlotStateChanged then comp:OnRep_BodySlotStateChanged() end end)
+            pcall(function() if comp.RefreshAvatarReAttach then comp:RefreshAvatarReAttach() end end)
+        end
+        
+        local function applyItemToMatchAvatar(comp, resID)
+            if not slua.isValid(comp) or not resID or not isInjectedRes(resID) then return false end
+            resID = tonumber(resID)
+            local applied = false
+            pcall(function()
+                comp.bSyncAvatar = false
+                comp.forceLodMode = true
+                comp.bIsLobbyAvatar = false
+            end)
+            local AvatarData = require("client.logic.data.AvatarData")
+            local wearEntry = makeWearEntry(resID)
+            local AData = AvatarData.ConvertToAvatarCustom and AvatarData.ConvertToAvatarCustom(wearEntry)
+                or AvatarData.CreateAvatarCustom(resID, 0, 0)
+            pcall(function()
+                if comp.PutOnEquipmentByResID then
+                    local r = comp:PutOnEquipmentByResID(AData.ItemID or resID, AData)
+                    if isApplySuccess(r) then applied = true end
+                end
+            end)
+            if not applied then
+                pcall(function()
+                    if comp.PutOnCustomEquipmentByID then
+                        local r = comp:PutOnCustomEquipmentByID(resID, AData)
+                        if isApplySuccess(r) then applied = true end
+                    end
+                end)
+            end
+            if not applied then
+                pcall(function()
+                    local ItemDefineID = FItemDefineID(4, resID)
+                    local EAvatarCustomType = import("EAvatarCustomType")
+                    local AvatarCustom = FAvatarCustomDefault()
+                    AvatarCustom.CustomType = EAvatarCustomType.AvatarCustomCharacter
+                    local r = comp:HandleEquipItem(ItemDefineID, AvatarCustom)
+                    if isApplySuccess(r) then applied = true end
+                end)
+            end
+            if applied then refreshMatchAvatar(comp) end
+            return applied
+        end
+
+        local function applyClothToComp(comp, resID)
+            if not slua.isValid(comp) then return false end
+            local ok = false
+            pcall(function()
+                if comp.PutOnCustomEquipmentByID then
+                    local r = comp:PutOnCustomEquipmentByID(resID)
+                    if isApplySuccess(r) then ok = true end
+                end
+            end)
+            if ok then return true end
+            return applyItemToMatchAvatar(comp, resID)
+        end
+
+        local function matchApplyOutfit(char)
+            syncWeaponCacheFromLobby()
+            syncClothesCacheFromLobby()
+            local comp = char.CharacterAvatarComp2_BP
+            if not slua.isValid(comp) then return false end
+
+            local outfitRes = getDesiredOutfit()
+            local applied = false
+
+            if outfitRes and isFullSuitRes(outfitRes) then
+                pcall(function()
+                    local r = comp:PutOnCustomEquipmentByID(outfitRes)
+                    if isApplySuccess(r) then applied = true end
+                end)
+                if not applied then
+                    pcall(function()
+                        local r = comp:HandleEquipItem(FItemDefineID(4, outfitRes), FAvatarCustomDefault())
+                        if isApplySuccess(r) then applied = true end
+                    end)
+                end
+                if applied then _G.ZoulObbNotiff("suit OK " .. outfitRes) end
+
+                for resID in pairs(collectAllClothResIDs()) do
+                    if resID ~= outfitRes and not isFullSuitRes(resID)
+                        and not isBodyClothSubType(subType(cfg(resID)))
+                        and applyClothToComp(comp, resID) then
+                        applied = true
+                        
+                       
+                        
+                    end
+                end
+            else
+                for resID in pairs(collectAllClothResIDs()) do
+                    if not isFullSuitRes(resID) and applyClothToComp(comp, resID) then
+                        applied = true
+                        _G.ZoulObbNotiff("clothes OK " .. resID)
+                    end
+                end
+            end
+            
+            if applied then
+                refreshMatchAvatar(comp)
+            end
+            ]]
+            return applied
+        end
+
+        local _lastPatchTime = 0
+        local function patchPlayerInfoForMatch(PlayerInfo)
+            if not PlayerInfo then return end
+            local now = 0
+            pcall(function() now = os.clock() end)
+            if (now - _lastPatchTime) < 1.0 then return end  
+            _lastPatchTime = now
+            snapshotLobbyWear()
+            local cch = cache()
+            if cch.equip.bag then PlayerInfo.bag_skin = cch.equip.bag end
+            if cch.equip.helmet then PlayerInfo.helmet_skin = cch.equip.helmet end
+            if cch.equip.armor then PlayerInfo.armor_skin = cch.equip.armor end
+
+            local idx = tonumber(PlayerInfo.use_rolewear) or 1
+            PlayerInfo.use_rolewear = idx
+            PlayerInfo.all_knapsack_ext_info = PlayerInfo.all_knapsack_ext_info or {}
+            PlayerInfo.all_knapsack_ext_info[idx] = PlayerInfo.all_knapsack_ext_info[idx] or {}
+            local ext = PlayerInfo.all_knapsack_ext_info[idx]
+            if cch.equip.bag then
+                local catalogBag = normalizeEquipCatalogRes(cch.equip.bag)
+                local bagLists = buildEquipSkinLists(catalogBag)
+                ext.bag_skin = catalogBag
+                ext.bag_skin_list = bagLists
+                PlayerInfo.bag_skin = catalogBag
+            end
+            if cch.equip.helmet then
+                local catalogHelm = normalizeEquipCatalogRes(cch.equip.helmet)
+                local helmLists = buildEquipSkinLists(catalogHelm)
+                ext.helmet_skin = catalogHelm
+                ext.helmet_skin_list = helmLists
+                PlayerInfo.helmet_skin = catalogHelm
+            end
+            if cch.equip.armor then ext.armor_skin = cch.equip.armor end
+            if cch.equip.parachute and cch.equip.parachute > 0 then
+                ext.parachute = cch.equip.parachuteIns or cch.equip.parachute
+            end
+            if cch.equip.glider and cch.equip.glider > 0 then
+                ext.gliding = cch.equip.glider
+            end
+
+            pcall(function()
+                if cch.throwObjects then
+                    local throwList = {}
+                    for st, info in pairs(cch.throwObjects) do
+                        if info.resID and info.resID > 0 and _K.THROW_SUB[st] then
+                            throwList[st] = info.resID
+                        end
+                    end
+                    if next(throwList) then
+                        local function applyThrowList(kext)
+                            if not kext then return end
+                            kext.throw_object_list = kext.throw_object_list or {}
+                            for st, resID in pairs(throwList) do
+                                kext.throw_object_list[st] = resID
+                            end
+                        end
+                        applyThrowList(ext)
+                        applyThrowList(PlayerInfo.knapsack_ext_info)
+                        PlayerInfo.all_knapsack_ext_info = PlayerInfo.all_knapsack_ext_info or {}
+                        for i = 1, 6 do
+                            PlayerInfo.all_knapsack_ext_info[i] = PlayerInfo.all_knapsack_ext_info[i] or {}
+                            applyThrowList(PlayerInfo.all_knapsack_ext_info[i])
+                        end
+                        for i, kext in pairs(PlayerInfo.all_knapsack_ext_info) do
+                            applyThrowList(kext)
+                        end
+                        log("patchPlayerInfoForMatch: throw_object_list injected into all knapsack entries")
+                    end
+                end
+            end)
+
+            pcall(function()
+                if DataMgr and DataMgr.VehicleSlotList then
+                    PlayerInfo.vst_in_battle = PlayerInfo.vst_in_battle or {}
+                    for subType, insList in pairs(DataMgr.VehicleSlotList) do
+                        if insList and type(insList) == "table" then
+                            local resList = {}
+                            for i, insID in ipairs(insList) do
+                                insID = tonumber(insID)
+                                if insID and insID > 0 then
+                                    local resID
+                                    if isInjectedIns(insID) then
+                                        resID = R.insToRes[insID]
+                                    else
+                                        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                                        local d = wd:GetHallDepotItemDataByInsID(insID)
+                                        resID = d and tonumber(d.resID)
+                                    end
+                                    if resID and resID > 0 then
+                                        resList[#resList + 1] = resID
+                                    end
+                                end
+                            end
+                            if #resList > 0 then
+                                PlayerInfo.vst_in_battle[subType] = resList
+                            end
+                        end
+                    end
+                    if DataMgr.vst_skin then
+                        local skinIns = tonumber(DataMgr.vst_skin)
+                        if skinIns and skinIns > 0 then
+                            local skinRes
+                            if isInjectedIns(skinIns) then
+                                skinRes = R.insToRes[skinIns]
+                            else
+                                local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                                local d = wd:GetHallDepotItemDataByInsID(skinIns)
+                                skinRes = d and tonumber(d.resID)
+                            end
+                            if skinRes and skinRes > 0 then
+                                PlayerInfo.vst_skin = skinRes
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        local _lastApplyEquipToController = 0
+        local function applyMatchEquipAvatarToController()
+            local now = 0
+            pcall(function() now = os.clock() end)
+            if (now - _lastApplyEquipToController) < 0.2 then return false end  
+            _lastApplyEquipToController = now
+            local pc = getPlayerController()
+            if not pc or not slua.isValid(pc) then return false end
+            local cch = cache()
+            if not cch.equip.bag and not cch.equip.helmet and not cch.equip.armor and not cch.equip.parachute and not cch.equip.glider then return false end
+
+            local char = getLocalChar()
+            local eq = pc.InitialEquipmentAvatar or {}
+
+            if cch.equip.bag and cch.equip.bag > 0 and isWearingEquip(char, "bag") then
+                local catalogBag = normalizeEquipCatalogRes(cch.equip.bag)
+                local bagLists = buildEquipSkinLists(catalogBag)
+                eq.BagAvatar = catalogBag
+                eq.BagAvatarList = bagLists
+                local realBagId = getCharEquipLevel(char, 8) or 0
+                local bagLevel
+                if realBagId > 0 and isBaseEquipItemId(realBagId) then
+                    bagLevel = detectEquipLevelFromBaseId(realBagId, catalogBag)
+                elseif realBagId > 0 then
+                    bagLevel = detectLevelFromEquipRes(realBagId)
+                end
+                bagLevel = bagLevel or getEquipDisplayLevel(cch.equip.bag, "bag")
+                local bagDisplay = mapEquipSkinRes(catalogBag, bagLevel)
+                if bagDisplay > 0 then eq.BagAvatar = bagDisplay end
+            else
+                eq.BagAvatar = 0
+                eq.BagAvatarList = nil
+            end
+
+            if cch.equip.helmet and cch.equip.helmet > 0 and isWearingEquip(char, "helmet") then
+                local catalogHelm = normalizeEquipCatalogRes(cch.equip.helmet)
+                local helmLists = buildEquipSkinLists(catalogHelm)
+                eq.HelmetAvatar = catalogHelm
+                eq.HelmetAvatarList = helmLists
+                local realHelmId = getCharEquipLevel(char, 9) or 0
+                local helmLevel
+                if realHelmId > 0 and isBaseEquipItemId(realHelmId) then
+                    helmLevel = detectEquipLevelFromBaseId(realHelmId, catalogHelm)
+                elseif realHelmId > 0 then
+                    helmLevel = detectLevelFromEquipRes(realHelmId)
+                end
+                helmLevel = helmLevel or getEquipDisplayLevel(cch.equip.helmet, "helmet")
+                local helmDisplay = mapEquipSkinRes(catalogHelm, helmLevel)
+                if helmDisplay > 0 then eq.HelmetAvatar = helmDisplay end
+            else
+                eq.HelmetAvatar = 0
+                eq.HelmetAvatarList = nil
+            end
+            if cch.equip.armor then eq.ArmorAvatar = cch.equip.armor end
+            if cch.equip.parachute and cch.equip.parachute > 0 then
+                eq.ParachuteAvatar = cch.equip.parachute
+            end
+            if cch.equip.glider and cch.equip.glider > 0 then
+                eq.GliderAvatar = cch.equip.glider
+            end
+
+            pc.InitialEquipmentAvatar = eq
+            pcall(function()
+                if slua.isValid(pc.PlayerState) and pc.PlayerState.MetroPlayerStateAvatarFeature then
+                    pc.PlayerState.MetroPlayerStateAvatarFeature.InitialEquipmentAvatar = eq
+                end
+            end)
+            pcall(function()
+                local comp = char and char.CharacterAvatarComp2_BP
+                if slua.isValid(comp) and comp.GetEquipmentSkinItemID then
+                    if cch.equip.helmet and isWearingEquip(char, "helmet") then
+                        pcall(function() comp:GetEquipmentSkinItemID(cch.equip.helmet) end)
+                    end
+                    if cch.equip.bag and isWearingEquip(char, "bag") then
+                        pcall(function() comp:GetEquipmentSkinItemID(cch.equip.bag) end)
+                    end
+                    if cch.equip.parachute and isWearingEquip(char, "parachute") then
+                        pcall(function() comp:GetEquipmentSkinItemID(cch.equip.parachute) end)
+                    end
+                    if cch.equip.glider and cch.equip.glider > 0 then
+                        pcall(function() comp:GetEquipmentSkinItemID(cch.equip.glider) end)
+                    end
+                end
+            end)
+            pcall(function()
+                if pc.OnEquipmentAvatarChange and pc.OnEquipmentAvatarChange.Broadcast then
+                    pc.OnEquipmentAvatarChange:Broadcast()
+                end
+            end)
+            _G.ZoulObbNotiff("Equipment: Helmet=" .. tostring(eq.HelmetAvatar) .. "bag=" .. tostring(eq.BagAvatar))
+            return true
+        end
+
+        local function hookEquipMapping()
+            pcall(function()
+                if DataMgr and not DataMgr._lava_equip_map_hooked then
+                    DataMgr._lava_equip_map_hooked = true
+                    local orig = DataMgr.GetEquipmentItemIDByResID
+                    DataMgr.GetEquipmentItemIDByResID = function(level, itemResID)
+                        level, itemResID = tonumber(level) or 3, tonumber(itemResID)
+                        local catalogRes = normalizeEquipCatalogRes(itemResID)
+                        local r = orig(level, catalogRes)
+                        if r and r > 0 then return r end
+                        if isInjectedIns(itemResID) then
+                            return mapEquipSkinRes(normalizeEquipCatalogRes(R.insToRes[itemResID]), level)
+                        end
+                        if isInjectedRes(itemResID) then
+                            return mapEquipSkinRes(catalogRes, level)
+                        end
+                        return r or 0
+                    end
+                end
+            end)
+            pcall(function()
+                local lav = require("client.slua.logic.wardrobe.logic_wardrobe_avatar")
+                if lav._lava_skinins_hooked then return end
+                lav._lava_skinins_hooked = true
+                local orig2 = lav.GetEquipmentItemIDBySkinInsID
+                lav.GetEquipmentItemIDBySkinInsID = function(self, itemSubType, itemInsID)
+                    local level = lav.GetEquipmentItemShowLevel(lav, itemSubType)
+                    local r = orig2(self, itemSubType, itemInsID)
+                    if r and r > 0 then return r end
+                    itemInsID = tonumber(itemInsID)
+                    if isInjectedIns(itemInsID) then
+                        return mapEquipSkinRes(normalizeEquipCatalogRes(R.insToRes[itemInsID]), level)
+                    end
+                    pcall(function()
+                        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                        local d = wd:GetHallDepotItemDataByInsID(itemInsID)
+                        if d and isInjectedRes(d.resID) then
+                            return mapEquipSkinRes(normalizeEquipCatalogRes(d.resID), level)
+                        end
+                    end)
+                    return r
+                end
+            end)
+            pcall(function()
+                local CAC = require("GameLua.Mod.Library.GamePlay.Avatar.Component.CharacterAvatarComponent")
+                if CAC._lava_equip_skin_hooked then return end
+                CAC._lava_equip_skin_hooked = true
+                local orig3 = CAC.GetEquipmentSkinItemID
+                CAC.GetEquipmentSkinItemID = function(self, InItemID)
+                    
+                    if self.IsSelf and not self:IsSelf() then
+                        return orig3(self, InItemID)
+                    end
+                    local cch = cache()
+                    InItemID = tonumber(InItemID) or 0
+
+                    local function tryGetSkin(catalogRes)
+                        if not catalogRes or catalogRes <= 0 then return 0 end
+                        catalogRes = normalizeEquipCatalogRes(catalogRes)
+                        local skin = resolveMatchEquipSkin(catalogRes, InItemID)
+                        if skin > 0 then return skin end
+                        for lvl = 1, 3 do
+                            local s = mapEquipSkinRes(catalogRes, lvl)
+                            if s > 0 then return s end
+                        end
+                        return 0
+                    end
+
+                    if InItemID > 0 and isBaseEquipItemId(InItemID) then
+                        local isHelmetBase = GAME_HELMET_LEVEL[InItemID] ~= nil
+                            or (InItemID >= 1505000001 and InItemID <= 1505000100)
+                            or (InItemID >= 502001 and InItemID <= 502999)
+                        local isBagBase = GAME_BAG_LEVEL[InItemID] ~= nil
+                            or (InItemID >= 501001 and InItemID <= 501999)
+                            or (InItemID >= 1501000000 and InItemID < 1502000000)
+
+                        local char = getLocalChar()
+                        if isHelmetBase and cch.equip.helmet and cch.equip.helmet > 0 then
+                            if char and isWearingEquip(char, "helmet") then
+                                local skin = tryGetSkin(cch.equip.helmet)
+                                if skin > 0 then return skin end
+                            end
+                        end
+                        if isBagBase and cch.equip.bag and cch.equip.bag > 0 then
+                            if char and isWearingEquip(char, "bag") then
+                                local skin = tryGetSkin(cch.equip.bag)
+                                if skin > 0 then return skin end
+                            end
+                        end
+                    end
+
+                    local origResult = orig3(self, InItemID)
+                    if origResult and origResult > 0 and origResult ~= InItemID then
+                        return origResult
+                    end
+
+                    
+                    local isHelmetQuery = GAME_HELMET_LEVEL[InItemID] ~= nil or (InItemID >= 502001 and InItemID <= 502999)
+                    local isBagQuery = GAME_BAG_LEVEL[InItemID] ~= nil or (InItemID >= 501001 and InItemID <= 501999)
+                    local char = getLocalChar()
+
+                    if isHelmetQuery and cch.equip.helmet and cch.equip.helmet > 0 then
+                        if char and isWearingEquip(char, "helmet") then
+                            local skin = tryGetSkin(cch.equip.helmet)
+                            if skin > 0 then return skin end
+                        end
+                    end
+                    if isBagQuery and cch.equip.bag and cch.equip.bag > 0 then
+                        if char and isWearingEquip(char, "bag") then
+                            local skin = tryGetSkin(cch.equip.bag)
+                            if skin > 0 then return skin end
+                        end
+                    end
+                    return origResult
+                end
+                local origEquipFinish = CAC.OnAvatarEquipFinish
+                CAC.OnAvatarEquipFinish = function(self, slotType, isEquipped, itemID)
+                    if origEquipFinish then origEquipFinish(self, slotType, isEquipped, itemID) end
+                    if not isEquipped then return end
+                    
+                    if not self.IsSelf or not self:IsSelf() then return end
+                    pcall(function()
+                        if self.IsLobbyActor and self:IsLobbyActor() then return end
+                        local EAvatarSlotType = import("EAvatarSlotType")
+                        local cch = cache()
+                        local isHelmet = slotType == EAvatarSlotType.EAvatarSlotType_HelmetEquipemtSlot
+                        local isBag = slotType == EAvatarSlotType.EAvatarSlotType_BackpackEquipemtSlot
+                        if (isHelmet and cch.equip.helmet and cch.equip.helmet > 0)
+                            or (isBag and cch.equip.bag and cch.equip.bag > 0) then
+                            local owner = self.GetOwner and self:GetOwner()
+                            if owner and slua.isValid(owner) and owner.AddGameTimer then
+                                owner:AddGameTimer(0.10, false, function()
+                                    if slua.isValid(owner) then matchApplyEquipSkins(owner) end
+                                end)
+                            end
+                        end
+                        applyMatchEquipAvatarToController()
+                    end)
+                end
+            end)
+        end
+
+        local function applyMatchEquipSkinAtLevel(comp, catalogResID, level)
+            if not slua.isValid(comp) or not catalogResID or catalogResID <= 0 then return false end
+            catalogResID = normalizeEquipCatalogRes(catalogResID)
+            level = tonumber(level) or 3
+            local skinId = mapEquipSkinRes(catalogResID, level)
+            if not skinId or skinId <= 0 then skinId = catalogResID end
+            local ok = false
+            pcall(function()
+                if comp.PutOnCustomEquipmentByID then
+                    local r = comp:PutOnCustomEquipmentByID(skinId)
+                    if isApplySuccess(r) then ok = true end
+                end
+            end)
+            if not ok then
+                pcall(function()
+                    local r = comp:HandleEquipItem(FItemDefineID(4, skinId), FAvatarCustomDefault())
+                    if isApplySuccess(r) then ok = true end
+                end)
+            end
+            if ok then refreshMatchAvatar(comp) end
+            return ok
+        end
+
+        
+        local function getCharEquipLevel(char, slotID)
+            local found = nil
+            pcall(function()
+                local comp = char and char.CharacterAvatarComp2_BP
+                if not slua.isValid(comp) then return end
+                local NetAvatarData = slua.IndexReference(comp, "NetAvatarData")
+                if not NetAvatarData then return end
+                local TempSlotSyncData = slua.IndexReference(NetAvatarData, "SlotSyncData")
+                if not TempSlotSyncData then return end
+                for Index, AvatarSynData in pairs(TempSlotSyncData) do
+                    if AvatarSynData.SlotID == slotID and AvatarSynData.ItemID and AvatarSynData.ItemID > 0 then
+                        found = AvatarSynData.ItemID
+                        return
+                    end
+                end
+            end)
+            return found
+        end
+
+        local function isWearingEquip(char, slot)
+            local slotID = (slot == "helmet") and 9 or (slot == "bag") and 8 or (slot == "parachute") and 11 or (slot == "glider") and 15 or nil
+            if not slotID then return false end
+
+            
+            local itemID = getCharEquipLevel(char, slotID)
+            if itemID and itemID > 0 then return true end
+
+            
+            local wearing = false
+            pcall(function()
+                local pc = getPlayerController()
+                if not pc or not slua.isValid(pc) then return end
+                if pc.PlayerState and pc.PlayerState.MetroPlayerStateAvatarFeature then
+                    local psEquip = pc.PlayerState.MetroPlayerStateAvatarFeature.EquipmentAvatarData
+                    if psEquip then
+                        if slot == "helmet" and psEquip.HelmetAvatar and psEquip.HelmetAvatar > 0 then
+                            wearing = true
+                        elseif slot == "bag" and psEquip.BagAvatar and psEquip.BagAvatar > 0 then
+                            wearing = true
+                        end
+                    end
+                end
+            end)
+            return wearing
+        end
+
+        local _lastMatchApplyEquip = 0
+        local function matchApplyEquipSkins(char)
+            local now = 0
+            pcall(function() now = os.clock() end)
+            if (now - _lastMatchApplyEquip) < 0.1 then return false end  
+            _lastMatchApplyEquip = now
+            local cch = cache()
+            if not cch.equip.bag and not cch.equip.helmet and not cch.equip.parachute and not cch.equip.glider then return false end
+            local comp = char and char.CharacterAvatarComp2_BP
+            if not slua.isValid(comp) then return false end
+            local ok = false
+
+            if cch.equip.helmet and cch.equip.helmet > 0 then
+                if isWearingEquip(char, "helmet") then
+                    local catalogHelm = normalizeEquipCatalogRes(cch.equip.helmet)
+                    local realHelmId = getCharEquipLevel(char, 9) or 0
+                    local helmLevel
+                    if realHelmId > 0 and isBaseEquipItemId(realHelmId) then
+                        helmLevel = detectEquipLevelFromBaseId(realHelmId, catalogHelm)
+                    elseif realHelmId > 0 then
+                        helmLevel = detectLevelFromEquipRes(realHelmId)
+                    end
+                    helmLevel = helmLevel or getEquipDisplayLevel(cch.equip.helmet, "helmet")
+                    if applyMatchEquipSkinAtLevel(comp, catalogHelm, helmLevel) then
+                        ok = true
+                        _G.ZoulObbNotiff("Match Helmet OK " .. mapEquipSkinRes(catalogHelm, helmLevel))
+                    end
+                end
+            end
+
+            if cch.equip.bag and cch.equip.bag > 0 then
+                if isWearingEquip(char, "bag") then
+                    local catalogBag = normalizeEquipCatalogRes(cch.equip.bag)
+                    local realBagId = getCharEquipLevel(char, 8) or 0
+                    local bagLevel
+                    if realBagId > 0 and isBaseEquipItemId(realBagId) then
+                        bagLevel = detectEquipLevelFromBaseId(realBagId, catalogBag)
+                    elseif realBagId > 0 then
+                        bagLevel = detectLevelFromEquipRes(realBagId)
+                    end
+                    bagLevel = bagLevel or getEquipDisplayLevel(cch.equip.bag, "bag")
+                    if applyMatchEquipSkinAtLevel(comp, catalogBag, bagLevel) then
+                        ok = true
+                        _G.ZoulObbNotiff("Match bag OK " .. mapEquipSkinRes(catalogBag, bagLevel))
+                    end
+                end
+            end
+
+            if cch.equip.parachute and cch.equip.parachute > 0 then
+                if isWearingEquip(char, "parachute") then
+                    local paraResID = cch.equip.parachute
+                    pcall(function()
+                        if comp.PutOnCustomEquipmentByID then
+                            local r = comp:PutOnCustomEquipmentByID(paraResID)
+                            if isApplySuccess(r) then
+                                ok = true
+                                _G.ZoulObbNotiff("Parachute Match OK " .. tostring(paraResID))
+                            end
+                        end
+                    end)
+                    if not ok then
+                        pcall(function()
+                            local r = comp:HandleEquipItem(FItemDefineID(4, paraResID), FAvatarCustomDefault())
+                            if isApplySuccess(r) then
+                                ok = true
+                                _G.ZoulObbNotiff("Parachute Match OK " .. tostring(paraResID))
+                            end
+                        end)
+                    end
+                end
+            end
+
+            if cch.equip.glider and cch.equip.glider > 0 then
+                local gliderResID = cch.equip.glider
+                pcall(function()
+                    if comp.PutOnCustomEquipmentByID then
+                        local r = comp:PutOnCustomEquipmentByID(gliderResID)
+                        if isApplySuccess(r) then
+                            ok = true
+                            _G.ZoulObbNotiff("Glider Match OK " .. tostring(gliderResID))
+                        end
+                    end
+                end)
+                if not ok then
+                    pcall(function()
+                        local r = comp:HandleEquipItem(FItemDefineID(4, gliderResID), FAvatarCustomDefault())
+                        if isApplySuccess(r) then
+                            ok = true
+                            _G.ZoulObbNotiff("Glider Match OK " .. tostring(gliderResID))
+                        end
+                    end)
+                end
+            end
+
+            
+            applyMatchEquipAvatarToController()
+
+            
+            pcall(function()
+                local NetAvatarData = slua.IndexReference(comp, "NetAvatarData")
+                if not NetAvatarData then return end
+                local TempSlotSyncData = slua.IndexReference(NetAvatarData, "SlotSyncData")
+                if not TempSlotSyncData then return end
+
+                for Index, AvatarSynData in pairs(TempSlotSyncData) do
+                    local slotID = AvatarSynData.SlotID
+                    local NDRid = AvatarSynData.ItemID
+
+                    if slotID == 8 and NDRid ~= 0 and cch.equip.bag and cch.equip.bag > 0 then
+                        local catalogBag = normalizeEquipCatalogRes(cch.equip.bag)
+                        local bagLevel
+                        if isBaseEquipItemId(NDRid) then
+                            bagLevel = detectEquipLevelFromBaseId(NDRid, catalogBag)
+                        else
+                            bagLevel = detectLevelFromEquipRes(NDRid)
+                        end
+                        bagLevel = bagLevel or getEquipDisplayLevel(cch.equip.bag, "bag")
+                        local skinId = mapEquipSkinRes(catalogBag, bagLevel)
+                        if skinId <= 0 then skinId = mapEquipSkinRes(catalogBag, 3) end
+                        if skinId > 0 and NDRid ~= skinId then
+                            AvatarSynData.ItemID = skinId
+                            slua.IndexReference(NetAvatarData, "SlotSyncData"):Set(Index, AvatarSynData)
+                            ok = true
+                        end
+                    end
+
+                    if slotID == 9 and NDRid ~= 0 and cch.equip.helmet and cch.equip.helmet > 0 then
+                        local catalogHelm = normalizeEquipCatalogRes(cch.equip.helmet)
+                        local helmLevel
+                        if isBaseEquipItemId(NDRid) then
+                            helmLevel = detectEquipLevelFromBaseId(NDRid, catalogHelm)
+                        else
+                            helmLevel = detectLevelFromEquipRes(NDRid)
+                        end
+                        helmLevel = helmLevel or getEquipDisplayLevel(cch.equip.helmet, "helmet")
+                        local skinId = mapEquipSkinRes(catalogHelm, helmLevel)
+                        if skinId <= 0 then skinId = mapEquipSkinRes(catalogHelm, 3) end
+                        if skinId > 0 and NDRid ~= skinId then
+                            AvatarSynData.ItemID = skinId
+                            slua.IndexReference(NetAvatarData, "SlotSyncData"):Set(Index, AvatarSynData)
+                            ok = true
+                        end
+                    end
+
+                    
+                    if slotID == 11 and NDRid ~= 0 and cch.equip.parachute and cch.equip.parachute > 0 then
+                        local paraResID = cch.equip.parachute
+                        if NDRid ~= paraResID then
+                            AvatarSynData.ItemID = paraResID
+                            slua.IndexReference(NetAvatarData, "SlotSyncData"):Set(Index, AvatarSynData)
+                            ok = true
+                        end
+                    end
+
+                    
+                    if slotID == 15 and NDRid ~= 0 and cch.equip.glider and cch.equip.glider > 0 then
+                        local gliderResID = cch.equip.glider
+                        if NDRid ~= gliderResID then
+                            AvatarSynData.ItemID = gliderResID
+                            slua.IndexReference(NetAvatarData, "SlotSyncData"):Set(Index, AvatarSynData)
+                            ok = true
+                        end
+                    end
+                end
+
+                if ok and comp.OnRep_BodySlotStateChanged then
+                    comp:OnRep_BodySlotStateChanged()
+                end
+            end)
+            return ok
+        end
+
+        local function hookPlayerWearingDone()
+            pcall(function()
+                local pc = getPlayerController()
+                if not pc or not slua.isValid(pc) or pc._lava_wear_done_hooked then return end
+                pc._lava_wear_done_hooked = true
+                if pc.OnPlayerChangeWearingDone and pc.OnPlayerChangeWearingDone.Add then
+                    pc.OnPlayerChangeWearingDone:Add(function()
+                        applyMatchEquipAvatarToController()
+                        local char = getLocalChar()
+                        if char then
+                            char:AddGameTimer(0.2, false, function()
+                                if slua.isValid(char) then matchApplyEquipSkins(char) end
+                            end)
+                        end
+                    end)
+                end
+            end)
+        end
+
+        local function hookCommerAvatarData()
+            pcall(function()
+                local CommerAvatarDataUtil = require("GameLua.Activity.Commercialize.GamePlay.CommerAvatarDataUtil")
+                if CommerAvatarDataUtil._lava_hooked_equip then return end
+                CommerAvatarDataUtil._lava_hooked_equip = true
+                local orig = CommerAvatarDataUtil.GeneratePlayerAvatarData
+                CommerAvatarDataUtil.GeneratePlayerAvatarData = function(self, PlayerInfo, uPlayerController, ...)
+                    
+                    local localPC = getPlayerController()
+                    if uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        pcall(function() patchPlayerInfoForMatch(PlayerInfo) end)
+                    end
+                    orig(self, PlayerInfo, uPlayerController, ...)
+                    if uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        applyMatchEquipAvatarToController()
+                    end
+                end
+            end)
+        end
+
+        local function hookMatchAvatarData()
+            hookCommerAvatarData()
+            pcall(function()
+                local AvatarDataUtil = require("GameLua.Mod.Library.GamePlay.Avatar.AvatarDataUtil")
+                if AvatarDataUtil._lava_hooked_gen then return end
+                AvatarDataUtil._lava_hooked_gen = true
+                local origGet = AvatarDataUtil.GetPlayerInfo
+                AvatarDataUtil.GetPlayerInfo = function(uPlayerController)
+                    local pi = origGet(uPlayerController)
+                    
+                    local localPC = getPlayerController()
+                    if pi and uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        patchPlayerInfoForMatch(pi)
+                    end
+                    return pi
+                end
+                local origGen = AvatarDataUtil.GeneratePlayerAvatarData
+                AvatarDataUtil.GeneratePlayerAvatarData = function(uPlayerController)
+                    
+                    local localPC = getPlayerController()
+                    if uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        pcall(function()
+                            local PlayerInfo = AvatarDataUtil.GetPlayerInfo(uPlayerController)
+                            if PlayerInfo then patchPlayerInfoForMatch(PlayerInfo) end
+                        end)
+                    end
+                    origGen(uPlayerController)
+                    if uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        applyMatchEquipAvatarToController()
+                    end
+                    return
+                end
+                local origInit = AvatarDataUtil.InitialEquipmentAvatar
+                AvatarDataUtil.InitialEquipmentAvatar = function(PlayerInfo, uPlayerController)
+                    
+                    local localPC = getPlayerController()
+                    if uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        pcall(function() patchPlayerInfoForMatch(PlayerInfo) end)
+                    end
+                    origInit(PlayerInfo, uPlayerController)
+                    if uPlayerController and slua.isValid(uPlayerController) and uPlayerController == localPC then
+                        applyMatchEquipAvatarToController()
+                    end
+                end
+            end)
+        end
+
+        local function hookClassMethod(classModule, methodName, hookTag, newFunc)
+            if not classModule then log("hookClassMethod: nil classModule for", methodName) return false end
+            local impl = classModule.__inner_impl
+            if not impl then log("hookClassMethod: no __inner_impl for", methodName) return false end
+            if impl[hookTag] then log("hookClassMethod: already hooked", methodName) return false end
+            local orig = impl[methodName]
+            if not orig then log("hookClassMethod: no orig method", methodName) return false end
+            impl[hookTag] = true
+            impl[methodName] = function(...)
+                return newFunc(orig, ...)
+            end
+            pcall(function() rawset(classModule, methodName, nil) end)
+            
+            return true
+        end
+
+        local function hookGrenadeAvatarInit()
+            pcall(function()
+                local PCB = require("GameLua.GameCore.Framework.PlayerControllerBase")
+                
+                hookClassMethod(PCB, "InitGrenadeAvatarList", "_lava_hooked_grenade_init", function(orig, self, ReInitial)
+                    orig(self, ReInitial)
+                    
+                    local localPC = getPlayerController()
+                    if not localPC or self ~= localPC then return end
+                    if ReInitial then
+                        pcall(function()
+                            local cch = cache()
+                            if cch.throwObjects and self.AddToGrenadeAvatarItemList then
+                                for st, info in pairs(cch.throwObjects) do
+                                    if info.resID and info.resID > 0 and _K.THROW_SUB[st] then
+                                        self:AddToGrenadeAvatarItemList(info.resID)
+                                    end
+                                end
+                            end
+                        end)
+                    end
+                end)
+            end)
+        end
+
+        local function applyGrenadeSkinsToController()
+            local pc = getPlayerController()
+            if not pc or not slua.isValid(pc) then return false end
+            local cch = cache()
+            if not cch.throwObjects then return false end
+            local hasThrow = false
+            for _, info in pairs(cch.throwObjects) do
+                if info.resID and info.resID > 0 then hasThrow = true break end
+            end
+            if not hasThrow then return false end
+            pcall(function()
+                if pc.AddToGrenadeAvatarItemList then
+                    for st, info in pairs(cch.throwObjects) do
+                        if info.resID and info.resID > 0 and _K.THROW_SUB[st] then
+                            pc:AddToGrenadeAvatarItemList(info.resID)
+                        end
+                    end
+                end
+                if pc.OnWeaponAvatarUpdate then
+                    pc:OnWeaponAvatarUpdate()
+                end
+                local char = getLocalChar()
+                if char and slua.isValid(char) then
+                    local curWeapon = char.GetCurrentWeapon and char:GetCurrentWeapon()
+                    if slua.isValid(curWeapon) then
+                        local wid = 0
+                        pcall(function() wid = curWeapon:GetWeaponID() end)
+                        if wid >= 602001 and wid <= 602004 then
+                            log("applyGrenadeSkinsToController: held grenade wid=", wid)
+                            if curWeapon.DelayHandleAvatarMeshChanged then
+                                curWeapon:DelayHandleAvatarMeshChanged()
+                            end
+                            if curWeapon.HandleAvatarMeshChanged then
+                                curWeapon:HandleAvatarMeshChanged()
+                            end
+                            local GRENADE_WID_TO_SUB = {
+                                [602001] = 614, [602002] = 613,
+                                [602003] = 615, [602004] = 612,
+                            }
+                            local sub = GRENADE_WID_TO_SUB[wid]
+                            local info = sub and cch.throwObjects[sub]
+                            if info and info.resID and info.resID > 0 then
+                                if slua.isValid(curWeapon.GrenadeAvatarComponent_BP) then
+                                    curWeapon.GrenadeAvatarComponent_BP:ChangeItemAvatar(info.resID, false)
+                                    log("applyGrenadeSkinsToController: ChangeItemAvatar on held weapon", info.resID)
+                                end
+                                if curWeapon.AddGameTimer then
+                                    curWeapon:AddGameTimer(0.1, false, function()
+                                        pcall(function()
+                                            if slua.isValid(curWeapon) and slua.isValid(curWeapon.GrenadeAvatarComponent_BP) then
+                                                curWeapon.GrenadeAvatarComponent_BP:ChangeItemAvatar(info.resID, false)
+                                            end
+                                        end)
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+            return true
+        end
+
+        
+        
+        local function hookGrenadeAvatarLookup()
+            pcall(function()
+                local AvatarDataUtil = require("GameLua.Mod.Library.GamePlay.Avatar.AvatarDataUtil")
+                if AvatarDataUtil and not AvatarDataUtil._lava_hooked_try_get then
+                    AvatarDataUtil._lava_hooked_try_get = true
+                    local origTry = AvatarDataUtil.TryGetGrenadeAvatarID
+                    if origTry then
+                        AvatarDataUtil.TryGetGrenadeAvatarID = function(uPlayerController, ItemID)
+                            local cch = cache()
+                            if cch.throwObjects then
+                                if ItemID == 602001 and cch.throwObjects[614] and cch.throwObjects[614].resID and cch.throwObjects[614].resID > 0 then
+                                    return cch.throwObjects[614].resID
+                                elseif ItemID == 602002 and cch.throwObjects[613] and cch.throwObjects[613].resID and cch.throwObjects[613].resID > 0 then
+                                    return cch.throwObjects[613].resID
+                                elseif ItemID == 602003 and cch.throwObjects[615] and cch.throwObjects[615].resID and cch.throwObjects[615].resID > 0 then
+                                    return cch.throwObjects[615].resID
+                                elseif ItemID == 602004 and cch.throwObjects[612] and cch.throwObjects[612].resID and cch.throwObjects[612].resID > 0 then
+                                    return cch.throwObjects[612].resID
+                                end
+                            end
+                            return origTry(uPlayerController, ItemID)
+                        end
+                    end
+                end
+            end)
+            
+            
+        end
+
+        local GRENADE_ITEMID_TO_SUB = {
+            [602001] = 614,
+            [602002] = 613,
+            [602003] = 615,
+            [602004] = 612,
+        }
+
+        
+        
+        local function hookProjectileGrenadeAvatar()
+            pcall(function()
+                local ProjectileBase = require("GameLua.Mod.BaseMod.GamePlay.Actor.Projectile.ProjectileBase")
+                local impl = ProjectileBase and ProjectileBase.__inner_impl
+                if not impl or impl._lava_hooked_proj then return end
+                impl._lava_hooked_proj = true
+                local origUpdate = impl.UpdateGrenadeAvatar
+                if origUpdate then
+                    impl.UpdateGrenadeAvatar = function(self)
+                        
+                        if self.bAuthority then return origUpdate(self) end
+                        local cch = cache()
+                        if cch.throwObjects and slua.isValid(self.GrenadeAvatarComponent_BP) then
+                            local itemID
+                            if self.GetItemTypeID then
+                                itemID = tonumber(self:GetItemTypeID())
+                            elseif self.ItemDefineID then
+                                itemID = tonumber(self.ItemDefineID.TypeSpecificID)
+                            end
+                            local sub = itemID and GRENADE_ITEMID_TO_SUB[itemID]
+                            local info = sub and cch.throwObjects[sub]
+                            if info and info.resID and info.resID > 0 then
+                                pcall(function()
+                                    self.GrenadeAvatarComponent_BP:ChangeItemAvatar(info.resID, false)
+                                end)
+                                return
+                            end
+                        end
+                        return origUpdate(self)
+                    end
+                end
+                
+                
+            end)
+        end
+
+        local function applyMatchWeaponSkinsToController()
+            local pc = getPlayerController()
+            if not pc or not slua.isValid(pc) then return false end
+            local skinList = {}
+            for _, w in pairs(cache().weapons) do
+                if w.resID and w.resID > 0 then skinList[#skinList + 1] = w.resID end
+            end
+            if #skinList == 0 then return false end
+            local ok = false
+            pcall(function()
+                local CommerAvatarDataUtil = require("GameLua.Activity.Commercialize.GamePlay.CommerAvatarDataUtil")
+                CommerAvatarDataUtil:InitWeaponSkinList(pc, skinList, nil, nil)
+                if pc.InitWeaponAvatarItems then pc:InitWeaponAvatarItems() end
+                if pc.OnWeaponAvatarUpdate then pc:OnWeaponAvatarUpdate() end
+                ok = true
+            end)
+            if ok then _G.ZoulObbNotiff("weapon PC: " .. table.concat(skinList, ",")) end
+            return ok
+        end
+
+        local _weaponTypeIDCache = {}
+        local function resolveWeaponTypeID(weaponResID)
+            weaponResID = tonumber(weaponResID) or 0
+            if weaponResID <= 0 then return 0 end
+            if _weaponTypeIDCache[weaponResID] ~= nil then return _weaponTypeIDCache[weaponResID] end
+            local found = 0
+            pcall(function()
+                local wc = CDataTable.GetTableData("WeaponConfig", weaponResID)
+                if wc then found = tonumber(wc.WeaponID or wc.WeaponId or wc.weaponID or 0) end
+            end)
+            if found > 0 then _weaponTypeIDCache[weaponResID] = found; return found end
+            pcall(function()
+                local ic = CDataTable.GetTableData("Item", weaponResID)
+                if ic then found = tonumber(ic.WeaponID or ic.weaponId or 0) end
+            end)
+            local result = found > 0 and found or weaponResID
+            _weaponTypeIDCache[weaponResID] = result
+            return result
+        end
+
+        local _lastBuildSkinMappings = 0
+        local function buildSkinMappings()
+            local now = 0
+            pcall(function() now = os.clock() end)
+            if (now - _lastBuildSkinMappings) < 0.5 then return end  
+            _lastBuildSkinMappings = now
+            syncWeaponCacheFromLobby()
+            local m = _G.AddOutfitSkinIdMappings
+            for k in pairs(m) do m[k] = nil end
+            for wid, w in pairs(cache().weapons) do
+                wid = tonumber(wid)
+                if wid and w.resID and w.resID > 0 then m[wid] = { tonumber(w.resID) } end
+            end
+            if MATCH_CONFIG.weaponSkins then
+                for weaponKey, skinRes in pairs(MATCH_CONFIG.weaponSkins) do
+                    weaponKey, skinRes = tonumber(weaponKey), tonumber(skinRes)
+                    if weaponKey and skinRes and skinRes > 0 and not m[weaponKey] then
+                        m[weaponKey] = { skinRes }
+                    end
+                end
+            end
+        end
+
+        local _skinIdCache = {}
+        local _skinIdCacheTick = 0
+        local function get_skin_id(currentGunId, maxIt)
+            currentGunId, maxIt = tonumber(currentGunId) or 0, tonumber(maxIt) or 0
+            if currentGunId <= 0 and maxIt <= 0 then return 0 end
+            
+            local cch = cache()
+            local wid = maxIt > 0 and maxIt or currentGunId
+            local w = cch.weapons[wid]
+            if w and w.resID and w.resID > 0 then return w.resID end
+            
+            local typeId = resolveWeaponTypeID(wid)
+            if typeId ~= wid then
+                local w2 = cch.weapons[typeId]
+                if w2 and w2.resID and w2.resID > 0 then return w2.resID end
+            end
+            
+            local nowTick = _S.globalFrame or 0
+            if (nowTick - _skinIdCacheTick) < 60 then
+                local cached = _skinIdCache[wid]
+                if cached then return cached end
+            end
+            buildSkinMappings()
+            local m = _G.AddOutfitSkinIdMappings
+            local result = nil
+            if m[wid] and m[wid][1] then result = tonumber(m[wid][1])
+            elseif typeId ~= wid and m[typeId] and m[typeId][1] then result = tonumber(m[typeId][1])
+            end
+            if result then
+                _skinIdCache[wid] = result
+                _skinIdCacheTick = nowTick
+                return result
+            end
+            return wid
+        end
+        _G.get_skin_id = get_skin_id
+        _G.skinIdMappings = _G.AddOutfitSkinIdMappings
+        
+        local _attachMaps = nil
+
+        local function _nameToString(name)
+            if name == nil then return "" end
+            if type(name) == "string" then return name end
+            if type(name) == "userdata" then
+                local s = nil
+                pcall(function() if name.ToString then s = name:ToString() end end)
+                if s and type(s) == "string" then return s end
+                pcall(function() if name.ToWString then s = name:ToWString() end end)
+                if s and type(s) == "string" then return s end
+            end
+            if type(name) == "table" and name.SourceString then
+                return name.SourceString
+            end
+            return tostring(name)
+        end
+
+        local _WEAPON_CLASS_SUFFIXES = {
+            { keywords = { "kar98", "awm", "m24", "amr", "mosin", "win94", "mk14" },
+            suffixes = { "(Snipers)", "(Sniper Rifles)" } },
+            { keywords = { "m249", "mg3", "dp-28", "dp28" },
+            suffixes = { "(Machine Guns)" } },
+            { keywords = { "ump", "p90", "vector", "bizon", "uzi", "thompson",
+                        "mp5", "mp5k", "tommy" },
+            suffixes = { "(SMG)", "(SMG, Pistols)", "(Rifles, SMG)" } },
+            { keywords = { "p1911", "p92", "p18c", "deagle", "r1895", "r45",
+                        "skorpion", "g18" },
+            suffixes = { "(Pistols)", "(SMG, Pistols)" } },
+            { keywords = { "akm", "m762", "scar", "famas", "m16a4", "aug",
+                        "groza", "qbz", "m416", "mk47", "g36c", "ace32",
+                        "k2", "m4" },
+            suffixes = { "(AR)", "(Rifles, SMG)" } },
+        }
+
+        local function _classSuffixesFromSkinName(skinName)
+            if type(skinName) ~= "string" or skinName == "" then return {} end
+            local low = string.lower(skinName)
+            for _, entry in ipairs(_WEAPON_CLASS_SUFFIXES) do
+                for _, kw in ipairs(entry.keywords) do
+                    if string.find(low, kw, 1, true) then return entry.suffixes end
+                end
+            end
+            return {}
+        end
+
+        local function buildAttachmentMaps()
+            if _attachMaps then return _attachMaps end
+            _attachMaps = {
+                skinAttachments  = {},  
+                skinBases        = {},  
+                attachToSkin     = {},  
+                skinToBaseWeapon = {},  
+            }
+            if not CDataTable or not CDataTable.GetTable then return _attachMaps end
+
+            
+            local groupToParts = {}
+            pcall(function()
+                local unlockTbl = CDataTable.GetTable("ItemUpgradeUnLockConfig")
+                if not unlockTbl then return end
+                for _, row in pairs(unlockTbl) do
+                    local gid  = tonumber(row.GroupID)
+                    local part = tonumber(row.PartId or row.PartID)
+                    if gid and part then
+                        if not groupToParts[gid] then groupToParts[gid] = {} end
+                        groupToParts[gid][#groupToParts[gid] + 1] = part
+                    end
+                end
+            end)
+
+            
+            local skinToGroup = {}
+            pcall(function()
+                local upTbl = CDataTable.GetTable("ItemUpgradeConfig")
+                if not upTbl then return end
+                for _, row in pairs(upTbl) do
+                    local gid = tonumber(row.GroupID)
+                    local itm = tonumber(row.ItemID)
+                    if gid and itm and itm >= 1000000000 then
+                        skinToGroup[itm] = gid
+                        local baseWeaponID = math.floor(itm / 1000) % 1000000
+                        if baseWeaponID >= 100000 and baseWeaponID <= 999999 then
+                            _attachMaps.skinToBaseWeapon[itm] = baseWeaponID
+                        end
+                    end
+                end
+            end)
+
+            
+            local baseNameToIds = {}
+            local itemTbl = CDataTable.GetTable("Item")
+            if itemTbl then
+                for k, row in pairs(itemTbl) do
+                    local id = tonumber(k) or tonumber(row and row.ItemID)
+                    if id and id >= 1000 and id < 10000000 then
+                        local nm = row and row.ItemName
+                        if type(nm) ~= "string" then nm = _nameToString(nm) end
+                        if type(nm) == "string" and nm ~= "" then
+                            if not baseNameToIds[nm] then baseNameToIds[nm] = {} end
+                            baseNameToIds[nm][#baseNameToIds[nm] + 1] = id
+                        end
+                    end
+                end
+            end
+
+            
+            for weaponSkinId, gid in pairs(skinToGroup) do
+                local parts = groupToParts[gid]
+                if parts and #parts > 0 then
+                    local bases = {}
+                    local wc = cfg(weaponSkinId)
+                    local weaponSkinName = ""
+                    if wc then
+                        local nm = wc.ItemName
+                        if type(nm) ~= "string" then nm = _nameToString(nm) end
+                        weaponSkinName = nm or ""
+                    end
+                    local suffixes = _classSuffixesFromSkinName(weaponSkinName)
+
+                    for _, partId in ipairs(parts) do
+                        local baseId = 0
+                        local partRow = nil
+                        if itemTbl then
+                            partRow = itemTbl[partId] or itemTbl[tostring(partId)]
+                        end
+                        if not partRow and CDataTable.GetTableData then
+                            partRow = CDataTable.GetTableData("Item", partId)
+                        end
+                        if partRow then
+                            local nm = partRow.ItemName
+                            if type(nm) ~= "string" then nm = _nameToString(nm) end
+                            if type(nm) == "string" and nm ~= "" then
+                                local list = baseNameToIds[nm]
+                                if type(list) == "table" and #list >= 1 then
+                                    baseId = list[1]
+                                    for _, v in ipairs(list) do
+                                        if v < baseId then baseId = v end
+                                    end
+                                end
+                                if baseId == 0 then
+                                    for _, suf in ipairs(suffixes) do
+                                        local trial = nm .. " " .. suf
+                                        local lst = baseNameToIds[trial]
+                                        if type(lst) == "table" and #lst >= 1 then
+                                            baseId = lst[1]
+                                            for _, v in ipairs(lst) do
+                                                if v < baseId then baseId = v end
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        bases[#bases + 1] = baseId
+                        _attachMaps.attachToSkin[partId] = { weaponSkinId, baseId }
+                    end
+                    _attachMaps.skinAttachments[weaponSkinId] = parts
+                    _attachMaps.skinBases[weaponSkinId] = bases
+                end
+            end
+
+            local nSkins, nAttach = 0, 0
+            for _ in pairs(_attachMaps.skinAttachments) do nSkins = nSkins + 1 end
+            for _ in pairs(_attachMaps.attachToSkin) do nAttach = nAttach + 1 end
+            log("Attachment maps: " .. nSkins .. " skins, " .. nAttach .. " attachments")
+
+            return _attachMaps
+        end
+
+        local function applyAttachmentSkins(AttachmentArray, selectedSkinID)
+            if not AttachmentArray or not slua.isValid(AttachmentArray) then return false end
+            selectedSkinID = tonumber(selectedSkinID) or 0
+            if selectedSkinID == 0 then return false end
+
+            local maps = buildAttachmentMaps()
+            local attachments = maps.skinAttachments[selectedSkinID]
+            local bases = maps.skinBases[selectedSkinID]
+
+            local numSlots = 0
+            pcall(function() numSlots = AttachmentArray:Num() end)
+            if numSlots <= 0 then return false end
+
+            local changed = false
+
+            
+            
+            if not attachments or #attachments == 0 then
+                for slotIdx = 0, numSlots - 1 do
+                    if slotIdx ~= _K.GUN_MASTER_SYN_SLOT then
+                        local slotData = AttachmentArray:Get(slotIdx)
+                        if slotData then
+                            local curID = 0
+                            pcall(function()
+                                curID = slua.IndexReference(slotData, "defineID").TypeSpecificID or 0
+                            end)
+                            curID = tonumber(curID) or 0
+                            if curID > 0 then
+                                local rIt = maps.attachToSkin[curID]
+                                if rIt then
+                                    local baseId = rIt[2]
+                                    if baseId ~= 0 and baseId ~= curID then
+                                        pcall(function()
+                                            local defRef = slua.IndexReference(slotData, "defineID")
+                                            defRef.TypeSpecificID = baseId
+                                            slotData.operationType = 0
+                                            AttachmentArray:Set(slotIdx, slotData)
+                                        end)
+                                        changed = true
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                return changed
+            end
+
+            
+            local validSkinIds = {}
+            for _, id in ipairs(attachments) do
+                validSkinIds[tonumber(id) or 0] = true
+            end
+
+            
+            
+            for slotIdx = 0, numSlots - 1 do
+                if slotIdx ~= _K.GUN_MASTER_SYN_SLOT then
+                    local slotData = AttachmentArray:Get(slotIdx)
+                    if slotData then
+                        local curID = 0
+                        pcall(function()
+                            curID = slua.IndexReference(slotData, "defineID").TypeSpecificID or 0
+                        end)
+                        curID = tonumber(curID) or 0
+                        if curID > 0 then
+                            
+                            if validSkinIds[curID] then
+                                
+                            else
+                                local baseId = 0
+                                local rIt = maps.attachToSkin[curID]
+                                if rIt then
+                                    baseId = rIt[2]
+                                elseif curID < 10000000 then
+                                    baseId = curID
+                                else
+                                    
+                                    baseId = 0
+                                end
+                                if baseId ~= 0 then
+                                    local srcIdx = 0
+                                    for k, b in ipairs(bases) do
+                                        if b ~= 0 and b == baseId then
+                                            local candidate = tonumber(attachments[k]) or 0
+                                            if candidate ~= 0 and candidate ~= curID then
+                                                srcIdx = k
+                                                break
+                                            end
+                                        end
+                                    end
+                                    if srcIdx > 0 and srcIdx <= #attachments then
+                                        local newID = tonumber(attachments[srcIdx]) or 0
+                                        if newID ~= 0 and newID ~= curID then
+                                            pcall(function()
+                                                local defRef = slua.IndexReference(slotData, "defineID")
+                                                defRef.TypeSpecificID = newID
+                                                slotData.operationType = 0
+                                                AttachmentArray:Set(slotIdx, slotData)
+                                            end)
+                                            changed = true
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            return changed
+        end
+
+        local function applySkinToWeaponRef(CurWeapon)
+            if not slua.isValid(CurWeapon) then return false end
+            local AttachmentArray = CurWeapon.synData
+            if not AttachmentArray or not slua.isValid(AttachmentArray) then return false end
+
+            
+            local AttachmentData = AttachmentArray:Get(_K.GUN_MASTER_SYN_SLOT)
+            if not AttachmentData then return false end
+
+            local current_gunid = 0
+            pcall(function()
+                current_gunid = slua.IndexReference(AttachmentData, "defineID").TypeSpecificID or 0
+            end)
+            current_gunid = tonumber(current_gunid) or 0
+            if current_gunid <= 0 then return false end
+
+            local MaxIt = 0
+            pcall(function()
+                if CurWeapon.GetWeaponID then MaxIt = CurWeapon:GetWeaponID() end
+                if MaxIt <= 0 then MaxIt = CurWeapon:GetItemDefineID().TypeSpecificID end
+            end)
+            MaxIt = tonumber(MaxIt) or 0
+            if MaxIt <= 0 then return false end
+
+            local tmp_id = get_skin_id(current_gunid, MaxIt)
+            tmp_id = tonumber(tmp_id) or 0
+            if tmp_id <= 0 then return false end
+            if tmp_id == current_gunid and not isInjectedRes(tmp_id) then
+                local ok, attChanged = pcall(applyAttachmentSkins, AttachmentArray, tmp_id)
+                if ok and attChanged then
+                    pcall(function()
+                        local char = getLocalChar()
+                        if char and char.AddGameTimer then
+                            for _, delay in ipairs({0.3, 0.6, 1.0}) do
+                                char:AddGameTimer(delay, false, function()
+                                    if slua.isValid(CurWeapon) then
+                                        local aa = CurWeapon.synData
+                                        if aa and slua.isValid(aa) then
+                                            pcall(applyAttachmentSkins, aa, tmp_id)
+                                        end
+                                    end
+                                end)
+                            end
+                        end
+                    end)
+                end
+                return false
+            end
+            if tmp_id == _S.lastAppliedSkinID and MaxIt == _S.lastAppliedWeaponID then
+                local ok, attChanged = pcall(applyAttachmentSkins, AttachmentArray, tmp_id)
+                if ok and attChanged then
+                    pcall(function()
+                        local char = getLocalChar()
+                        if char and char.AddGameTimer then
+                            for _, delay in ipairs({0.3, 0.6, 1.0}) do
+                                char:AddGameTimer(delay, false, function()
+                                    if slua.isValid(CurWeapon) then
+                                        local aa = CurWeapon.synData
+                                        if aa and slua.isValid(aa) then
+                                            pcall(applyAttachmentSkins, aa, tmp_id)
+                                        end
+                                    end
+                                end)
+                            end
+                        end
+                    end)
+                end
+                return true
+            end
+
+            _G.AddOutfitLastAppliedSkin[current_gunid] = tmp_id
+            pcall(function()
+                local defRef = slua.IndexReference(AttachmentData, "defineID")
+                defRef.TypeSpecificID = tmp_id
+                local c0 = cfg(tmp_id)
+                if c0 and c0.ItemType and defRef.Type ~= nil then defRef.Type = c0.ItemType end
+                AttachmentData.operationType = 0
+                AttachmentArray:Set(_K.GUN_MASTER_SYN_SLOT, AttachmentData)
+            end)
+            pcall(applyAttachmentSkins, AttachmentArray, tmp_id)
+            if CurWeapon.DelayHandleAvatarMeshChanged then CurWeapon:DelayHandleAvatarMeshChanged() end
+            
+            
+            
+            pcall(function()
+                local char = getLocalChar()
+                if char and char.AddGameTimer then
+                    for _, delay in ipairs({0.3, 0.6, 1.0}) do
+                        char:AddGameTimer(delay, false, function()
+                            if slua.isValid(CurWeapon) then
+                                local aa = CurWeapon.synData
+                                if aa and slua.isValid(aa) then
+                                    pcall(applyAttachmentSkins, aa, tmp_id)
+                                end
+                            end
+                        end)
+                    end
+                end
+            end)
+            _S.weaponHookGuardUntil = _S.globalFrame + 45
+            _G.AddOutfitLastAppliedSkin[MaxIt] = tmp_id
+            _S.lastAppliedWeaponID = MaxIt
+            _S.lastAppliedSkinID = tmp_id
+            return true
+        end
+
+        function _G.equip_weapon_avatar(uCharacter)
+            if not uCharacter or not slua.isValid(uCharacter) then return false end
+            buildSkinMappings()
+            local WeaponManager = uCharacter:GetWeaponManager()
+            if not WeaponManager or not slua.isValid(WeaponManager) then return false end
+            local uWeaponList = WeaponManager:GetAllInventoryWeaponList(false)
+            if not uWeaponList or not slua.isValid(uWeaponList) then return false end
+            local appliedAny = false
+            for i = 0, uWeaponList:Num() - 1 do
+                local CurWeapon = uWeaponList:Get(i)
+                if slua.isValid(CurWeapon) and applySkinToWeaponRef(CurWeapon) then
+                    appliedAny = true
+                end
+            end
+            return appliedAny
+        end
+
+        local function getDesiredWeaponSkins()
+            syncWeaponCacheFromLobby()
+            local out, seen = {}, {}
+            local function add(res)
+                res = tonumber(res)
+                if res and res > 0 and not seen[res] then seen[res] = true; out[#out + 1] = res end
+            end
+            for _, w in pairs(cache().weapons) do add(w.resID) end
+            if MATCH_CONFIG.weaponSkins then
+                for _, res in pairs(MATCH_CONFIG.weaponSkins) do add(res) end
+            end
+            return out
+        end
+
+        local function registerWeaponAvatarItems(char)
+            local pc = char.GetPlayerControllerSafety and char:GetPlayerControllerSafety()
+            if not slua.isValid(pc) then return false end
+            local BU = import("BackpackUtils")
+            local AU = import("AvatarUtils")
+            local addedCount = 0
+            for _, resID in ipairs(getDesiredWeaponSkins()) do
+                local doneDirect = false
+                pcall(function()
+                    if pc.AddWeaponAvatarItem then
+                        pc:AddWeaponAvatarItem(tonumber(resID))
+                        doneDirect = true
+                        addedCount = addedCount + 1
+                    end
+                end)
+                if not doneDirect then
+                    pcall(function()
+                        local skinBPID = BU.GetBPIDByResID(tonumber(resID))
+                        local arr = slua.Array(UEnums.EPropertyClass.Int)
+                        local parents = AU.GetWeaponAvatarParentIDList(skinBPID, arr, false)
+                        if parents and parents.Num and parents:Num() > 0 and pc.WeaponAvatarItemList then
+                            for _, parentID in pairs(parents) do
+                                pc.WeaponAvatarItemList:Add(parentID, skinBPID)
+                            end
+                            addedCount = addedCount + 1
+                        end
+                    end)
+                end
+            end
+            if addedCount == 0 then return false end
+            pcall(function() if pc.InitWeaponAvatarItems then pc:InitWeaponAvatarItems() end end)
+            pcall(function() if pc.OnWeaponAvatarUpdate then pc:OnWeaponAvatarUpdate() end end)
+            _G.ZoulObbNotiff("Taking notes " .. addedCount .. "Weapon Housing")
+            return true
+        end
+
+        local _lastMatchApplyWeapon = 0
+        local function matchApplyWeaponSkin(char)
+            local now = 0
+            pcall(function() now = os.clock() end)
+            if (now - _lastMatchApplyWeapon) < 0.5 then return false end  
+            _lastMatchApplyWeapon = now
+            buildSkinMappings()
+            applyMatchWeaponSkinsToController()
+            if not _S.avatarItemsRegistered then
+                _S.avatarItemsRegistered = registerWeaponAvatarItems(char)
+            end
+            local curWeapon = char.GetCurrentWeapon and char:GetCurrentWeapon()
+            if not slua.isValid(curWeapon) then
+                return _G.equip_weapon_avatar(char)
+            end
+
+            local curWeaponResID = 0
+            pcall(function() curWeaponResID = curWeapon:GetItemDefineID().TypeSpecificID end)
+            local desiredSkin = get_skin_id(curWeaponResID, curWeaponResID)
+            if curWeaponResID == _S.lastAppliedWeaponID and desiredSkin == _S.lastAppliedSkinID then
+                pcall(_G.equip_weapon_avatar, char)
+                return true
+            end
+
+            local ok = applySkinToWeaponRef(curWeapon)
+            ok = _G.equip_weapon_avatar(char) or ok
+            if ok then
+                _S.lastAppliedWeaponID = curWeaponResID
+                _S.lastAppliedSkinID = desiredSkin
+                _S.weaponApplied = true
+                _S.weaponDiagDone = true
+                _G.ZoulObbNotiff("matchApplyWeaponSkin: " .. tostring(desiredSkin))
+            end
+            return ok
+        end
+
+        local function applyMatchThrowObjects()
+            local pc = getPlayerController()
+            if not pc or not slua.isValid(pc) then return false end
+            local cch = cache()
+            if not cch.throwObjects then
+                log("applyMatchThrowObjects: no throwObjects in cache")
+                return false
+            end
+            local hasThrow = false
+            for st, info in pairs(cch.throwObjects) do
+                if info.resID and info.resID > 0 then hasThrow = true end
+            end
+            if not hasThrow then
+                log("applyMatchThrowObjects: throwObjects cache empty")
+                return false
+            end
+            local applied = false
+            pcall(function()
+                
+                if pc.InitialConsumableAvatar then
+                    for st, info in pairs(cch.throwObjects) do
+                        local key = _K.THROW_AVATAR_KEY[_K.THROW_SUB[st]]
+                        if key and info.resID and info.resID > 0 then
+                            pc.InitialConsumableAvatar[key] = info.resID
+                            
+                        end
+                    end
+                end
+                
+                if pc.InitGrenadeAvatarList then
+                    pc:InitGrenadeAvatarList(false)
+                end
+                
+                if pc.AddToGrenadeAvatarItemList then
+                    for st, info in pairs(cch.throwObjects) do
+                        if info.resID and info.resID > 0 and _K.THROW_SUB[st] then
+                            pc:AddToGrenadeAvatarItemList(info.resID)
+                            applied = true
+                        end
+                    end
+                end
+            end)
+            return applied
+        end
+
+        local function matchApplyAll(char)
+            local ok = false
+            if not _S.matchOutfitDone then
+                _S.matchOutfitDone = matchApplyOutfit(char)
+                ok = _S.matchOutfitDone or ok
+            end
+            if applyMatchEquipAvatarToController() then ok = true end
+            if matchApplyEquipSkins(char) then ok = true; _S.matchApplied = true end
+            if matchApplyWeaponSkin(char) then ok = true end
+            if applyMatchThrowObjects() then ok = true end
+            return ok
+        end
+
+        
+        local function startMatchWatcher(char)
+            if _S.matchTimer then return end
+            _S.matchOutfitDone = false
+            _S.avatarItemsRegistered = false
+            _S.weaponApplied = false
+            _S.weaponDiagDone = false
+            _S.lastAppliedWeaponID = 0
+            _S.lastAppliedSkinID = 0
+
+            local attempts = 0
+
+            _S.matchTimer = char:AddGameTimer(1.0, true, function()
+                attempts = attempts + 1
+                local cur = getLocalChar()
+                if not cur or not slua.isValid(cur) then return end
+                pcall(matchApplyAll, cur)
+                if attempts >= 30 then
+                    pcall(function() if cur.RemoveGameTimer then cur:RemoveGameTimer(_S.matchTimer) end end)
+                    _S.matchTimer = nil
+                end
+            end)
+        end
+        
+        
+        local _hookedGetWeaponAvatarRes = false
+
+        local function hookBackpackWeaponAvatarRes()
+            if _hookedGetWeaponAvatarRes then return end
+            _hookedGetWeaponAvatarRes = true
+            pcall(function()
+                local BPL = require("GameLua.Mod.BaseMod.Client.Backpack.BackPackFunctionLibrary")
+                if BPL and BPL.GetWeaponAvatarRes and not BPL._lava_hooked_avatar_res then
+                    BPL._lava_hooked_avatar_res = true
+                    local _bpAvatarResCache = {}
+                    local _bpAvatarResTicks = {}
+                    local _bpResCacheAge = 0
+                    local origGetRes = BPL.GetWeaponAvatarRes
+                    BPL.GetWeaponAvatarRes = function(WeaponID, AdditionalDataArray)
+                        WeaponID = tonumber(WeaponID) or 0
+                        if WeaponID <= 0 then return origGetRes(WeaponID, AdditionalDataArray) end
+                        
+                        local cached = _bpAvatarResCache[WeaponID]
+                        local age = _bpResCacheAge
+                        local nowTick = _S.globalFrame or 0
+                        if cached and (nowTick - (_bpAvatarResTicks[WeaponID] or 0)) < 150 then
+                            return cached, ""
+                        end
+                        local targetSkinID = 0
+                        
+                        local cch = cache()
+                        local typeId = resolveWeaponTypeID(WeaponID)
+                        local w = cch.weapons[typeId] or cch.weapons[WeaponID]
+                        if w and w.resID and w.resID > 0 then
+                            targetSkinID = w.resID
+                        end
+                        
+                        if targetSkinID <= 0 or targetSkinID == WeaponID then
+                            local sid = get_skin_id(WeaponID, WeaponID)
+                            targetSkinID = tonumber(sid) or 0
+                        end
+                        
+                        if targetSkinID > 0 and targetSkinID ~= WeaponID then
+                            _bpAvatarResCache[WeaponID] = targetSkinID
+                            _bpAvatarResTicks[WeaponID] = nowTick
+                            local skinCfg = cfg(targetSkinID)
+                            if skinCfg then
+                                return targetSkinID, ""
+                            end
+                        end
+                        _bpAvatarResCache[WeaponID] = WeaponID
+                        _bpAvatarResTicks[WeaponID] = nowTick
+                        return origGetRes(WeaponID, AdditionalDataArray)
+                    end
+                    log("[AddOutfit] hookBackpackWeaponAvatarRes")
+                end
+            end)
+        end
+
+        local _lastVehicleSkinKey = ""
+
+        local function applyVehicleSkinInGame()
+            local char = getLocalChar()
+            if not char or not slua.isValid(char) then return end
+
+            local vehicle = char.GetCurrentVehicle and char:GetCurrentVehicle()
+            if not vehicle or not slua.isValid(vehicle) then
+                _lastVehicleSkinKey = ""
+                return
+            end
+            pcall(syncVehicleAvatarSkinList)
+
+            local avatarComp = vehicle.GetAvatarComponent and vehicle:GetAvatarComponent()
+            if not avatarComp or not slua.isValid(avatarComp) then return end
+
+            local defaultAvatarID = avatarComp.GetDefaultAvatarID and avatarComp:GetDefaultAvatarID()
+            if not defaultAvatarID or defaultAvatarID == 0 then return end
+
+            local currentAvatarID = avatarComp.GetCurrentAvatarID and avatarComp:GetCurrentAvatarID()
+
+            local cacheKey = tostring(vehicle) .. "_" .. tostring(defaultAvatarID) .. "_" .. tostring(currentAvatarID)
+            if cacheKey == _lastVehicleSkinKey then return end
+
+            
+            local vehicleSubType = 0
+            local defaultItemCfg = cfg(defaultAvatarID)
+            if defaultItemCfg then
+                vehicleSubType = tonumber(defaultItemCfg.ItemSubType or defaultItemCfg.itemSubType) or 0
+            end
+
+            
+            local desiredSkins = {}
+            local firstSkinResID = 0
+            if vehicleSubType > 0 and DataMgr and DataMgr.VehicleSlotList then
+                local slotList = DataMgr.VehicleSlotList[vehicleSubType]
+                if slotList then
+                    for i = 1, #slotList do
+                        local skinInsID = tonumber(slotList[i])
+                        if skinInsID and skinInsID > 0 then
+                            local skinResID = 0
+                            if isInjectedIns(skinInsID) then
+                                skinResID = R.insToRes[skinInsID] or 0
+                            else
+                                pcall(function()
+                                    local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                                    local d = wd:GetHallDepotItemDataByInsID(skinInsID)
+                                    skinResID = d and tonumber(d.resID) or 0
+                                end)
+                            end
+                            if skinResID > 0 then
+                                desiredSkins[skinResID] = true
+                                if firstSkinResID == 0 then
+                                    firstSkinResID = skinResID
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            if vehicleSubType > 0 then
+                pcall(function()
+                    local pc = getPlayerController()
+                    if pc and pc.PlayerState then
+                        local vst = pc.PlayerState.vst_in_battle
+                        if vst and vst[vehicleSubType] then
+                            local resList = vst[vehicleSubType]
+                            if resList and type(resList) == "table" then
+                                for _, resID in ipairs(resList) do
+                                    resID = tonumber(resID)
+                                    if resID and resID > 0 then
+                                        if not desiredSkins[resID] then
+                                            desiredSkins[resID] = true
+                                            if firstSkinResID == 0 then
+                                                firstSkinResID = resID
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+
+            if firstSkinResID == 0 and DataMgr and DataMgr.VehicleSlotList then
+                local defStr = tostring(defaultAvatarID)
+                for subType, insList in pairs(DataMgr.VehicleSlotList) do
+                    if insList and type(insList) == "table" then
+                        for i = 1, #insList do
+                            local skinInsID = tonumber(insList[i])
+                            if skinInsID and skinInsID > 0 then
+                                local rid = 0
+                                if isInjectedIns(skinInsID) then
+                                    rid = R.insToRes[skinInsID] or 0
+                                else
+                                    pcall(function()
+                                        local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                                        local d = wd:GetHallDepotItemDataByInsID(skinInsID)
+                                        rid = d and tonumber(d.resID) or 0
+                                    end)
+                                end
+                                if rid > 0 then
+                                    local skinCfg = cfg(rid)
+                                    if skinCfg then
+                                        local skinDefault = skinCfg.DefaultAvatarID or skinCfg.defaultAvatarID
+                                        if skinDefault and tostring(skinDefault):find(defStr, 1, true) then
+                                            if not desiredSkins[rid] then
+                                                desiredSkins[rid] = true
+                                                firstSkinResID = rid
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if firstSkinResID > 0 then break end
+                    end
+                end
+            end
+
+            if currentAvatarID and desiredSkins[currentAvatarID] then
+                _lastVehicleSkinKey = cacheKey
+                return
+            end
+
+            local skinResID = firstSkinResID
+
+            if skinResID == 0 then
+                _lastVehicleSkinKey = cacheKey
+                return
+            end
+
+            pcall(function()
+                local pc = getPlayerController()
+                if pc and avatarComp.SetVehicleNetAvatarData then
+                    avatarComp:SetVehicleNetAvatarData(pc)
+                end
+
+                if avatarComp.VehicleNetAvatarData then
+                    avatarComp.VehicleNetAvatarData.SwitchEffectId = 7303001
+                    avatarComp.VehicleNetAvatarData.UpdateFlag = 1
+                end
+                avatarComp:ChangeItemAvatar(skinResID, true)
+                avatarComp.CanChangeAvatar = true
+            end)
+
+            pcall(applyVehicleChassisLight)
+
+            _lastVehicleSkinKey = cacheKey
+        end
+
+        
+        local _LAVA_CHASSIS_LIGHT_ID = 7302002
+
+        local function isLocalPlayerVehicle(vehicle)
+            if not vehicle or not slua.isValid(vehicle) then return false end
+            local char = getLocalChar()
+            if not char or not slua.isValid(char) then return false end
+            local currentVehicle = char.GetCurrentVehicle and char:GetCurrentVehicle()
+            if currentVehicle and currentVehicle == vehicle then return true end
+            local driver = nil
+            pcall(function() driver = vehicle.GetDriver and vehicle:GetDriver() end)
+            if driver and driver == char then return true end
+            return false
+        end
+
+        local function getVehicleSkinID(vehicle)
+            if not vehicle or not slua.isValid(vehicle) then return 0 end
+            local skinID = 0
+            pcall(function()
+                if vehicle.GetVehicleSkinItemID then
+                    skinID = vehicle:GetVehicleSkinItemID() or 0
+                end
+            end)
+            if skinID and skinID > 0 then return skinID end
+            pcall(function()
+                if vehicle.ClientUsedAvatarID then
+                    skinID = vehicle.ClientUsedAvatarID
+                end
+            end)
+            if skinID and skinID > 0 then return skinID end
+            pcall(function()
+                local avatarComp = vehicle.GetAvatarComponent and vehicle:GetAvatarComponent()
+                if avatarComp and slua.isValid(avatarComp) and avatarComp.GetCurrentAvatarID then
+                    skinID = avatarComp:GetCurrentAvatarID() or 0
+                end
+            end)
+            return skinID or 0
+        end
+
+        local function vehicleHasSkinApplied(vehicle)
+            if not vehicle or not slua.isValid(vehicle) then return false end
+            local skinID = getVehicleSkinID(vehicle)
+            if skinID <= 0 then return false end
+            local defaultID = 0
+            pcall(function()
+                local avatarComp = vehicle.GetAvatarComponent and vehicle:GetAvatarComponent()
+                if avatarComp and slua.isValid(avatarComp) and avatarComp.GetDefaultAvatarID then
+                    defaultID = avatarComp:GetDefaultAvatarID() or 0
+                end
+            end)
+            return skinID ~= defaultID
+        end
+
+        local function forceVehicleChassisLight(vehicle)
+            if not vehicle or not slua.isValid(vehicle) then return end
+            local licenseComp = vehicle.GetLicenseComponent and vehicle:GetLicenseComponent()
+            if not licenseComp or not slua.isValid(licenseComp) then
+                print("[AddOutfit] forceVehicleChassisLight: no licenseComp")
+                return
+            end
+            if not licenseComp.LicensePlate then
+                print("[AddOutfit] forceVehicleChassisLight: no LicensePlate")
+                return
+            end
+            if licenseComp.LicensePlate.ChassisLightId == _LAVA_CHASSIS_LIGHT_ID and slua.isValid(licenseComp.ChassisLightMesh) then
+                return
+            end
+            local skinID = getVehicleSkinID(vehicle)
+            if skinID > 0 then
+                licenseComp.LicensePlate.ItemID = skinID
+            end
+            licenseComp.LicensePlate.ChassisLightId = _LAVA_CHASSIS_LIGHT_ID
+            if licenseComp.curVehicleAvatarId == nil or licenseComp.curVehicleAvatarId == 0 then
+                licenseComp.curVehicleAvatarId = skinID
+            end
+            print("[AddOutfit] forceVehicleChassisLight: skinID=" .. tostring(skinID) .. " ChassisLightId=" .. tostring(_LAVA_CHASSIS_LIGHT_ID) .. " ItemID=" .. tostring(licenseComp.LicensePlate.ItemID))
+            if licenseComp.PreChangeChassisLight then
+                pcall(function() licenseComp:PreChangeChassisLight() end)
+            end
+        end
+
+        local function applyVehicleChassisLight()
+            local char = getLocalChar()
+            if not char or not slua.isValid(char) then return end
+            local vehicle = char.GetCurrentVehicle and char:GetCurrentVehicle()
+            if not vehicle or not slua.isValid(vehicle) then return end
+            if not isLocalPlayerVehicle(vehicle) then return end
+            if not vehicleHasSkinApplied(vehicle) then return end
+            forceVehicleChassisLight(vehicle)
+        end
+
+        local function hookVehicleLicenseComponentBase()
+            local ok, VLB = pcall(require, "GameLua.Activity.Commercialize.Actor.ActorComponent.BP_VehicleLicenseComponentBase")
+            if not ok or not VLB then return end
+            local impl = VLB.__inner_impl
+            if not impl or type(impl) ~= "table" then return end
+            if impl._lava_hooked_chassis then return end
+            impl._lava_hooked_chassis = true
+
+            local origCheckDownloaded = impl.CheckHasVehicleDownloaded
+            impl.CheckHasVehicleDownloaded = function(self, ItemID)
+                local vehicle = self:GetOwner()
+                if isLocalPlayerVehicle(vehicle) and vehicleHasSkinApplied(vehicle) then
+                    return true
+                end
+                return origCheckDownloaded(self, ItemID)
+            end
+
+            local origPreChange = impl.PreChangeChassisLight
+            impl.PreChangeChassisLight = function(self)
+                pcall(function()
+                    local vehicle = self:GetOwner()
+                    if isLocalPlayerVehicle(vehicle) and vehicleHasSkinApplied(vehicle) then
+                        if self.LicensePlate then
+                            local skinID = getVehicleSkinID(vehicle)
+                            if skinID > 0 then
+                                self.LicensePlate.ItemID = skinID
+                            end
+                            self.LicensePlate.ChassisLightId = _LAVA_CHASSIS_LIGHT_ID
+                        end
+                    end
+                end)
+                return origPreChange(self)
+            end
+
+            local origAsyncLoad = impl.AsyncLoadAccessoryItemHandle
+            if origAsyncLoad then
+                impl.AsyncLoadAccessoryItemHandle = function(self, itemId, bCheckDownload)
+                    if itemId == _LAVA_CHASSIS_LIGHT_ID then
+                        bCheckDownload = false
+                    end
+                    return origAsyncLoad(self, itemId, bCheckDownload)
+                end
+            end
+
+            local origAsyncLoadHandle = impl._AsyncLoadHandle
+            if origAsyncLoadHandle then
+                impl._AsyncLoadHandle = function(self, ItemID)
+                    if ItemID == _LAVA_CHASSIS_LIGHT_ID then
+                        pcall(function()
+                            local UBackpackUtils = import("BackpackUtils")
+                            local handlePath = self:GetAccessoryAvatarHandlePath(ItemID)
+                            local itemCfg = CDataTable.GetTableData("Item", ItemID)
+                            if handlePath and itemCfg and itemCfg.BPID then
+                                local bpCfg = CDataTable.GetTableData("AvatarBPTable", itemCfg.BPID)
+                                if bpCfg and bpCfg.AvatarBPPath and bpCfg.AvatarBPPath ~= "" then
+                                    self:AsyncLoadAsset(handlePath, self.OnAccHandleLoaded, self, ItemID, itemCfg.BPID)
+                                    return
+                                end
+                            end
+                            print("[AddOutfit] _AsyncLoadHandle bypass failed for chassis light, trying direct load")
+                        end)
+                    end
+                    return origAsyncLoadHandle(self, ItemID)
+                end
+            end
+
+            local origOnRep = impl.OnRep_LicensePlate
+            if origOnRep then
+                impl.OnRep_LicensePlate = function(self)
+                    local bReapply = false
+                    pcall(function()
+                        local vehicle = self:GetOwner()
+                        if isLocalPlayerVehicle(vehicle) and vehicleHasSkinApplied(vehicle) then
+                            bReapply = true
+                            if self.LicensePlate then
+                                local skinID = getVehicleSkinID(vehicle)
+                                if skinID > 0 then
+                                    self.LicensePlate.ItemID = skinID
+                                end
+                                self.LicensePlate.ChassisLightId = _LAVA_CHASSIS_LIGHT_ID
+                            end
+                        end
+                    end)
+                    local result = origOnRep(self)
+                    if bReapply then
+                        pcall(function()
+                            if self.LicensePlate then
+                                local skinID = getVehicleSkinID(self:GetOwner())
+                                if skinID > 0 then
+                                    self.LicensePlate.ItemID = skinID
+                                end
+                                self.LicensePlate.ChassisLightId = _LAVA_CHASSIS_LIGHT_ID
+                            end
+                            if self.PreChangeChassisLight then
+                                self:PreChangeChassisLight()
+                            end
+                        end)
+                    end
+                    return result
+                end
+            end
+
+            local origOnVehicleMesh = impl.OnVehicleMeshAvatarEquiped
+            if origOnVehicleMesh then
+                impl.OnVehicleMeshAvatarEquiped = function(self, expectItemId)
+                    local result = origOnVehicleMesh(self, expectItemId)
+                    pcall(function()
+                        local vehicle = self:GetOwner()
+                        if isLocalPlayerVehicle(vehicle) and vehicleHasSkinApplied(vehicle) then
+                            if self.LicensePlate then
+                                local skinID = getVehicleSkinID(vehicle)
+                                if skinID > 0 then
+                                    self.LicensePlate.ItemID = skinID
+                                end
+                                self.LicensePlate.ChassisLightId = _LAVA_CHASSIS_LIGHT_ID
+                            end
+                            if self.PreChangeChassisLight then
+                                self:PreChangeChassisLight()
+                            end
+                        end
+                    end)
+                    return result
+                end
+            end
+            print("[AddOutfit] VehicleLicenseComponentBase chassis hook installed")
+        end
+
+        local function hookVehiclePlateLicenseUtil()
+            local ok, VPLU = pcall(require, "GameLua.Activity.Commercialize.GamePlay.Vehicle.VehiclePlateLicenseUtil")
+            if not ok or not VPLU then return end
+            if VPLU._lava_hooked_chassis then return end
+            VPLU._lava_hooked_chassis = true
+            local origGetLoc = VPLU.GetChassisLightLocAndScale
+            VPLU.GetChassisLightLocAndScale = function(vehicleId, bIsLobbyVehicle)
+                local loc, scale = origGetLoc(vehicleId, bIsLobbyVehicle)
+                if loc and scale then
+                    return loc, scale
+                end
+                local defaultLoc = FVector(0, -20, 10)
+                local defaultScale = FVector(6.5, 7, 1)
+                print("[AddOutfit] GetChassisLightLocAndScale fallback defaults for vehicleId:" .. tostring(vehicleId))
+                return defaultLoc, defaultScale
+            end
+            print("[AddOutfit] VehiclePlateLicenseUtil chassis hook installed")
+        end
+
+        local function hookServerChangeVehicleAvatar(pc)
+            if not pc or not slua.isValid(pc) then return end
+            if pc._lava_hooked_server_vehicle_skin then return end
+            if not pc.ServerChangeVehicleAvatar then return end
+            pc._lava_hooked_server_vehicle_skin = true
+            local orig = pc.ServerChangeVehicleAvatar
+            local hooked = function(self, resID)
+                pcall(function()
+                    local char = self:GetPlayerCharacterSafety()
+                    if char and slua.isValid(char) then
+                        local vehicle = char.GetCurrentVehicle and char:GetCurrentVehicle()
+                        if vehicle and slua.isValid(vehicle) then
+                            local avatarComp = vehicle.GetAvatarComponent and vehicle:GetAvatarComponent()
+                            if avatarComp and slua.isValid(avatarComp) then
+                                if avatarComp.SetVehicleNetAvatarData then
+                                    avatarComp:SetVehicleNetAvatarData(self)
+                                end
+                                if avatarComp.VehicleNetAvatarData then
+                                    avatarComp.VehicleNetAvatarData.SwitchEffectId = 7303001
+                                    avatarComp.VehicleNetAvatarData.UpdateFlag = 1
+                                end
+                                avatarComp:ChangeItemAvatar(resID, true)
+                                avatarComp.CanChangeAvatar = true
+                                _lastVehicleSkinKey = ""
+                                print("[AddOutfit] Vehicle skin changed locally to " .. tostring(resID))
+                                pcall(applyVehicleChassisLight)
+                            end
+                        end
+                    end
+                end)
+            end
+            pcall(function() rawset(pc, "ServerChangeVehicleAvatar", hooked) end)
+        end
+
+        local _lava_skin_click_handler
+        local function getSkinClickHandler()
+            if _lava_skin_click_handler then return _lava_skin_click_handler end
+            _lava_skin_click_handler = function(self)
+                if self.resID > 0 then
+                    local UsingID = self:GetLoopScrollBoxParentUI():GetCurUsingSkinID()
+                    if self.resID ~= UsingID then
+                        pcall(function()
+                            local GameplayData = require("GameLua.GameCore.Data.GameplayData")
+                            local PlayerController = GameplayData.GetPlayerController()
+                            if not slua.isValid(PlayerController) then return end
+                            local char = PlayerController:GetPlayerCharacterSafety()
+                            if not char or not slua.isValid(char) then return end
+                            local vehicle = char.GetCurrentVehicle and char:GetCurrentVehicle()
+                            if not vehicle or not slua.isValid(vehicle) then return end
+                            local avatarComp = vehicle.GetAvatarComponent and vehicle:GetAvatarComponent()
+                            if not avatarComp or not slua.isValid(avatarComp) then return end
+                            if avatarComp.SetVehicleNetAvatarData then
+                                avatarComp:SetVehicleNetAvatarData(PlayerController)
+                            end
+                            if avatarComp.VehicleNetAvatarData then
+                                avatarComp.VehicleNetAvatarData.SwitchEffectId = 7303001
+                                avatarComp.VehicleNetAvatarData.UpdateFlag = 1
+                            end
+                            avatarComp:ChangeItemAvatar(self.resID, true)
+                            avatarComp.CanChangeAvatar = true
+                            _lastVehicleSkinKey = ""
+                            print("[AddOutfit] VehicleSkinItem applied skin locally " .. tostring(self.resID))
+                            pcall(applyVehicleChassisLight)
+                        end)
+                    end
+                end
+                if EventSystem and EVENTYPE_INGAME_VEHICLE_CONTROL_PANEL and EVENTID_CHANGE_VEHICLESKIN_BUTTON_CLICK then
+                    EventSystem:postEvent(EVENTYPE_INGAME_VEHICLE_CONTROL_PANEL, EVENTID_CHANGE_VEHICLESKIN_BUTTON_CLICK)
+                end
+            end
+            return _lava_skin_click_handler
+        end
+
+        local function hookVehicleSkinItem()
+            local ok, VSI = pcall(require, "GameLua.Mod.BaseMod.Client.InGameUI.VehicleControl.VehicleSkinItem")
+            if not ok or not VSI then return end
+
+            local impl = VSI.__inner_impl
+            if not impl or type(impl) ~= "table" then return end
+            if impl._lava_hooked_skin_item then return end
+            impl._lava_hooked_skin_item = true
+            local handler = getSkinClickHandler()
+            local origRegist = impl.RegistEvents
+            impl.RegistEvents = function(self)
+                rawset(self, "OnClickSkinButton", handler)
+                return origRegist(self)
+            end
+            local origOnRefresh = impl.OnRefresh
+            impl.OnRefresh = function(self, resID, selectIndex)
+                local cur = rawget(self, "OnClickSkinButton")
+                if cur ~= handler then
+                    rawset(self, "OnClickSkinButton", handler)
+                    pcall(function()
+                        if self.UnRegistEvents and self.RegistEvents then
+                            self:UnRegistEvents()
+                            self:RegistEvents()
+                        end
+                    end)
+                end
+                return origOnRefresh(self, resID, selectIndex)
+            end
+            impl.OnClickSkinButton = handler
+        end
+
+        local function hookVehicleSkinAndMusicPanel()
+            local ok, VSP = pcall(require, "GameLua.Mod.BaseMod.Client.InGameUI.VehicleControl.VehicleSkinAndMusicPanel")
+            if not ok or not VSP then return end
+            local impl = VSP.__inner_impl
+            if not impl or type(impl) ~= "table" then return end
+            if impl._lava_hooked_panel then return end
+            impl._lava_hooked_panel = true
+            local orig = impl.InitSkinList
+            impl.InitSkinList = function(self)
+                hookVehicleSkinItem()
+                return orig(self)
+            end
+        end
+
+        local function syncVehicleAvatarSkinList()
+            local pc = getPlayerController()
+            if not pc or not slua.isValid(pc) then return end
+            hookServerChangeVehicleAvatar(pc)
+            hookVehicleSkinItem()
+            hookVehicleSkinAndMusicPanel()
+            hookVehicleLicenseComponentBase()
+            hookVehiclePlateLicenseUtil()
+            if pc.bEnableFuzzyAvatarOnClient then
+                pc.bEnableFuzzyAvatarOnClient = false
+            end
+            if not DataMgr or not DataMgr.VehicleSlotList then return end
+            if not pc.InitVehicleAvatarSkinList then return end
+            local vehicleSkinData = {}
+            for subType, insList in pairs(DataMgr.VehicleSlotList) do
+                if insList and type(insList) == "table" then
+                    local itemArray = {}
+                    for _, insID in ipairs(insList) do
+                        insID = tonumber(insID)
+                        if insID and insID > 0 then
+                            local skinResID = 0
+                            if isInjectedIns(insID) then
+                                skinResID = R.insToRes[insID] or 0
+                            else
+                                pcall(function()
+                                    local wd = require("client.slua.logic.wardrobe.wardrobe_data")
+                                    local d = wd:GetHallDepotItemDataByInsID(insID)
+                                    skinResID = d and tonumber(d.resID) or 0
+                                end)
+                            end
+                            if skinResID and skinResID > 0 then
+                                table.insert(itemArray, {ItemTableID = skinResID, Count = 1})
+                            end
+                        end
+                    end
+                    if #itemArray > 0 then
+                        table.insert(vehicleSkinData, {Items = itemArray})
+                    end
+                end
+            end
+            if #vehicleSkinData > 0 then
+                pc.InitialVehicleAvatarSkinList = vehicleSkinData
+                pc:InitVehicleAvatarSkinList()
+            end
+        end
+
+        local function stopMatchWatcher()
+            if _S.matchTimer then
+                pcall(function()
+                    local char = getLocalChar()
+                    if char and char.RemoveGameTimer then char:RemoveGameTimer(_S.matchTimer) end
+                end)
+                _S.matchTimer = nil
+            end
+            _S.matchOutfitDone = false
+            _S.avatarItemsRegistered = false
+            _S.weaponApplied = false
+            _S.weaponDiagDone = false
+            _S.lastAppliedWeaponID = 0
+            _S.lastAppliedSkinID = 0
+            _S.matchApplied = false
+            _S.bootstrapped = false
+        end
+
+        local function bootstrapMatch(char)
+            if _S.bootstrapped then return true end
+            char = char or getLocalChar()
+            if not char or not slua.isValid(char) then return false end
+            snapshotLobbyWear()
+            _S.weaponApplied = false
+            _S.weaponDiagDone = false
+            _S.matchOutfitDone = false
+            if not _S.bootstrapNotified then
+                _S.bootstrapNotified = true
+                _G.ZoulObbNotiff("bootstrapMatch")
+            end
+            startMatchWatcher(char)
+            hookPlayerWearingDone()
+            matchApplyAll(char)
+            _S.bootstrapped = true
+            return true
+        end
+
+        local function isSelfAvatarComp(self)
+            if not self or not self.IsSelf then return true end
+            local ok, r = pcall(function() return self:IsSelf() end)
+            return ok and r == true
+        end
+
+        local function hookMatchAvatar()
+            pcall(function()
+                if EventSystem and EventSystem.registEvent
+                    and EVENTTYPE_PLAYEREVENT_AVATAR and EVENTID_LOCAL_PLAYEREVENT_AVATAR_ALL_MESH_LOADED then
+                    EventSystem:registEvent(EVENTTYPE_PLAYEREVENT_AVATAR, EVENTID_LOCAL_PLAYEREVENT_AVATAR_ALL_MESH_LOADED, function()
+                        if isInLobby() then return end
+                        local char = getLocalChar()
+                        if char then
+                            hookPlayerWearingDone()
+                            applyMatchEquipAvatarToController()
+                            matchApplyEquipSkins(char)
+                        end
+                    end)
+                end
+            end)
+            pcall(function()
+                local CAC = require("GameLua.Mod.Library.GamePlay.Avatar.Component.CharacterAvatarComponent")
+                if not CAC._lava_hooked_mesh then
+                    CAC._lava_hooked_mesh = true
+                    local o = CAC.OnAvatarAllMeshLoadedLua
+                    CAC.OnAvatarAllMeshLoadedLua = function(self)
+                        o(self)
+                        pcall(function()
+                            if self.IsLobbyActor and self:IsLobbyActor() then return end
+                            if not (self.IsSelf and self:IsSelf()) then return end
+                            local char = getLocalChar()
+                            if char and char.AddGameTimer then
+                                char:AddGameTimer(0.5, false, function() bootstrapMatch(char) end)
+                            end
+                        end)
+                    end
+                end
+            end)
+            pcall(function()
+                local WAC = require("GameLua.Mod.Library.GamePlay.Avatar.Component.WeaponAvatarComponent")
+                local oLoad = WAC.OnWeaponAvatarLoadedLua
+                WAC.OnWeaponAvatarLoadedLua = function(self, slotID, definedID)
+                    oLoad(self, slotID, definedID)
+                    pcall(function()
+                        if self.IsLobbyActor and self:IsLobbyActor() then return end
+                        if not isSelfAvatarComp(self) then return end
+                        if _S.globalFrame < _S.weaponHookGuardUntil then return end
+                        local char = getLocalChar()
+                        if not char then return end
+                        bootstrapMatch(char)
+                        _S.weaponApplied = false
+                        if char.AddGameTimer then
+                            char:AddGameTimer(0.2, false, function()
+                                local c = getLocalChar()
+                                if c then matchApplyWeaponSkin(c) end
+                            end)
+                            
+                            char:AddGameTimer(0.5, false, function()
+                                local c = getLocalChar()
+                                if c then matchApplyWeaponSkin(c) end
+                            end)
+                        end
+                    end)
+                end
+            end)
+        end
+
+        local function onWeaponLuaInit(_, _, weapon)
+            if not weapon or not slua.isValid(weapon) then return end
+            local char = getLocalChar()
+            if not char then return end
+            local owner = nil
+            pcall(function() if weapon.GetOwnerPawn then owner = weapon:GetOwnerPawn() end end)
+            if not slua.isValid(owner) or owner ~= char then return end
+            if _S.globalFrame < _S.weaponHookGuardUntil then return end
+            pcall(function()
+                char:AddGameTimer(0.5, false, function()
+                    if slua.isValid(weapon) then
+                        applySkinToWeaponRef(weapon)
+                        _S.weaponApplied = false
+                    end
+                end)
+                
+                char:AddGameTimer(0.5, false, function()
+                    if slua.isValid(weapon) then
+                        applySkinToWeaponRef(weapon)
+                    end
+                end)
+            end)
+        end
+
+        local function hookWeaponSpawn()
+            if _S.weaponSpawnHooked then return end
+            pcall(function()
+                if EventSystem and EventSystem.registEvent
+                    and EVENTTYPE_PLAYEREVENT_WEAPON and EVENTID_PLAYEREVENT_WEAPON_LUA_INIT then
+                    EventSystem:registEvent(EVENTTYPE_PLAYEREVENT_WEAPON, EVENTID_PLAYEREVENT_WEAPON_LUA_INIT, onWeaponLuaInit)
+                    _S.weaponSpawnHooked = true
+                end
+            end)
+        end
+
+        local function hookLobbyWeaponCache()
+            pcall(function()
+                local Arm = require("client.logic.armory.logic_armory")
+                local oRsp = Arm.install_weapon_skin_rsp
+                Arm.install_weapon_skin_rsp = function(client_data, errorCode, weapon_id, instanceID)
+                    oRsp(client_data, errorCode, weapon_id, instanceID)
+                    if errorCode == 0 or errorCode == _K.NET_OK then
+                        cacheWeaponSkinFromIns(weapon_id, instanceID)
+                    end
+                end
+            end)
+            pcall(function()
+                local wl = require("client.slua.logic.wardrobe.logic_wardrobe_new")
+                local o = wl.on_puton_rsp
+                wl.on_puton_rsp = function(self, res, item, olditem, index, extra)
+                    o(self, res, item, olditem, index, extra)
+                    if item and item.instid and (res == 0 or res == _K.NET_OK) then
+                        local resID, insID = tonumber(item.res_id), tonumber(item.instid)
+                        local slot = getEquipSkinSlot(resID)
+                        if isInjectedIns(insID) and slot and not _S.equipSkinApplying then
+                            saveEquipSkin(resID, insID)
+                            if slot ~= "parachute" and slot ~= "glider" then
+                                applyEquipVisual(resID, insID, slot)
+                            end
+                        elseif isInjectedIns(insID) then
+                            local mt = wardrobeMainTab(resID)
+                            if mt ~= _K.WARDROBE_PAGE_VEHICLE then
+                                if isThrowObjectRes(resID) then
+                                    saveThrowObject(resID, insID)
+                                else
+                                    saveEquip(resID, insID)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        local function hookGunWardrobe()
+            pcall(function()
+                local wgl = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+                if wgl._lava_gun_hooked then return end
+                wgl._lava_gun_hooked = true
+
+                local origSetGunID = wgl.SetGunID
+                wgl.SetGunID = function(self, weaponID, ...)
+                    weaponID = tonumber(weaponID)
+                    if not weaponID then return origSetGunID(self, weaponID, ...) end
+
+                    local w = cache().weapons[weaponID]
+                    local injected = w and w.insID and w.insID > 0 and isInjectedIns(w.insID)
+                    local currentSkin = wgl.GetCurrentEquippedSkinInsID and wgl:GetCurrentEquippedSkinInsID(weaponID) or 0
+                    if injected and currentSkin == w.insID then
+                        return origSetGunID(self, weaponID, ...)
+                    end
+
+                    if injected then
+                        pcall(function()
+                            local Arm = require("client.logic.armory.logic_armory")
+                            Arm.rsp_list = Arm.rsp_list or { skin_list = {}, install_list = {} }
+                            Arm.rsp_list.install_list = Arm.rsp_list.install_list or {}
+                            Arm.rsp_list.install_list[weaponID] = { skin_id = w.insID }
+
+                            local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                            if fbd.UpdateCurrentFashionBagWeaponSkin then
+                                fbd:UpdateCurrentFashionBagWeaponSkin(weaponID, w.insID)
+                            end
+                            if fbd.SetFashionBagWeaponSkin then
+                                fbd:SetFashionBagWeaponSkin(weaponID, w.insID)
+                            end
+                        end)
+                    else
+                        pcall(function()
+                            local Arm = require("client.logic.armory.logic_armory")
+                            if Arm.rsp_list and Arm.rsp_list.install_list then
+                                Arm.rsp_list.install_list[weaponID] = nil
+                            end
+                            local fbd = require("client.slua.logic.wardrobe.fashionbag.fashionbag_data")
+                            if fbd.UpdateCurrentFashionBagWeaponSkin then
+                                fbd:UpdateCurrentFashionBagWeaponSkin(weaponID, 0)
+                            end
+                            local bag = fbd.GetCurrentFashionBag and fbd:GetCurrentFashionBag()
+                            if bag and bag.weapon_skin_list then
+                                bag.weapon_skin_list[weaponID] = nil
+                            end
+                        end)
+                    end
+
+                    local result = origSetGunID(self, weaponID, ...)
+
+                    if injected then
+                        later(0.05, function()
+                            pcall(function()
+                                local wgl2 = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+                                wgl2:UpdateCurrentGunAvatar(weaponID, w.insID)
+
+                                if EventSystem then
+                                    if EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN then
+                                        EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN, w.resID)
+                                    end
+                                    if EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_GUN_LIST then
+                                        EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_GUN_LIST, -1)
+                                    end
+                                    if EVENTTYPE_ARMORY and EVENTID_ARMORY_EQUIP_STAT_CHANGE then
+                                        EventSystem:postEvent(EVENTTYPE_ARMORY, EVENTID_ARMORY_EQUIP_STAT_CHANGE, w.resID)
+                                    end
+                                end
+                            end)
+                        end)
+                    else
+                        later(0.05, function()
+                            pcall(function()
+                                local wgl2 = require("client.slua.logic.wardrobe.logic_wardrobe_gun")
+                                wgl2:UpdateCurrentGunAvatar(weaponID, 0)
+                                if EventSystem and EVENTTYPE_WARDROBE and EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN then
+                                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_CURRENT_PUT_ON_GUN, 0)
+                                end
+                                if EventSystem and EVENTID_WARDROBE_UPDATE_GUN_LIST then
+                                    EventSystem:postEvent(EVENTTYPE_WARDROBE, EVENTID_WARDROBE_UPDATE_GUN_LIST, weaponID)
+                                end
+                            end)
+                        end)
+                        log("injected", weaponID)
+                    end
+
+                    return result
+                end
+
+                local origUpdateGunAvatar = wgl.UpdateCurrentGunAvatar
+                wgl.UpdateCurrentGunAvatar = function(self, weaponID, insID, ...)
+                    weaponID = tonumber(weaponID)
+                    insID = tonumber(insID)
+                    if weaponID and (not insID or insID <= 0) then
+                        local w = cache().weapons[weaponID]
+                        if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then
+                            insID = w.insID
+                            log("UpdateCurrentGunAvatar", weaponID, insID)
+                        else
+                            insID = 0
+                        end
+                    end
+                    return origUpdateGunAvatar(self, weaponID, insID, ...)
+                end
+
+                if wgl.GetCurrentEquippedSkinInsID then
+                    local origGetCurSkin = wgl.GetCurrentEquippedSkinInsID
+                    wgl.GetCurrentEquippedSkinInsID = function(self, weaponID, ...)
+                        weaponID = tonumber(weaponID)
+                        if weaponID then
+                            local w = cache().weapons[weaponID]
+                            if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then
+                                return w.insID
+                            end
+                        end
+                        return origGetCurSkin(self, weaponID, ...)
+                    end
+                end
+
+                if wgl.GetGunSkinInsID then
+                    local origGetGunSkin = wgl.GetGunSkinInsID
+                    wgl.GetGunSkinInsID = function(self, weaponID, ...)
+                        weaponID = tonumber(weaponID)
+                        if weaponID then
+                            local w = cache().weapons[weaponID]
+                            if w and w.insID and w.insID > 0 and isInjectedIns(w.insID) then
+                                return w.insID
+                            end
+                        end
+                        return origGetGunSkin(self, weaponID, ...)
+                    end
+                end
+            end)
+        end
+
+        
+        local ELIMINATION_KING_EFFECT_ID = 619150001
+        
+        local FINAL_KILL_EFFECT_ID = 61950002
+
+        local function getLocalPlayerKey()
+            local ok, GD = pcall(require, "GameLua.GameCore.Data.GameplayData")
+            if ok and GD and GD.GetPlayerState then
+                local ps = GD.GetPlayerState()
+                if ps and slua.isValid(ps) and ps.PlayerKey then
+                    return tonumber(ps.PlayerKey)
+                end
+            end
+            return nil
+        end
+
+        local function getLocalUID()
+            local uid
+            pcall(function()
+                local Subsystem = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+                local AccountSubsystem = Subsystem:Get("AccountSubsystem")
+                if AccountSubsystem and AccountSubsystem.GetAccountUID then
+                    uid = AccountSubsystem:GetAccountUID()
+                end
+            end)
+            if not uid then
+                pcall(function()
+                    local GD = require("GameLua.GameCore.Data.GameplayData")
+                    local ps = GD.GetPlayerState()
+                    if ps and slua.isValid(ps) and ps.UID then
+                        uid = tonumber(ps.UID)
+                    end
+                end)
+            end
+            return uid
+        end
+
+        local function hookEliminationKingEffect()
+            if _G._lava_hooked_elim_king then return end
+            _G._lava_hooked_elim_king = true
+
+            pcall(function()
+                local CommerAvatarDataUtil = require("GameLua.Activity.Commercialize.GamePlay.CommerAvatarDataUtil")
+                if CommerAvatarDataUtil._lava_hooked_ext_attr then return end
+                CommerAvatarDataUtil._lava_hooked_ext_attr = true
+
+                local ExtendAttribute = require("Server.config.ExtendAttribute")
+                local origGetAttr = CommerAvatarDataUtil.GetPlayerExtendAttributeAndTest
+                CommerAvatarDataUtil.GetPlayerExtendAttributeAndTest = function(self, UID, attr)
+                    if attr == ExtendAttribute.EliminationKingEffect then
+                        local localUID = getLocalUID()
+                        if localUID and tonumber(UID) == tonumber(localUID) then
+                            return ELIMINATION_KING_EFFECT_ID
+                        end
+                    end
+                    return origGetAttr(self, UID, attr)
+                end
+                log("hookEliminationKingEffect: CommerAvatarDataUtil hooked")
+            end)
+
+            pcall(function()
+                local KillInfoClass = require("GameLua.Mod.BaseMod.Client.KillInfoTips.KillInfo")
+                local impl = KillInfoClass.__inner_impl
+                if not impl or impl._lava_hooked_show_king then return end
+                impl._lava_hooked_show_king = true
+
+                local origShow = impl.ShowKingEliminationInfo
+                impl.ShowKingEliminationInfo = function(self, DamageRecordData)
+                    local localKey = getLocalPlayerKey()
+                    if localKey and DamageRecordData and DamageRecordData.ExpandDataContent then
+                        pcall(function()
+                            local FatalDamageInfo = slua.LuaArchiverDecode(LuaStateWrapper, DamageRecordData.ExpandDataContent)
+                            if FatalDamageInfo and FatalDamageInfo.KingEliminationInfo then
+                                local KingEliminationInfo = FatalDamageInfo.KingEliminationInfo
+                                if KingEliminationInfo.NewKingEliminationInfo then
+                                    local info = KingEliminationInfo.NewKingEliminationInfo
+                                    if tonumber(info.PlayerKey) == localKey then
+                                        info.EffectID = ELIMINATION_KING_EFFECT_ID
+                                        log("hookEliminationKingEffect: injected EffectID into NewKingEliminationInfo")
+                                    end
+                                end
+                                if KingEliminationInfo.DeadKingEliminationInfo then
+                                    local info = KingEliminationInfo.DeadKingEliminationInfo
+                                    if tonumber(info.KillerPlayerKey) == localKey then
+                                        info.EffectID = ELIMINATION_KING_EFFECT_ID
+                                        log("hookEliminationKingEffect: injected EffectID into DeadKingEliminationInfo")
+                                    end
+                                end
+                            end
+                        end)
+                    end
+                    return origShow(self, DamageRecordData)
+                end
+                log("hookEliminationKingEffect: KillInfo.ShowKingEliminationInfo hooked")
+            end)
+
+            pcall(function()
+                local KingEliminationInfoItemClass = require("GameLua.Mod.BaseMod.Client.KillInfoTips.KingEliminationInfoItem")
+                local impl = KingEliminationInfoItemClass.__inner_impl
+                if not impl or impl._lava_hooked_update then return end
+                impl._lava_hooked_update = true
+
+                local origUpdate = impl.UpdateKingEliminationInfo
+                impl.UpdateKingEliminationInfo = function(self, DamageRecordData, KingEliminationInfo)
+                    local localKey = getLocalPlayerKey()
+                    if localKey and KingEliminationInfo then
+                        if KingEliminationInfo.NewKingEliminationInfo then
+                            local info = KingEliminationInfo.NewKingEliminationInfo
+                            if tonumber(info.PlayerKey) == localKey then
+                                info.EffectID = ELIMINATION_KING_EFFECT_ID
+                            end
+                        end
+                        if KingEliminationInfo.DeadKingEliminationInfo then
+                            local info = KingEliminationInfo.DeadKingEliminationInfo
+                            if tonumber(info.KillerPlayerKey) == localKey then
+                                info.EffectID = ELIMINATION_KING_EFFECT_ID
+                            end
+                        end
+                    end
+                    return origUpdate(self, DamageRecordData, KingEliminationInfo)
+                end
+                log("hookEliminationKingEffect: KingEliminationInfoItem hooked")
+            end)
+
+            pcall(function()
+                local PlayerStateBaseClass = require("GameLua.GameCore.Framework.PlayerStateBase")
+                local impl = PlayerStateBaseClass.__inner_impl
+                if not impl or impl._lava_hooked_init_team then return end
+                impl._lava_hooked_init_team = true
+
+                local origInit = impl.InitTeamShowData
+                impl.InitTeamShowData = function(self, ...)
+                    origInit(self, ...)
+                    pcall(function()
+                        local localUID = getLocalUID()
+                        if localUID and self.UID and tonumber(self.UID) == tonumber(localUID) then
+                            self.EliminationKingEffectID = ELIMINATION_KING_EFFECT_ID
+                        end
+                    end)
+                end
+                log("hookEliminationKingEffect: PlayerStateBase hooked")
+            end)
+        end
+
+        local function tickEliminationKingEffect()
+            pcall(function()
+                local ok, GD = pcall(require, "GameLua.GameCore.Data.GameplayData")
+                if ok and GD and GD.GetPlayerState then
+                    local ps = GD.GetPlayerState()
+                    if ps and slua.isValid(ps) then
+                        if not ps.EliminationKingEffectID or ps.EliminationKingEffectID == 0 then
+                            ps.EliminationKingEffectID = ELIMINATION_KING_EFFECT_ID
+                        end
+                    end
+                end
+            end)
+        end
+
+        
+        local function hookFinalKillEffect()
+            if _G._lava_hooked_final_kill then return end
+            _G._lava_hooked_final_kill = true
+
+            
+            
+            pcall(function()
+                local LSActor = require("GameLua.Mod.Library.GamePlay.Actor.FinalKillEffectLevelSequenceActor")
+                if LSActor._lava_hooked then return end
+                LSActor._lava_hooked = true
+
+                local origBeginPlay = LSActor.ReceiveBeginPlay
+                if origBeginPlay then
+                    LSActor.ReceiveBeginPlay = function(self)
+                        if self.ItemId == FINAL_KILL_EFFECT_ID then
+                            local Config = CDataTable.GetTableData("FinalKillEffectCfg", self.ItemId)
+                            if not Config or not Config.Sequence or Config.Sequence == "" then
+                                log("hookFinalKillEffect: no sequence for 61950002, calling OnPlay directly")
+                                if self.Callback and self.Callback.OnPlay then
+                                    self.Callback.OnPlay()
+                                end
+                                return
+                            end
+                        end
+                        return origBeginPlay(self)
+                    end
+                    log("hookFinalKillEffect: FinalKillEffectLevelSequenceActor hooked")
+                end
+            end)
+
+            
+            pcall(function()
+                local Feature = require("GameLua.Mod.BaseMod.GamePlay.Feature.Player.PlayerCharacterFinalKillEffectFeature")
+                if Feature._lava_hooked_fke then return end
+                Feature._lava_hooked_fke = true
+
+                local origTriggerParticle = Feature.TriggerParticleEffect
+                if origTriggerParticle then
+                    Feature.TriggerParticleEffect = function(self, ItemId, Location, Rotator, TeamMemberNames)
+                        log("hookFinalKillEffect: TriggerParticleEffect called, ItemId=" .. tostring(ItemId) .. " forcing to " .. tostring(FINAL_KILL_EFFECT_ID))
+                        return origTriggerParticle(self, FINAL_KILL_EFFECT_ID, Location, Rotator, TeamMemberNames)
+                    end
+                end
+
+                local origPrepareItem = Feature.PrepareItem
+                if origPrepareItem then
+                    Feature.PrepareItem = function(self, ItemId)
+                        log("hookFinalKillEffect: PrepareItem called, ItemId=" .. tostring(ItemId) .. " forcing to " .. tostring(FINAL_KILL_EFFECT_ID))
+                        return origPrepareItem(self, FINAL_KILL_EFFECT_ID)
+                    end
+                end
+                log("hookFinalKillEffect: PlayerCharacterFinalKillEffectFeature hooked")
+            end)
+
+            
+            local function triggerFinalKillEffect()
+                pcall(function()
+                    local char = getLocalChar()
+                    if not char or not slua.isValid(char) then
+                        log("hookFinalKillEffect: char not valid")
+                        return
+                    end
+
+                    if _G._lava_fke_triggered then return end
+                    _G._lava_fke_triggered = true
+
+                    char:EnsureDynamicFeature("FinalKillEffect")
+                    if not char.FinalKillEffect then
+                        log("hookFinalKillEffect: FinalKillEffect feature not available")
+                        return
+                    end
+
+                    local Location = char:K2_GetActorLocation()
+                    local Rotator = FRotator(0, 0, 0)
+                    local Names = char.PlayerName or ""
+
+                    log("hookFinalKillEffect: triggering effect 61950002")
+                    char.FinalKillEffect:TriggerParticleEffect(FINAL_KILL_EFFECT_ID, Location, Rotator, Names)
+                end)
+            end
+
+            
+            pcall(function()
+                if BattleResult and BattleResult.on_game_result and not BattleResult._lava_hooked_fke then
+                    BattleResult._lava_hooked_fke = true
+                    local origOnGameResult = BattleResult.on_game_result
+                    BattleResult.on_game_result = function(battle_result, result)
+                        log("hookFinalKillEffect: BattleResult.on_game_result triggered")
+                        triggerFinalKillEffect()
+                        return origOnGameResult(battle_result, result)
+                    end
+                    log("hookFinalKillEffect: BattleResult.on_game_result hooked")
+                end
+            end)
+
+            
+            pcall(function()
+                if BattleResult and BattleResult.on_game_over and not BattleResult._lava_hooked_fke_over then
+                    BattleResult._lava_hooked_fke_over = true
+                    local origOnGameOver = BattleResult.on_game_over
+                    BattleResult.on_game_over = function(game_id)
+                        log("hookFinalKillEffect: BattleResult.on_game_over triggered")
+                        triggerFinalKillEffect()
+                        return origOnGameOver(game_id)
+                    end
+                    log("hookFinalKillEffect: BattleResult.on_game_over hooked")
+                end
+            end)
+
+            
+            pcall(function()
+                if EventSystem and EventSystem.registEvent
+                    and EVENTTYPE_STATE and EVENTID_GAMESTATE_ON_PRE_BATTLE_RESULT
+                    and not _G._lava_fke_event_registered then
+                    _G._lava_fke_event_registered = true
+                    EventSystem:registEvent(EVENTTYPE_STATE, EVENTID_GAMESTATE_ON_PRE_BATTLE_RESULT, triggerFinalKillEffect)
+                    log("hookFinalKillEffect: registered for EVENTID_GAMESTATE_ON_PRE_BATTLE_RESULT")
+                end
+            end)
+            log("hookFinalKillEffect: done")
+        end
+
+        
+        local function hookSecurityBypass()
+            
+            pcall(function()
+                local pufferTlog = package.loaded["client.slua.logic.download.report.puffer_tlog"]
+                if pufferTlog then
+                    pufferTlog.ReportEvent = function() end
+                    pufferTlog.ReportDownloadResult = function() end
+                    pufferTlog.ReportODPAKError = function() end
+                end
+            end)
+
+            
+            pcall(function()
+                local AvatarUtils = package.loaded["AvatarUtils"]
+                if AvatarUtils then
+                    AvatarUtils.CheckIsWeaponInBlackList = function() return false end
+                    AvatarUtils.IsValidAvatar = function() return true end
+                end
+            end)
+
+            
+            pcall(function()
+                local SubsystemMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+                if SubsystemMgr then
+                    local FileCheckSubsystem = SubsystemMgr:Get("FileCheckSubsystem")
+                    if FileCheckSubsystem then
+                        FileCheckSubsystem.StartCheck = function() end
+                        FileCheckSubsystem.ReportAbnormalFile = function() end
+                    end
+                end
+            end)
+
+            
+            pcall(function()
+                local equipReport = package.loaded["client.slua.logic.report.EquipmentExceptionReport"]
+                if equipReport then
+                    equipReport.Report = function() end
+                end
+            end)
+
+            
+            pcall(function()
+                local pufferManager = require("client.slua.logic.download.puffer.puffer_manager")
+                local pufferConst = require("client.slua.logic.download.puffer_const")
+                if pufferManager and pufferConst then
+                    local origCheck = pufferManager.CheckResourceValid
+                    if origCheck then
+                        pufferManager.CheckResourceValid = function(...) return true end
+                    end
+                end
+            end)
+
+            
+            pcall(function()
+                local AvatarUtils = package.loaded["AvatarUtils"]
+                if AvatarUtils then
+                    local origVerify = AvatarUtils.VerifyAvatarData
+                    if origVerify then
+                        AvatarUtils.VerifyAvatarData = function(...) return true end
+                    end
+                end
+            end)
+            print("[AddOutfit] Security bypass installed")
+        end
+        
+        _G.AlreadyChangedSet = _G.AlreadyChangedSet or {}
+        _G.DeadBoxSkins = _G.DeadBoxSkins or {}
+        _G.CurrentEquipVehicleID = 0
+        local function locationsClose(loc1, loc2, tolerance)
+            local dx = loc1.X - loc2.X
+            local dy = loc1.Y - loc2.Y
+            local dz = loc1.Z - loc2.Z
+            return dx * dx + dy * dy + dz * dz < tolerance * tolerance
+        end
+        local UGameplayStatics = import("GameplayStatics")
+        local APlayerTombBox = import("PlayerTombBox")
+        local UIUtil = require("client.common.ui_util")
+        local uActor = import("Actor")
+        function _G.DeadBox_TemperRequest(PlayerController)
+            if not PlayerController or not UGameplayStatics or not APlayerTombBox then return end
+            local uCharacter = PlayerController:GetPlayerCharacterSafety()
+            if not uCharacter then return end
+            local uGameInstance = UIUtil and UIUtil.GetGameInstance()
+            if not uGameInstance then return end
+
+            local uActorArray = UGameplayStatics.GetAllActorsOfClass(uGameInstance, APlayerTombBox, slua.Array(UEnums.EPropertyClass.Object, uActor))
+
+            for _, actor in pairs(uActorArray) do
+                if slua.isValid(actor) then
+                    local actorKey = tostring(actor)
+                    
+                    if not _G.AlreadyChangedSet[actorKey] then
+                        local DamageCauser = actor.DamageCauser
+
+                        if DamageCauser and DamageCauser.Playerkey == PlayerController.Playerkey then
+                            local Deadboxavatar = actor.DeadBoxAvatarComponent_BP
+                            
+                            if Deadboxavatar then
+                                local actorLocation = actor:K2_GetActorLocation()
+                                local ApplySkinID = nil
+                                for _, entry in pairs(_G.DeadBoxSkins) do
+                                    if locationsClose(entry.location, actorLocation, 1.0) then
+                                        ApplySkinID = entry.SkinID
+                                        break
+                                    end
+                                end
+
+                                if not ApplySkinID then
+                                    local CurrentVehicle = uCharacter.CurrentVehicle
+                                    if CurrentVehicle and _G.CurrentEquipVehicleID ~= 0 then
+                                        ApplySkinID = tonumber(tostring(_G.CurrentEquipVehicleID) .. "1")
+                                    else
+                                        local currweapon = uCharacter:GetCurrentWeapon()
+                                        if currweapon and currweapon.synData then
+                                            local ref = slua.IndexReference(currweapon.synData:Get(7), "defineID")
+                                            if ref then ApplySkinID = ref.TypeSpecificID end
+                                        end
+                                    end
+
+                                    if ApplySkinID and ApplySkinID ~= 0 then
+                                        table.insert(_G.DeadBoxSkins, { location = actorLocation, SkinID = ApplySkinID })
+                                    end
+                                end
+
+                                if ApplySkinID and ApplySkinID ~= 0 then
+                                    Deadboxavatar:ResetItemAvatar()
+                                    Deadboxavatar:PreChangeItemAvatar(ApplySkinID)
+                                    Deadboxavatar:SyncChangeItemAvatar(ApplySkinID)
+                                    _G.AlreadyChangedSet[actorKey] = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+        function _G.GameAvatarHandlerDeadBox()
+            local PlayerController = slua_GameFrontendHUD and slua_GameFrontendHUD:GetPlayerController()
+            if PlayerController then
+                _G.DeadBox_TemperRequest(PlayerController)
+            end
+        end
+        pcall(function()
+           require("common.time_ticker").AddTimerLoop(2.0, _G.GameAvatarHandlerDeadBox, -1, 1)
+        end)
+        
+        local n,C=nil,{}
+        local WID=0
+        local SID=0
+        local function D(x)
+            if not x or x=="" then return {} end
+            local o,r=pcall(slua.LuaArchiverDecode,LuaStateWrapper,x)
+            return o and r or {}
+        end
+        local function E(x)
+            local o,r=pcall(slua.LuaArchiverEncode,LuaStateWrapper,x or {})
+            return o and r or nil
+        end
+        local function M(d)
+            if not d then return false end
+            if d.bIamCauser then return true end
+            if not n then
+                local h=slua_GameFrontendHUD
+                local p=h and h:GetPlayerController()
+                local c=p and slua.isValid(p) and p:GetPlayerCharacterSafety()
+                if c and slua.isValid(c) then
+                    pcall(function() n=c:GetPlayerNameSafety() end)
+                end
+            end
+            return n and n~="" and (d.Causer==n or d.CauserRealPlayerName==n or d.CauserPlayerName==n) or false
+        end
+        local function S()
+            local h=slua_GameFrontendHUD
+            local p=h and h:GetPlayerController()
+            if not p or not slua.isValid(p) then
+                return WID,SID
+            end
+            local c=p:GetPlayerCharacterSafety()
+            if not c or not slua.isValid(c) then
+                return WID,SID
+            end
+            local w=c:GetCurrentWeapon()
+            if not w or not slua.isValid(w) then
+                return WID,SID
+            end
+            local defineID=0
+            local skinID=0
+            pcall(function()
+                local data=w:GetItemDefineID()
+                if data then
+                    defineID=tonumber(data.TypeSpecificID) or 0
+                end
+            end)
+            pcall(function()
+                if w.synData and slua.isValid(w.synData) then
+                    local data=w.synData:Get(7)
+                    if data then
+                        local r=slua.IndexReference(data,"defineID")
+                        if r and slua.isValid(r) then
+                            skinID=tonumber(r.TypeSpecificID) or 0
+                        end
+                    end
+                end
+            end)
+            if defineID>0 and defineID~=69 then
+                WID=defineID
+            end
+            if skinID>0 and skinID~=69 then
+                SID=skinID
+            end
+            return WID,SID
+        end
+        local function GetBroadcast(weaponID,skinID)
+            if skinID and skinID>0 and skinID~=69 then
+                local c
+                pcall(function() c=CDataTable.GetTableData("TeamKillBroadcast",skinID) end)
+                if c and ((c.BgPath and c.BgPath~="") or (c.EffectPath and c.EffectPath~="")) then
+                    return skinID,c
+                end
+            end
+            if weaponID and weaponID>0 and weaponID~=69 then
+                local c
+                pcall(function() c=CDataTable.GetTableData("TeamKillBroadcast",weaponID) end)
+                if c and ((c.BgPath and c.BgPath~="") or (c.EffectPath and c.EffectPath~="")) then
+                    return weaponID,c
+                end
+            end
+            return 0,nil
+        end
+        local function A(id,c)
+            if not id or id<=0 or id==69 or C[id] then
+                return
+            end
+            if not c then
+                pcall(function() c=CDataTable.GetTableData("TeamKillBroadcast",id) end)
+            end
+            if not c then return end
+            if (not c.EffectPath or c.EffectPath=="") and (not c.BgPath or c.BgPath=="") then
+                return
+            end
+            C[id]=true
+            pcall(function()
+                local p=require("client.slua.logic.download.puffer.puffer_manager")
+                local k=require("client.slua.logic.download.puffer_const")
+                local function d(x)
+                    if x and x~="" then
+                        p.Download(k.ENUM_DownloadType.ODPAK,{x})
+                    end
+                end
+                d(id)
+                d(c.EffectPath)
+                d(c.BgPath)
+            end)
+        end
+        local function P(d)
+            if not d or not M(d) then
+                return d
+            end
+            local weaponID,skinID=S()
+            if weaponID==0 and skinID==0 then
+                return d
+            end
+            local id,c=GetBroadcast(weaponID,skinID)
+            if id==0 or not c then
+                return d
+            end
+            pcall(function()
+                local e=D(d.ExpandDataContent)
+                e.CauserWeaponAvatarID=id
+                local encoded=E(e)
+                if not encoded then
+                    return
+                end
+                d.ExpandDataContent=encoded
+                d.bShowBottomBothSidesKillInfo=true
+                d.bIamCauser=true
+                A(id,c)
+            end)
+            return d
+        end
+        local function installTeamBroadcastHooks()
+            local function H(path,tag)
+                local ok,m=pcall(require,path)
+                if not ok or not m then
+                    return
+                end
+                local i=m.__inner_impl or m
+                if not i then
+                    return
+                end
+                local k="__teamKillCopy_"..tag
+                if i[k] then
+                    return
+                end
+                local f=i.CopyKillOrPutDownMessageDataUserDataToLuaTable
+                if not f then
+                    return
+                end
+                i[k]=f
+                i.CopyKillOrPutDownMessageDataUserDataToLuaTable=function(s,d)
+                    local x=f(s,d)
+                    local ok2,r=pcall(P,x)
+                    if ok2 and r then
+                        return r
+                    end
+                    return x
+                end
+            end
+            pcall(H,"GameLua.Mod.BaseMod.Client.BattleKillBroadcast.BattleKillBroadcastSubSystem","base")
+            pcall(H,"GameLua.Mod.SingleTraining.Client.BattleKillBroadcast.BattleKillBroadcastSubSystem","training")
+        end
+
+        
+        _G.killCountInfo = _G.killCountInfo or {}
+        _G.LastKillTime = _G.LastKillTime or {}
+        _G.WeaponEvents = _G.WeaponEvents or {
+            onWeaponChanged = function() end
+        }
+
+        function _G.getKills(weaponID)
+            if not weaponID then
+                return 0
+            end
+            if _G.killCountInfo[weaponID] == nil then
+                _G.killCountInfo[weaponID] = 1000
+            end
+            return _G.killCountInfo[weaponID]
+        end
+
+        function _G.addKill(weaponID, count)
+            if not weaponID or not count then
+                return
+            end
+            local currentTime = os.clock()
+            if _G.LastKillTime[weaponID] and (currentTime - _G.LastKillTime[weaponID]) < 0.5 then
+                return
+            end
+            _G.LastKillTime[weaponID] = currentTime
+            _G.killCountInfo[weaponID] = (_G.killCountInfo[weaponID] or 1000) + count
+            pcall(function()
+                local uCharacter = getLocalChar()
+                if not uCharacter or not slua.isValid(uCharacter) then
+                    return
+                end
+                local currweapon = uCharacter:GetCurrentWeapon()
+                if not currweapon or not slua.isValid(currweapon) then
+                    return
+                end
+                local DefineData = currweapon:GetItemDefineID()
+                local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                if DefineID == 0 then
+                    return
+                end
+                local SkinID = 0
+                if currweapon.synData and slua.isValid(currweapon.synData) then
+                    local weaponDefineID = slua.IndexReference(currweapon.synData:Get(7), "defineID")
+                    if weaponDefineID and slua.isValid(weaponDefineID) then
+                        SkinID = weaponDefineID.TypeSpecificID or 0
+                    end
+                end
+                if _G.OurkillCountSystem then
+                    _G.OurkillCountSystem:UpdateMainKillCounterUI(true, DefineID, SkinID)
+                end
+            end)
+        end
+
+        function _G.ForceUpdateKillCounterUI()
+            pcall(function()
+                local uCharacter = getLocalChar()
+                if not uCharacter or not slua.isValid(uCharacter) then
+                    return
+                end
+                local currweapon = uCharacter:GetCurrentWeapon()
+                if not currweapon or not slua.isValid(currweapon) then
+                    return
+                end
+                local DefineData = currweapon:GetItemDefineID()
+                local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                if DefineID == 0 then
+                    return
+                end
+                local currentEquipAvatarID = 0
+                if currweapon.synData and slua.isValid(currweapon.synData) then
+                    local weaponDefineID = slua.IndexReference(currweapon.synData:Get(7), "defineID")
+                    if weaponDefineID and slua.isValid(weaponDefineID) then
+                        currentEquipAvatarID = weaponDefineID.TypeSpecificID or 0
+                    end
+                end
+                local UIManager = require("client.slua_ui_framework.manager")
+                local MainKillCounter = UIManager.GetUI(UIManager.UI_Config_InGame.MainKillCounter)
+                if not MainKillCounter or not slua.isValid(MainKillCounter) then
+                    return
+                end
+                local ModuleManager = require("client.module_framework.ModuleManager")
+                local LogicKillCounter = ModuleManager.GetModule(ModuleManager.CommonModuleConfig.LogicKillCounter)
+                if not LogicKillCounter then
+                    return
+                end
+                local curEquipedKillCounter = LogicKillCounter:GetEquipedKillCounterId(6114302174, currentEquipAvatarID)
+                if not curEquipedKillCounter or curEquipedKillCounter == 0 then
+                    curEquipedKillCounter = LogicKillCounter:GetBaseKillCounterIdByWeaponId(DefineID)
+                end
+                local kills = _G.getKills(DefineID)
+                MainKillCounter:SetKillCounterItemShowWithNum(curEquipedKillCounter, kills, currentEquipAvatarID)
+                if MainKillCounter.KillCounterItem and MainKillCounter.KillCounterItem.SetVisibility then
+                    local ESlateVisibility = import("ESlateVisibility")
+                    MainKillCounter.KillCounterItem:SetVisibility(ESlateVisibility.Collapsed)
+                    MainKillCounter.KillCounterItem:SetVisibility(ESlateVisibility.SelfHitTestInvisible)
+                end
+            end)
+        end
+        
+        local SKillInfo = require("GameLua.Mod.BaseMod.Client.KillInfoTips.KillInfo")
+        local ECharacterHealthStatus = import("ECharacterHealthStatus")
+        local SKillInfoModuleManager = require("client.module_framework.ModuleManager")
+        local O_FileItem = SKillInfo.__inner_impl.FileItem
+
+        SKillInfo.__inner_impl.FileItem = function(self, DamageRecordData)
+            if not self or not DamageRecordData then
+                return O_FileItem(self, DamageRecordData)
+            end
+            local LogicKillCounter = SKillInfoModuleManager.GetModule(SKillInfoModuleManager.CommonModuleConfig.LogicKillCounter)
+            if not LogicKillCounter then
+                return O_FileItem(self, DamageRecordData)
+            end
+            local uCharacter = getLocalChar()
+            if not uCharacter or not slua.isValid(uCharacter) then
+                return O_FileItem(self, DamageRecordData)
+            end
+            local SelfName = uCharacter:GetPlayerNameSafety()
+            if DamageRecordData.Causer == SelfName then
+                local currWeapon = uCharacter:GetCurrentWeapon()
+                if currWeapon and slua.isValid(currWeapon) then
+                    local DefineData = currWeapon:GetItemDefineID()
+                    local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                    if DefineID ~= 0 then
+                        local ExpandData = slua.LuaArchiverDecode(LuaStateWrapper, DamageRecordData.ExpandDataContent) or {}
+                        local SupportKillCounter = LogicKillCounter:GetBaseKillCounterIdByWeaponId(DefineID)
+                        if SupportKillCounter and DamageRecordData.ResultHealthStatus == ECharacterHealthStatus.FinishedLastBreath then
+                            ExpandData.KillCounterItemId = DefineID
+                            ExpandData.KillCounterNum = (ExpandData.KillCounterNum or 0) + 1
+                            _G.addKill(DefineID, 1)
+                        end
+                        local synData = currWeapon.synData
+                        if synData and slua.isValid(synData) then
+                            local weaponDefineID = slua.IndexReference(synData:Get(7), "defineID")
+                            if weaponDefineID and slua.isValid(weaponDefineID) then
+                                DamageRecordData.CauserWeaponAvatarID = weaponDefineID.TypeSpecificID
+                            end
+                        end
+                        DamageRecordData.ExpandDataContent = slua.LuaArchiverEncode(LuaStateWrapper, ExpandData)
+                    end
+                end
+            end
+            return O_FileItem(self, DamageRecordData)
+        end
+        
+        local MyMainKillCounter = require("GameLua.Mod.BaseMod.Client.KillCounter.MainKillCounter")
+        local MyKillCountSubSystem = require("GameLua.Mod.BaseMod.Client.KillCounter.KillCounterUISubsystem")
+        local MyMainWeaponInfoItemUI = require("GameLua.Mod.BaseMod.Client.Backpack.MainWeaponInfoItemUI")
+        local MyMainWeaponKillCounter = require("GameLua.Mod.BaseMod.Client.KillCounter.MainKillCounter")
+        local SubsystemMgr = require("GameLua.GameCore.Module.Subsystem.SubsystemMgr")
+        local SlotBase = require("GameLua.Mod.BaseMod.Client.MainControlUI.SwitchWeaponSlotMode2")
+        _G.OurkillCountSystem = MyKillCountSubSystem.__inner_impl
+
+        MyMainKillCounter.__inner_impl.OnRefreshUI = function(self, _, _, UID)
+            pcall(function()
+                local ModuleManager = require("client.module_framework.ModuleManager")
+                local LogicKillCounter = ModuleManager.GetModule(ModuleManager.CommonModuleConfig.LogicKillCounter)
+                local uCharacter = getLocalChar()
+                if not uCharacter or not slua.isValid(uCharacter) then
+                    return
+                end
+                local currweapon = uCharacter:GetCurrentWeapon()
+                if not currweapon or not slua.isValid(currweapon) then
+                    return
+                end
+                local DefineData = currweapon:GetItemDefineID()
+                local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                if DefineID == 0 then
+                    return
+                end
+                local currentEquipAvatarID = 0
+                if currweapon.synData and slua.isValid(currweapon.synData) then
+                    local weaponDefineID = slua.IndexReference(currweapon.synData:Get(7), "defineID")
+                    if weaponDefineID and slua.isValid(weaponDefineID) then
+                        currentEquipAvatarID = weaponDefineID.TypeSpecificID or 0
+                    end
+                end
+                local curEquipedKillCounter = LogicKillCounter:GetEquipedKillCounterId(6114302174, currentEquipAvatarID)
+                if not curEquipedKillCounter or curEquipedKillCounter == 0 then
+                    curEquipedKillCounter = LogicKillCounter:GetBaseKillCounterIdByWeaponId(DefineID)
+                end
+                if self.KillCounterItem then
+                    self.KillCounterItem:SetKillCounterItemShowWithNum(curEquipedKillCounter, _G.getKills(DefineID), currentEquipAvatarID)
+                end
+            end)
+        end
+
+        MyKillCountSubSystem.__inner_impl.CheckSupportKCUI = function(self)
+            return true
+        end
+
+        local o_CheckNeedMainKillCounterUI = MyKillCountSubSystem.__inner_impl.CheckNeedMainKillCounterUI
+        MyKillCountSubSystem.__inner_impl.CheckNeedMainKillCounterUI = function(self, Weapon, PlayerID)
+            pcall(function()
+                local uCharacter = getLocalChar()
+                if not uCharacter or not slua.isValid(uCharacter) then
+                    return
+                end
+                local currweapon = uCharacter:GetCurrentWeapon()
+                if not currweapon then
+                    return
+                end
+                local DefineData = currweapon:GetItemDefineID()
+                local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                if DefineID == 0 then
+                    return
+                end
+                _G.WeaponEvents.onWeaponChanged(DefineID)
+                local SkinID = 0
+                if currweapon.synData and slua.isValid(currweapon.synData) then
+                    local weaponDefineID = slua.IndexReference(currweapon.synData:Get(7), "defineID")
+                    if weaponDefineID and slua.isValid(weaponDefineID) then
+                        SkinID = weaponDefineID.TypeSpecificID or 0
+                    end
+                end
+                self:UpdateMainKillCounterUI(true, DefineID, SkinID)
+            end)
+        end
+
+        local o_UpdateMainKillCounterUI = MyKillCountSubSystem.__inner_impl.UpdateMainKillCounterUI
+        MyKillCountSubSystem.__inner_impl.UpdateMainKillCounterUI = function(self, bShow, WeaponID, AvatarID)
+            pcall(function()
+                o_UpdateMainKillCounterUI(self, bShow, WeaponID, AvatarID)
+                local UIManager = require("client.slua_ui_framework.manager")
+                local MainKillCounter = UIManager.GetUI(UIManager.UI_Config_InGame.MainKillCounter)
+                local uCharacter = getLocalChar()
+                if not uCharacter or not slua.isValid(uCharacter) then
+                    return
+                end
+                local currweapon = uCharacter:GetCurrentWeapon()
+                if not bShow then
+                    if MainKillCounter then
+                        UIManager.CloseUI(UIManager.UI_Config_InGame.MainKillCounter)
+                    end
+                    return
+                end
+                if not currweapon then
+                    return
+                end
+                local DefineData = currweapon:GetItemDefineID()
+                local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                if DefineID == 0 then
+                    return
+                end
+                local currentEquipAvatarID = AvatarID or 0
+                local ModuleManager = require("client.module_framework.ModuleManager")
+                local LogicKillCounter = ModuleManager.GetModule(ModuleManager.CommonModuleConfig.LogicKillCounter)
+                if not LogicKillCounter then
+                    return
+                end
+                local SupportKillCounter = LogicKillCounter:GetBaseKillCounterIdByWeaponId(DefineID)
+                if SupportKillCounter == nil then
+                    if MainKillCounter then
+                        UIManager.CloseUI(UIManager.UI_Config_InGame.MainKillCounter)
+                    end
+                    return
+                end
+                if DefineID == currentEquipAvatarID then
+                    if MainKillCounter then
+                        UIManager.CloseUI(UIManager.UI_Config_InGame.MainKillCounter)
+                    end
+                    return
+                end
+                local curEquipedKillCounter = LogicKillCounter:GetEquipedKillCounterId(6114302174, currentEquipAvatarID)
+                if not curEquipedKillCounter or curEquipedKillCounter == 0 then
+                    curEquipedKillCounter = SupportKillCounter
+                end
+                if not MainKillCounter then
+                    UIManager.ShowUI(UIManager.UI_Config_InGame.MainKillCounter, DefineID, currentEquipAvatarID)
+                    MainKillCounter = UIManager.GetUI(UIManager.UI_Config_InGame.MainKillCounter)
+                    if MainKillCounter then
+                        MainKillCounter:SetKillCounterItemShowWithNum(curEquipedKillCounter, _G.getKills(DefineID), currentEquipAvatarID)
+                    end
+                else
+                    MainKillCounter:UpdateWeaponID(DefineID, currentEquipAvatarID)
+                    MainKillCounter:SetKillCounterItemShowWithNum(curEquipedKillCounter, _G.getKills(DefineID), currentEquipAvatarID)
+                end
+            end)
+        end
+
+        _G.WeaponEvents.onWeaponChanged = function(weaponId)
+            pcall(function()
+                local uCharacter = getLocalChar()
+                if not uCharacter or
+                   not slua.isValid(uCharacter) then
+                    return
+                end
+                if not _G.OurkillCountSystem then
+                    return
+                end
+                local currweapon = uCharacter:GetCurrentWeapon()
+                if not currweapon or not slua.isValid(currweapon) then
+                    return
+                end
+                local DefineData = currweapon:GetItemDefineID()
+                local DefineID = DefineData and DefineData.TypeSpecificID or 0
+                if DefineID == 0 then
+                    return
+                end
+                local SkinID = 0
+                if currweapon.synData and slua.isValid(currweapon.synData) then
+                    local weaponDefineID = slua.IndexReference(currweapon.synData:Get(7), "defineID")
+                    if weaponDefineID and slua.isValid(weaponDefineID) then
+                        SkinID = weaponDefineID.TypeSpecificID or 0
+                    end
+                end
+                _G.OurkillCountSystem:UpdateMainKillCounterUI(true, DefineID, SkinID)
+            end)
+        end
+        
+        local function GameAvatarHandlerkillcounter()
+            pcall(_G.ForceUpdateKillCounterUI)
+            pcall(installTeamBroadcastHooks)
+            
+        end
+
+        function _G.ChangeLobbyWeapon(WeaponMgr)
+            if not WeaponMgr or not slua.isValid(WeaponMgr) then
+                return false
+            end
+            local ok, result = pcall(function()
+                if type(WeaponMgr.GetUsingWeapon) ~= "function" then
+                    return false
+                end
+                local weapon = WeaponMgr:GetUsingWeapon()
+                if not weapon or not slua.isValid(weapon) then
+                    return false
+                end
+                if type(weapon.GetWeaponID) ~= "function" then
+                    return false
+                end
+                local currentID = weapon:GetWeaponID()
+                if not currentID or currentID == 0 then
+                    return false
+                end
+                local targetID = currentID
+                if type(getCachedWeaponSkin) == "function" then
+                    targetID = getCachedWeaponSkin(currentID) or currentID
+                end
+                if targetID == currentID or targetID == 0 then
+                    return false
+                end
+                local socket = WeaponMgr.CurUseWeaponSocket
+                if type(WeaponMgr.DestroyLastWeapon) == "function" then
+                    WeaponMgr:DestroyLastWeapon()
+                end
+                if type(WeaponMgr.EquipWeaponByResId) ~= "function" then
+                    return false
+                end
+                WeaponMgr:EquipWeaponByResId(targetID, true, false, socket)
+                if type(WeaponMgr.DoUseWeaponBySocketID) == "function" then
+                    WeaponMgr:DoUseWeaponBySocketID(socket)
+                end
+                return true
+            end)
+            return ok and result == true
+        end
+        
+        function _G.equip_character_lobby(uCharacter)
+            if not uCharacter or not slua.isValid(uCharacter) then 
+                return 
+            end
+    
+            local AvatarComp = nil
+            if uCharacter.CharacterAvatarComp2_BP and slua.isValid(uCharacter.CharacterAvatarComp2_BP) then
+                AvatarComp = uCharacter.CharacterAvatarComp2_BP
+            elseif uCharacter.CharacterAvatarComp and slua.isValid(uCharacter.CharacterAvatarComp) then
+                AvatarComp = uCharacter.CharacterAvatarComp
+            elseif uCharacter.getAvatarComponent2 then
+                AvatarComp = uCharacter:getAvatarComponent2()
+            end
+    
+            if not AvatarComp or not slua.isValid(AvatarComp) then return end
+    
+            local ApplyData = AvatarComp.NetAvatarData and AvatarComp.NetAvatarData.SlotSyncData
+            if not ApplyData or not slua.isValid(ApplyData) then return end
+    
+            if not _G.skinIdCache then _G.skinIdCache = {} end
+    
+            local EAvatarSlotType = import("EAvatarSlotType")
+            if not EAvatarSlotType then return end
+    
+            local outfitRes = 0
+            if MATCH_CONFIG and MATCH_CONFIG.outfitRes and MATCH_CONFIG.outfitRes > 0 then
+                outfitRes = MATCH_CONFIG.outfitRes
+            elseif cache then
+                local c = cache()
+                if c and c.outfitRes then
+                    outfitRes = c.outfitRes
+                end
+            end
+    
+            local count = ApplyData.Num and ApplyData:Num() or 0
+            if count <= 0 or count > 30 then
+                return
+            end
+    
+            local outfitApplied = false
+            for j = 0, count - 1 do
+                local equipment = ApplyData:Get(j)
+                if equipment then
+                    local slotType = equipment.SlotID
+                    local currentId = tonumber(equipment.ItemId) or 0
+                    local targetSkinID = 0
+            
+                    
+                    if (slotType == EAvatarSlotType.EAvatarSlotType_ClothesEquipemtSlot or slotType == EAvatarSlotType.EAvatarSlotType_UnderClothSlot) then
+                        targetSkinID = tonumber(outfitRes) or 0
+                        if targetSkinID > 0 and not outfitApplied then
+                            local ok = false
+                            pcall(function()
+                                if AvatarComp.PutOnCustomEquipmentByID then
+                                    local result = AvatarComp:PutOnCustomEquipmentByID(targetSkinID, nil)
+                                    if result == true or result == nil then
+                                        ok = true
+                                    end
+                                end
+                            end)
+                            if not ok then
+                                pcall(function()
+                                    if FItemDefineID and FAvatarCustomDefault and AvatarComp.HandleEquipItem then
+                                        local itemID = FItemDefineID(AvatarComp.ItemType or 1, targetSkinID)
+                                        AvatarComp:HandleEquipItem(itemID, FAvatarCustomDefault())
+                                        ok = true
+                                    end
+                                end)
+                            end
+                            if ok then
+                                pcall(function()
+                                    if AvatarComp.ReloadLogicAvatar then
+                                        AvatarComp:ReloadLogicAvatar(0, 0, true) 
+                                    end
+                                    if AvatarComp.ResetClothSimulate then
+                                        AvatarComp:ResetClothSimulate()
+                                    end
+                                end)
+                                outfitApplied = true
+                            end
+                        end
+                    end
+            
+                    
+                    if targetSkinID > 0 and currentId ~= targetSkinID then
+                        if not _G.skinIdCache[targetSkinID] then
+                            _G.skinIdCache[targetSkinID] = true
+                        end
+                        equipment.ItemId = targetSkinID
+                        pcall(function()
+                            ApplyData:Set(j, equipment)
+                        end)
+                    end
+                end
+            end
+    
+            
+            pcall(function()
+                if AvatarComp.OnRep_BodySlotStateChanged then
+                    AvatarComp:OnRep_BodySlotStateChanged()
+                end
+                if AvatarComp.ResetData then
+                    AvatarComp:ResetData()
+                end
+            end)
+        end
+
+        function _G.GameAvatarLobby()
+            local function processLobbyCharacter(pawn)
+                if not pawn or not slua.isValid(pawn) then
+                    return false
+                end
+                if type(_G.equip_character_lobby) == "function" then
+                    pcall(_G.equip_character_lobby, pawn)
+                end
+                if type(pawn.GetWeaponManager) == "function" then
+                    local weaponMgr = pawn.BP_LobbyWeaponManager
+                    if weaponMgr and slua.isValid(weaponMgr) then
+                        if type(_G.ChangeLobbyWeapon) == "function" then
+                            pcall(_G.ChangeLobbyWeapon, weaponMgr)
+                        end
+                    end
+                end
+                return true
+            end
+            local ok, TeamAvatarManager = pcall(require, "client.logic.avatar.logic_team_avatar_manager")
+            if ok and TeamAvatarManager then
+                local avatar = TeamAvatarManager.GetMainAvatar and TeamAvatarManager.GetMainAvatar()
+                if avatar then
+                    local pawn = avatar.GetModel and avatar:GetModel()
+                    if processLobbyCharacter(pawn) then
+                        return true
+                    end
+                end
+            end
+            ok, LobbyAvatarManager = pcall(require, "client.logic.avatar.LobbyAvatarManager")
+            if ok and LobbyAvatarManager and LobbyAvatarManager.playerList then
+                local lastID = LobbyAvatarManager.avatarCreateID
+                local pawn = LobbyAvatarManager.playerList[lastID]
+                if processLobbyCharacter(pawn) then
+                    return true
+                end
+                for _, pawnObject in pairs(LobbyAvatarManager.playerList) do
+                    if processLobbyCharacter(pawnObject) then
+                        return true
+                    end
+                end
+            end
+            return false
+        end
+
+        pcall(function()
+           require("common.time_ticker").AddTimerLoop(1.0, _G.GameAvatarLobby, -1, 1)
+        end)
+
+        local function start()
+            log("AddOutfit ZoulObb start")
+            
+            pcall(hookSecurityBypass)
+            
+            installTeamBroadcastHooks()
+            buildSkinMappings()
+            pcall(restorePersistedVehicles)
+            pcall(restorePersistedMotions)
+            pcall(restorePersistedEquipIns)
+            pcall(restorePersistedThrowObjects)
+            pcall(restorePersistedHallTheme)
+            pcall(syncMatchConfigFromCache)
+            hookCDataTableCache()
+            hookDepotInit()
+            hookWardrobeData()
+            hookPageFilter()
+            hookArmory()
+            hookPutOn()
+            hookLobbyTheme()
+            hookMotionEquip()
+            hookIngameEmote()
+            hookFashionBag()
+            hookBackpackValid()
+            hookAvatarValid()
+            hookEquipMapping()
+            hookLobbyWeaponCache()
+            hookGunWardrobe()
+            hookLobbySwipePersistence()
+            hookMatchAvatar()
+            hookMatchAvatarData()
+            hookGrenadeAvatarInit()
+            hookGrenadeAvatarLookup()
+            hookProjectileGrenadeAvatar()
+            hookWeaponSpawn()
+            hookVehicleLicenseComponentBase()
+            hookVehiclePlateLicenseUtil()
+            hookBackpackWeaponAvatarRes()
+            hookEliminationKingEffect()
+            hookFinalKillEffect()
+            
+            if injectAllSources() then
+                refreshWardrobe()
+                later(2.0, reapplyLobbyEquipped)
+            else
+                local tries = 0
+                local function retry()
+                    tries = tries + 1
+                    if injectAllSources() then
+                        refreshWardrobe()
+                        later(3.0, reapplyLobbyEquipped)
+                        return
+                    end
+                    if tries < 60 then later(2.5, retry) end
+                end
+                later(3.0, retry)
+            end
+
+            pcall(function()
+                if isInGamePlay() then
+                    local char = getLocalChar()
+                    if char then bootstrapMatch(char) end
+                elseif isInLobby() then
+                    snapshotLobbyWear()
+                end
+            end)
+        end
+
+        hookBackpackValid()
+        hookEquipMapping()
+        hookMatchAvatar()
+        hookMatchAvatarData()
+        hookGrenadeAvatarInit()
+        hookGrenadeAvatarLookup()
+        hookProjectileGrenadeAvatar()
+        hookWeaponSpawn()
+        hookBackpackWeaponAvatarRes()
+        hookEliminationKingEffect()
+        hookFinalKillEffect()
+        pcall(_loadEquippedCache)
+        start()
+        pcall(hookVehicleSkinAndMusicPanel)
+
+        
+        
+        local _lastTickTime = os.clock()
+        local _timeCount = 0
+
+        
+        local function fastApplyLoop()
+            pcall(function()
+                _timeCount = _timeCount + 1
+                _S.globalFrame = _timeCount
+                
+                if _timeCount % 3 == 0 then
+                    pcall(function()
+                        if GameAvatarHandlerkillcounter then GameAvatarHandlerkillcounter() end
+                    end)
+                end
+                if isInLobby() then
+                    if _timeCount % 10 == 0 then
+                        pcall(snapshotLobbyWear)
+                    end
+                    if _timeCount % 6 == 0 then
+                        pcall(_G.AddOutfitTryFlushSave)
+                    end
+                end
+                if isInGamePlay() then
+                    local char = getLocalChar()
+                    local charValid = char and slua.isValid(char)
+                    if not _S.matchTimer and charValid then
+                        bootstrapMatch(char)
+                    end
+                    if _timeCount % 6 == 0 and charValid then
+                        pcall(function()
+                            local curWeapon = char.GetCurrentWeapon and char:GetCurrentWeapon()
+                            if slua.isValid(curWeapon) then
+                                applySkinToWeaponRef(curWeapon)
+                            end
+                            equip_weapon_avatar(char)
+
+                            if not _S.matchOutfitDone then
+                                _S.matchOutfitDone = matchApplyOutfit(char)
+                            end
+                            matchApplyEquipSkins(char)
+                            bootstrapMatch(char)
+                            PatchUpgradeEffectEmoteDirectly()
+                            applyGrenadeSkinsToController()
+                        end)
+                    end
+                    if _timeCount % 6 == 0 then
+                        pcall(applyVehicleSkinInGame)
+                    end
+                end
+            end)
+            if _ticker and _ticker.AddTimerOnce then
+                _ticker.AddTimerOnce(1.0, fastApplyLoop)
+            end
+        end
+
+        local function mediumLoop()
+            pcall(function()
+                
+                if isInGamePlay() then
+                    local char = getLocalChar()
+                    if char and not _S.matchTimer then
+                        bootstrapMatch(char)
+                    end
+                    pcall(tickEliminationKingEffect)
+                    pcall(applyVehicleChassisLight)
+                end
+                if isInLobby() then
+                    pcall(snapshotLobbyWear)
+                end
+            end)
+            if _ticker and _ticker.AddTimerOnce then
+                _ticker.AddTimerOnce(2.5, mediumLoop)
+            end
+        end
+
+        local function slowLoop()
+            pcall(function()
+                if isInGamePlay() then
+                    pcall(syncVehicleAvatarSkinList)
+                end
+                pcall(_G.AddOutfitTryFlushSave)
+            end)
+            if _ticker and _ticker.AddTimerOnce then
+                _ticker.AddTimerOnce(5.0, slowLoop)
+            end
+        end
+
+        
+        if _ticker and _ticker.AddTimerOnce then
+            _ticker.AddTimerOnce(0.5, fastApplyLoop)
+            _ticker.AddTimerOnce(1.0, mediumLoop)
+            _ticker.AddTimerOnce(2.0, slowLoop)
+        end
+
+        
+        local _lastGameStatus = ""
+        local function statusPollLoop()
+            local currentStatus = ""
+            if isInLobby() then currentStatus = "lobby"
+            elseif isInGamePlay() then currentStatus = "gameplay"
+            else currentStatus = "other" end
+
+            if currentStatus ~= _lastGameStatus then
+                _lastGameStatus = currentStatus
+                
+                stopMatchWatcher()
+                _S.bootstrapNotified = false
+                _S.matchOutfitDone = false
+                _S.lobbyApplied = false
+                _G._lava_fke_triggered = nil
+                pcall(function()
+                    if isInLobby() then
+                        snapshotLobbyWear()
+                        later(2.0, reapplyLobbyEquipped)
+                    end
+                end)
+                pcall(function()
+                    if isInGamePlay() then
+                        local char = getLocalChar()
+                        if char then bootstrapMatch(char) end
+                    end
+                end)
+                pcall(_AutoSaveOutfit, true)
+            end
+
+            if _ticker and _ticker.AddTimerOnce then
+                _ticker.AddTimerOnce(3.0, statusPollLoop)
+            end
+        end
+
+        if _ticker and _ticker.AddTimerOnce then
+            _ticker.AddTimerOnce(1.0, statusPollLoop)
+        end
+
+        end 
+
+        local function prewarmModules()
+            local mods = {
+                "client.logic.armory.logic_armory",
+                "client.slua.logic.wardrobe.fashionbag.fashionbag_data",
+                "client.logic.lobby.hall_theme_utils",
+                "client.slua.logic.wardrobe.logic_wardrobe_gun",
+                "client.slua.logic.wardrobe.wardrobe_data",
+                "client.network.Protocol.WardRobeHandler",
+                "client.slua.logic.wardrobe.logic_wardrobe_avatar",
+                "client.slua.logic.wardrobe.fashionbag.wardrobe_fashion_utils",
+                "client.logic.data.AvatarData",
+                "client.slua.logic.XSuit.logic_xsuit",
+                "client.slua.logic.wardrobe.logic_wardrobe_new",
+                "client.slua.logic.wardrobe.logic_display_setting",
+                "client.logic.avatar.logic_team_avatar_manager",
+                "client.slua.logic.wardrobe.logic_wardrobe_data_center",
+                "client.slua.logic.wardrobe.WardrobeDataEntity",
+                "client.slua.umg.Wardrobe.subtab_item_list_base",
+                "client.slua.logic.wardrobe.tab_surveillance",
+                "client.network.comm.NetManager",
+                "client.slua.umg.Wardrobe.wardrobe_macro",
+                "client.slua.logic.avatar.avatar_common",
+                "client.slua.logic.lobby.Main.Lobby_Main_Control",
+                "common.time_ticker",
+                "GameLua.GameCore.Module.Subsystem.SubsystemMgr",
+                "GameLua.Mod.BaseMod.GamePlay.Backpack.BackpackUtils",
+                "GameLua.Mod.Library.GamePlay.Avatar.AvatarDataUtil",
+                "GameLua.Activity.Commercialize.GamePlay.CommerAvatarDataUtil",
+            }
+            for _, m in ipairs(mods) do
+                pcall(require, m)
+            end
+        end
+
+        prewarmModules()
+        initHooks()
+
+        log("AddOutfit Merged loaded")
+        _G.ZoulObbNotiff("By ZoulObb")
+    end)
+    if not _ao_ok then
+        print("[AddOutfit] LOAD ERROR:", tostring(_ao_err))
+        _G.ZoulObbNotiff("[AddOutfit] LOAD ERROR")
+    end
+
