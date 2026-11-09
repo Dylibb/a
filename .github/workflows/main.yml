@@ -2,7 +2,7 @@ name: Build Tweak
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -13,17 +13,31 @@ jobs:
       - name: Kodu Repodan Çek
         uses: actions/checkout@v4
 
-      - name: Theos'u Kur
+      - name: Theos'u Kur (SDK olmadan)
         uses: Randomblock1/theos-action@v1
         with:
-          theos-sdks: 'https://github.com/theos/sdks'
+          # SDK indirme kısmını devre dışı bırakıyoruz, manuel yapacağız
+          theos-sdks: ''
+
+      - name: SDK'ları Manuel İndir ve Çıkart
+        run: |
+          cd $THEOS
+          # SDK'yı indir
+          curl -L -o master.zip https://codeload.github.com/theos/sdks/zip/refs/heads/master
+          # İzin hatasını önlemek için zip'i doğrudan çıkart
+          unzip -q master.zip
+          # Klasörü sdks olarak yeniden adlandır
+          mv sdks-master sdks
+          rm master.zip
+          # İçeriği kontrol et
+          ls -la sdks/
 
       - name: Projeyi Derle (Paket Oluştur)
         run: |
           make clean
           make package FINALPACKAGE=1
 
-      - name: Derlenen Dosyaları (Deb ve Dylib) Yükle
+      - name: Derlenen Dosyaları Yükle
         uses: actions/upload-artifact@v4
         with:
           name: derlenmis-tweak
