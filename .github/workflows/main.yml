@@ -13,31 +13,28 @@ jobs:
       - name: Kodu Repodan Çek
         uses: actions/checkout@v4
 
-      - name: Theos ve SDK'ları Manuel Kur
+      - name: Theos, SDK ve ldid Kur
         run: |
           # 1. Theos'u klonla
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
           
-          # 2. SDK'ları .zip yerine .tar.gz (sıkıştırılmış arşiv) olarak indir
-          # Bu yöntem, macOS sunucusundaki "symlink error: Permission denied" hatasını engeller.
+          # 2. SDK'ları .tar.gz olarak indir (Symlink hatasını önler)
           cd $HOME/theos
-          echo "SDK indiriliyor..."
           curl -L -o sdks.tar.gz https://github.com/theos/sdks/archive/refs/heads/master.tar.gz
-          
-          # 3. Arşivi tar ile çıkart
           tar -xzf sdks.tar.gz
           mv sdks-master sdks
           rm sdks.tar.gz
           
+          # 3. ldid aracını indir ve PATH'e ekle
+          echo "ldid indiriliyor..."
+          curl -L -o /tmp/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_arm64
+          chmod +x /tmp/ldid
+          sudo mv /tmp/ldid /usr/local/bin/ldid
+          ldid -v
+          
           # 4. Ortam değişkenlerini ayarla
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
-
-      - name: SDK Kontrolü (İsteğe Bağlı)
-        run: |
-          echo "İndirilen SDK'lar:"
-          ls -l $HOME/theos/sdks/
-          echo "THEOS değişkeni: $THEOS"
 
       - name: Projeyi Derle (Paket Oluştur)
         run: |
