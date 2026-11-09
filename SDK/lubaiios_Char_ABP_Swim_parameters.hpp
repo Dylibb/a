@@ -1,0 +1,67 @@
+#pragma once
+
+//    
+// PUBGM 4.2.0 iOS
+// 分享: - @lubaiios 
+// 生成时间 2026年01月06日 16时15分12秒
+#include "../SDK.hpp"
+
+namespace SDK
+{
+//---------------------By lubaiios @LBAsTool---------------------------
+//Parameters
+//---------------------By lubaiios @LBAsTool---------------------------
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_923ECC9946F87BD9304658A4C6C371E1
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_923ECC9946F87BD9304658A4C6C371E1_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_CC8B1E084EF50E58E7E92B881995E35D
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_CC8B1E084EF50E58E7E92B881995E35D_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendListByBool_A8F2C54D4B38AF5749C3BBAEB4CCD442
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendListByBool_A8F2C54D4B38AF5749C3BBAEB4CCD442_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendListByBool_4F338550438AA787A37AC7A5B47A57D6
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendListByBool_4F338550438AA787A37AC7A5B47A57D6_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_5322D9594A3FF835BE1EF8BD9B874442
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_5322D9594A3FF835BE1EF8BD9B874442_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_8CCABF8A4335407291BE5F82A4F2DF4C
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_BlendSpacePlayer_8CCABF8A4335407291BE5F82A4F2DF4C_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_TransitionResult_EA8583CF48558D8742D60989B755AECF
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_TransitionResult_EA8583CF48558D8742D60989B755AECF_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_ModifyBone_9329604E408B6CE5ED05CB9A881E12D7
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_ModifyBone_9329604E408B6CE5ED05CB9A881E12D7_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_TransitionResult_ACDC5F01413E6CDDD5E26290FB0D2A28
+struct UChar_ABP_Swim_C_EvaluateGraphExposedInputs_ExecuteUbergraph_Char_ABP_Swim_AnimGraphNode_TransitionResult_ACDC5F01413E6CDDD5E26290FB0D2A28_Params
+{
+};
+
+// Function Char_ABP_Swim.Char_ABP_Swim_C.ExecuteUbergraph_Char_ABP_Swim
+struct UChar_ABP_Swim_C_ExecuteUbergraph_Char_ABP_Swim_Params
+{
+	int                                                EntryPoint;                                               // (BlueprintVisible, BlueprintReadOnly, Parm, ZeroConstructor, IsPlainOldData)
+};
+
+}
+

@@ -1,0 +1,17 @@
+Package: com.engine
+Name: INOY
+Version: 3.3.0
+Description: 
+Section: Tweaks
+Depends: firmware (>= 11.0)
+Conflicts: 
+Replaces: 
+Priority: optional
+Architecture: iphoneos-arm
+Author: AIZEN ON TOP
+dev: AIZEN
+Homepage: 
+Depiction: 
+Maintainer: 
+Icon: 
+

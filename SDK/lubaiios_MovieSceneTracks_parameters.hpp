@@ -1,0 +1,22 @@
+#pragma once
+
+//    
+// PUBGM 4.2.0 iOS
+// 分享: - @lubaiios 
+// 生成时间 2026年01月06日 16时15分04秒
+#include "../SDK.hpp"
+
+namespace SDK
+{
+//---------------------By lubaiios @LBAsTool---------------------------
+//Parameters
+//---------------------By lubaiios @LBAsTool---------------------------
+
+// Function MovieSceneTracks.MovieSceneTransformOrigin.BP_GetTransformOrigin
+struct UMovieSceneTransformOrigin_BP_GetTransformOrigin_Params
+{
+	struct FTransform                                  ReturnValue;                                              // (Parm, OutParm, ReturnParm, IsPlainOldData)
+};
+
+}
+

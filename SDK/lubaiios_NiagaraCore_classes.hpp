@@ -1,0 +1,48 @@
+#pragma once
+
+//    
+// PUBGM 4.2.0 iOS
+// 分享: - @lubaiios 
+// 生成时间 2026年01月06日 16时15分07秒
+namespace SDK
+{
+//---------------------By lubaiios @LBAsTool---------------------------
+//Classes
+//---------------------By lubaiios @LBAsTool---------------------------
+
+// Class NiagaraCore.NiagaraMergeable
+// 0x0000 (0x0028 - 0x0028)
+class UNiagaraMergeable : public UObject
+{
+public:
+
+	static UClass* StaticClass()
+	{
+        static UClass *pStaticClass = 0;
+        if (!pStaticClass)
+            pStaticClass = UObject::FindClass("Class NiagaraCore.NiagaraMergeable");
+		return pStaticClass;
+	}
+
+};
+
+
+// Class NiagaraCore.NiagaraDataInterfaceBase
+// 0x0000 (0x0028 - 0x0028)
+class UNiagaraDataInterfaceBase : public UNiagaraMergeable
+{
+public:
+
+	static UClass* StaticClass()
+	{
+        static UClass *pStaticClass = 0;
+        if (!pStaticClass)
+            pStaticClass = UObject::FindClass("Class NiagaraCore.NiagaraDataInterfaceBase");
+		return pStaticClass;
+	}
+
+};
+
+
+}
+

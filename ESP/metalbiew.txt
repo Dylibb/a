@@ -1,0 +1,4354 @@
+
+
+#import "font.h"
+#import "metalbiew.h"
+#import "mahoa.h"
+#include "sys/mman.h"
+#include "Tools.h"
+#import <AVFoundation/AVFoundation.h>
+#include "../JRMemory.framework/Headers/MemScan.h"
+#include <stdio.h>
+#include <stdint.h>
+#import <CoreTelephony/CTTelephonyNetworkInfo.h>
+#import "../authcheatbot/FTNotificationIndicator.h"
+#import "../authcheatbot/FCUUID.h"
+#import "../authcheatbot/menuButtonConfigLQ.h"
+#import "../authcheatbot/MBProgressHUD.h"
+#import "../authcheatbot/Reachability.h"
+#include "Icon.h"
+#include "Iconcpp.h"
+#include "ico_font.h"
+#include <string>
+#include <stdio.h>
+#include <string.h>
+#include "Vector3.hpp"
+#include "Vector2.hpp"
+#import <Foundation/Foundation.h>
+#import "UE4.h"
+#import "../API/APIClient.h"
+#import "PubgLoad.h"
+#include "imgui_notify.h"
+#include "tahoma.h"
+//#import "../PatchNonJB/PatchNonJB.h"
+
+#define kWidth  [UIScreen mainScreen].bounds.size.width
+#define kHeight [UIScreen mainScreen].bounds.size.height
+#define timer(sec) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, sec * NSEC_PER_SEC), dispatch_get_main_queue(), ^
+NSString *xrpb = NSSENCRYPT("Paste Key...");
+
+#define E(str) _xor_(str).c_str()
+
+
+#define iPhone8P ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1242, 2208), [[UIScreen mainScreen] currentMode].size) : NO)
+
+
+NSString *bundle;
+uint64_t GUObjectArray;
+uint64_t GNameFun;
+#define gName 0x104609920
+#define gObject 0x109416BD8
+
+@interface metalbiew () <MTKViewDelegate>
+@property (nonatomic, strong) IBOutlet MTKView *mtkView;
+@property (nonatomic, strong) id <MTLDevice> device;
+@property (nonatomic, strong) id <MTLCommandQueue> commandQueue;
+
+
+@end
+
+bool isAimKnocked = true;
+bool IsValidAddress(kaddr addr) {
+    return addr > 0x100000000 && addr < 0x2000000000;
+}
+
+//hook no jb
+bool anti1 =false;
+bool anti2 =false;
+bool anti3 =false;
+bool anti4 =false;
+
+bool giamgiat = false;
+
+bool init1 = false;
+bool init2 = false;
+bool init3 = false;
+bool init4 = false;
+bool init5 = false;
+bool WideView = false;
+int WideValue = 120;
+
+uintptr_t UE4;
+kaddr module= (unsigned long)_dyld_get_image_vmaddr_slide(1);
+namespace Options
+{
+int boxtype = 1;
+int healthbartype = 0;
+int Nationtype = 2;
+int DirectionLineSize = 70;
+int VehicleDirectionLineSize = 100;
+int offscreen_range = 40;
+int max_distance_offscreen = 400;
+int playersdistancessize = 600;
+bool esp_Outline = true;
+int distance_Radar = 150;
+}
+
+enum EAimTarget {
+    Head = 0,
+    Chest = 1
+};
+
+enum EAimTrigger {
+    None = 0,
+    Shooting = 1,
+    Scoping = 2,
+    Both = 3,
+    Any = 4
+};
+
+
+long l1 = 0xFF544;
+long l2 = 0xFFFFF;
+//const char * stack230 = 0;//index of class array 75
+int stack_20;
+NSString * val_1;
+NSString * val_x2 ;
+int sort = 1,sort_1 = 3;
+long RAMADDRESS = 0x4332443;//0x4332443 + F = 0x4332452
+bool stack_193 = NO;
+using namespace std;
+using namespace SDK;
+
+static int Styleesp = 2;
+
+bool ConfigSilentAimEnable = false;
+    struct sConfig {
+        struct sESPMenu {
+            bool Line;
+            bool Box;
+            bool Skeleton;
+            bool Health;
+            bool Name;
+            bool Distance;
+            bool TeamID;
+bool Weapon;
+bool Alert;
+            bool Vehicle;
+            bool IgnoreBot;
+            bool LootBox;
+            bool Throwables;
+        };
+        sESPMenu ESPMenu{false};
+
+        
+    };
+    sConfig Config{false};
+//
+struct JsonPreferences {
+enum EAimTarget {
+        Head = 0,
+        Chest = 1
+    };
+
+    enum EAimTrigger {
+        None = 0,
+        Shooting = 1,
+        Scoping = 2,
+        Both = 3,
+        Any = 4
+    };
+
+    enum EAimPriority {
+        DistancePriority = 0,
+        FOVPriority = 1
+    };
+    
+    
+int xsuit = 0;
+int skinm4 = 0;
+int skinakm = 0;
+int para = 0;
+int bag = 0;
+int helmet = 0;
+bool CoupeRB = false;
+bool Dacia = false;
+bool UAZ = false;
+bool MiniBus = false;
+bool BigFoot = false;
+bool Boat = false;
+bool Mirado = false;
+bool Buggy = false;
+bool OMirado = false;
+bool Moto = false;
+bool Emote = false;
+bool Helmett = false;
+bool Bagg = false;
+bool Face = false;
+bool Outfit = false;
+bool Parachute = false;
+bool M416 = false;
+bool AKM = false;
+bool SCARL = false;
+bool M762 = false;
+bool AWM = false;
+bool KAR98 = false;
+bool M24 = false;
+bool M16 = false;
+bool M249 = false;
+bool DP28 = false;
+bool GROZA = false;
+bool AUG = false;
+bool PAN = false;
+bool UZI = false;
+bool UMP = false;
+bool TOMMY = false;
+bool BIZON = false;
+bool ACE32 = false;
+bool VECTOR = false;
+
+    struct sConfig {
+         struct sAimMenu {
+            bool EnableAllHack;
+            bool Enable;
+            bool Autofire;
+            bool AimBot;
+            bool CameraCache;
+            EAimTarget Target;
+            EAimTrigger Trigger;
+            EAimPriority Priority;
+            bool IgnoreKnocked;
+            bool IgnoreBot;
+            bool Prediction;
+            bool VisCheck;
+            bool LessRecoil;
+            bool Norecoil;
+            bool InstantHit;
+            bool FastShoot;
+            bool HeadShoot;
+            bool ReCo;
+            float Recc = 1.0f;
+            bool HitX;
+            int Cross = 200;
+            bool test5;
+            bool SpeedHack;
+        };
+        sAimMenu SilentAim{false};
+		struct sModSkin {
+  bool Enable = 1;
+  bool HitEffect = 0;
+  bool KillMessage = 0;
+  bool DeadBox = 0;
+  int XSuits = 1;
+  int AKM = 1;
+  int M16A4 = 1;
+  int Scar = 1;
+  int M416 = 1;
+  int Groza = 1;
+  int AUG = 1;
+  int QBZ = 1;
+  int M762 = 1;
+  int ACE32 = 1;
+  int Parachute = 1;
+  int UZI = 1;
+  int UMP = 1;
+  int Vector = 1;
+  int Thompson = 1;
+  int Bizon = 1;
+  int K98 = 1;
+  int M24 = 1;
+  int AWM = 1;
+  int DP28 = 1;
+  int M249 = 1;
+  int Pan = 1;
+  int Moto = 1;
+  int CoupeRP = 1;
+  int UAZ = 1;
+  int Dacia = 1;
+  int Bigfoot = 1;
+  int Mirado = 1;
+  int OMirado = 1;
+  int Buggy = 1;
+  int MiniBus = 1;
+  int Boat = 1;
+};
+sModSkin Skin{false};
+        
+    };
+    sConfig Config{false};
+
+} preferences;
+static int helmett3 = 1;
+static int bag3 = 1;
+bool ModSkinn = false;
+bool KillMessage = false;
+bool DeadBox = false;
+int sEmote1 = 2200101;
+int sEmote2 = 2200201;
+int sEmote3 = 2200301;
+int ModEmote1 = 1;
+namespace Active {
+  inline int SkinCarDefault = 0;
+  inline int SkinCarMod = 0;
+  inline int SkinCarNew = 0;
+}
+UISlider * Auto1;//autofire
+UISlider * Auto1Interval;//autofire interval
+UISlider * sliderrr;//aimpos
+extern float TurnRate; //No scope turn rate - aim speed
+extern float NoScopeAimDisSliderVal;
+extern float HiddenFOVSliderVal;// with scope Filed of view slider value /NOT ACTIVE/
+extern float NoScopeFOVSliderVal;//No scope FOV size slider value
+//Slider_Sniper * Aimbot1;//fov
+//extern float FovRadousVal;
+UISlider * aimspeed;//aimbot speed
+CGSize AutoFireCircelSize;// CGSizeMake(w, h);
+bool IsAirDrop = false;
+int Interval = 1;
+int counter;
+int iAwareTexSiz = 20;
+bool iAwareText = true;
+int EspTextSiz = 9;
+float EspBoxThik = 2.0f;
+float EspSktonThik = 1.5f;
+float IsfovSlider = 150.0f;
+float AimSmooth = 5.0f;
+bool AimTouch = false;
+bool antibypass = false;
+//UISlider * Aimbot2;
+//aimbot bool
+float g_disstance = 150.f;
+
+
+int boxtype = 1;
+int healthbartype = 0;
+int Nationtype = 2;
+int DirectionLineSize = 70;
+int VehicleDirectionLineSize = 100;
+int offscreen_range = 40;
+int max_distance_offscreen = 400;
+int playersdistancessize = 600;
+bool esp_Outline = true;
+int distance_Radar = 150;
+
+uintptr_t ProcessEvent_Offset,AimBullet_Offset,AimBullet_Offset2,SetControlRotation_Offset;
+#define SLEEP_TIME 1000LL / 60LL
+#define TORAD(x) ((x) * (M_PI / 180.f))
+int g_screenWidth ;
+int g_screenHeight ;
+int screenWidth ;
+int screenHeight ;
+int screenDensity = 0;
+int getEspFramerate;
+int SCOLOR;
+int scc;
+
+
+char extra[30];
+float density = -1;
+float gDistance;
+int localFiring{0};
+BOOL kaiguan1 = NO;
+BOOL kaiguan2 = NO;
+BOOL kaiguan3 = NO;
+BOOL kaiguan4 = NO;
+#define PI 3.14159265358979323846
+#define __fastcall
+bool ARWP = false;
+bool SMGWP =false;
+bool SNPWP = false;
+bool otherWP =false;
+bool AmmoWP =false;
+bool LIGHTMW = false;
+bool SHOTGUNWP = false;
+bool scopewp = false;
+bool POSTOLWP = false;
+bool ARMORWP =false;
+//extern float FovRadousVal;
+float IsAimBotRecc = 1.183f;
+bool IsRecoilComparison = false;
+static int Istargets = 2;
+
+static int loaixe = 0;
+static int xedacia = 0;
+bool modxe = false;
+bool tamnho = false;
+
+//hiệu ứng bắn
+bool effectm44 = false;
+
+float dorong = 88.0f;
+
+float IsDistance = 68;
+/*
+float add() // circle radius size
+{
+   // if(FovRadousVal==0){
+    float FovRadousVal = 230;
+    
+    return FovRadousVal;
+}
+*/
+
+float aimspeedsl()
+{
+    // return aimspeed.value;
+    float val1 = 20;//50
+    //return TurnRate;// aim speed from slider
+    return val1;
+}
+int aimpos()
+{
+    float speedVal = 25;//100
+    //return sliderrr.value;//maybe speed
+    return speedVal;
+}
+int autodiss()
+{
+    return Auto1.value;
+}
+
+
+NSString *resultx;
+@implementation metalbiew
+bool MenDeal;
+
+
+
+
+
+
+
+- (MTKView *)mtkView
+{
+    return (MTKView *)self.view;
+}
+
+
+- (void)loadView
+{
+    self.view = [[MTKView alloc] initWithFrame:CGRectMake(0, 0, kWidth, kHeight)];
+}
+
+- (void)viewDidLoad {
+    
+    
+    [super viewDidLoad];
+    
+    self.mtkView.device = self.device;
+    self.mtkView.delegate = self;
+    self.mtkView.clearColor = MTLClearColorMake(0, 0, 0, 0);
+    self.mtkView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
+    self.mtkView.clipsToBounds = YES;
+
+    
+    
+}
+
+
+- (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil
+{
+    
+    
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    
+    _device = MTLCreateSystemDefaultDevice();
+    _commandQueue = [_device newCommandQueue];
+    if (!self.device) abort();
+    
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+   ImGuiStyle& style = ImGui::GetStyle();
+   ImGui::StyleColorsClassic();
+       style.Alpha = 0.95;
+    ImFontConfig config;
+    config.FontDataOwnedByAtlas = false;
+
+            //添加中文字体
+            config.FontDataOwnedByAtlas = false;
+            io.Fonts->AddFontFromMemoryTTF((void *)Fontdata, Fontsize, 15.0f, NULL,
+            io.Fonts->GetGlyphRangesChineseFull());
+	// Initialize notify
+	ImGui::MergeIconsWithLatestFont(12.f, false);
+    ImGui_ImplMetal_Init(_device);
+    
+    return self;
+}
+
+ImVec4 to_vec4(float r, float g, float b, float a)
+    {
+        return ImVec4(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+    }
+static auto start = std::chrono::steady_clock::now();
+static auto noww = std::chrono::high_resolution_clock::now();
+auto elapsedd = std::chrono::duration_cast<std::chrono::milliseconds>(noww - start).count();
+namespace Settings
+{
+    static int Tab = 0;
+}
+int newUAZID = 0;
+int lastUAZID = 0;
+int newDaciaID = 0;
+int lastDaciaID = 0;
+int newCoupeID = 0;
+int lastCoupeID = 0;
+struct snew_Skin {
+  int XSuits = 403003;
+  int XSuits1 = 40604002;
+  int Balo1 = 501001;
+  int Balo2 = 501002;
+  int Balo3 = 501003;
+  int Balo4 = 501004;
+  int Balo5 = 501005;
+  int Balo6 = 501006;
+  int Helmet1 = 502001;
+  int Helmet2 = 502002;
+  int Helmet3 = 502003;
+  int Helmet4 = 502004;
+  int Helmet5 = 502005;
+
+  int Helmet6 = 502114;
+  int Helmet7 = 502115;
+  int Helmet8 = 502116;
+  int Parachute = 703001;
+
+  int AKM = 101001;
+  int AKM_Mag = 291001;
+  int M16A4 = 101002;
+  int M16A4_Stock = 205007;
+  int M16A4_Mag = 291002;
+  int Scar = 101003;
+  int Scar_Mag = 291003;
+  int Pan = 108004;
+
+  int M416_1 = 101004;
+  int M416_2 = 291004;
+  int M416_3 = 203008;
+  int M416_4 = 205005;
+  int M416_flash = 201010;
+  int M416_compe = 201009;
+  int M416_silent = 201011;
+  int M416_reddot = 203001;
+  int M416_holo = 203001;
+  int M416_x2 = 203003;
+  int M416_x3 = 203014;
+  int M416_x4 = 203004;
+  int M416_x6 = 203015;
+  int M416_quickMag = 204012;
+  int M416_extendedMag = 204011;
+  int M416_quickNextended = 204013;
+  int M416_stock = 205002;
+  int M416_verical = 203015;
+  int M416_angle = 202001;
+  int M416_lightgrip = 202004;
+  int M416_pink = 202005;
+  int M416_lazer = 202007;
+  int M416_thumb = 202006;
+
+  int Groza = 101005;
+  int QBZ = 101007;
+  int AUG = 101006;
+  int M762 = 101008;
+  int M762_Mag = 291008;
+  int ACE32 = 101102;
+  int Honey = 101012;
+  int UZI = 102001;
+  int UMP = 102002;
+  int Vector = 102003;
+  int Thompson = 102004;
+  int Bizon = 102005;
+  int K98 = 103001;
+  int M24 = 103002;
+  int AWM = 103003;
+  int AMR = 103012;
+  int VSS = 103005;
+  int SKS = 103004;
+  int Mini14 = 103006;
+  int MK14 = 103007;
+  int SLR = 103009;
+  int S1897 = 104002;
+  int DP28 = 105002;
+  int M249 = 105001;
+  int MG3 = 105010;
+  int Skorpion = 106008;
+  int Moto = 1901001;
+  int CoupeRP = 1961001;
+  int Dacia = 1903001;
+  int UAZ = 1908001;
+  int Bigfoot = 1953001;
+  int Mirado = 1914004;
+  int OMirado = 1915001;
+  int Buggy = 1907001;
+  int MiniBus = 1904001;
+  int Boat = 1911001;
+  int M249s = 205009;
+};
+
+inline snew_Skin new_Skin;
+
+
+
+std::chrono::steady_clock::time_point lastChangeTime;
+std::chrono::steady_clock::time_point lastWeaponChangeTime;
+
+void updateSkin() {
+if (preferences.bag == 1)
+                    bag3 = 1501003174; //blood raven x suit
+                    if (preferences.bag == 2)
+                    bag3 = 1501003220; //Golden Pharaoh X-Suit
+                    if (preferences.bag == 3)
+                    bag3 = 1501003051; //Avalanche
+                    if (preferences.bag == 4)
+                    bag3 = 1501003443; //Irresidence
+                    if (preferences.bag == 5)
+                    bag3 = 1501003265; //Poseidon
+                    if (preferences.bag == 6)
+                    bag3 = 1501003321; //Arcane Jester X-suit
+                    if (preferences.bag == 7)
+                    bag3 = 1501003277; //Silvanus X-Suit
+					if (preferences.bag == 8)
+                    bag3 = 1501003550;
+					if (preferences.bag == 9)
+                    bag3 = 1501003550;
+					if (preferences.xsuit == 10)
+					bag3 = 0;
+					if (preferences.xsuit == 11)
+					bag3 = 0;
+					if (preferences.xsuit == 12)//todo
+					bag3 = 0;
+					//Helmet
+					if (preferences.helmet == 1)
+                    helmett3 = 1502003014; //blood raven x suit
+                    if (preferences.helmet == 2)
+                    helmett3 = 1502003028; //Golden Pharaoh X-Suit
+                    if (preferences.helmet == 3)
+                    helmett3 = 1502003023; //Avalanche
+                    if (preferences.helmet == 4)
+                    helmett3 = 1501002443; //Irresidence
+                    if (preferences.helmet == 5)
+                    helmett3 = 1502003031; //Poseidon
+                    if (preferences.helmet == 6)
+                    helmett3 = 1502003033; //Arcane Jester X-suit
+                    if (preferences.helmet == 7)
+                    helmett3 = 1502003069; //Silvanus X-Suit
+					if (preferences.helmet == 8)
+                    helmett3 = 1502003069;
+					if (preferences.helmet == 8)
+                    helmett3 = 1502003261;
+					if (preferences.xsuit == 10)
+					helmett3 = 0;
+					if (preferences.xsuit == 11)
+					helmett3 = 0;
+					if (preferences.xsuit == 12)//todo
+					helmett3 = 0;
+					
+if (ModEmote1 == 0)
+sEmote1 = 2200101;
+if (ModEmote1 == 1)
+sEmote1 = 12220023;
+if (ModEmote1 == 2)
+sEmote1 = 12219677;
+if (ModEmote1 == 3)
+sEmote1 = 12219716;
+if (ModEmote1 == 4)
+sEmote1 = 12209401;
+if (ModEmote1 == 5)
+sEmote1 = 12209501;
+if (ModEmote1 == 6)
+sEmote1 = 12209701;
+if (ModEmote1 == 7)
+sEmote1 = 12209801;
+if (ModEmote1 == 8)
+sEmote1 = 12209901;
+
+
+if (ModEmote1 == 0)
+sEmote2 = 2200201;
+if (ModEmote1 == 1)
+sEmote2 = 12210201;
+if (ModEmote1 == 2)
+sEmote2 = 12210601;
+if (ModEmote1 == 3)
+sEmote2 = 12220028;
+if (ModEmote1 == 4)
+sEmote2 = 12219819;
+if (ModEmote1 == 5)
+sEmote2 = 12211801;
+if (ModEmote1 == 6)
+sEmote2 = 12212001;
+if (ModEmote1 == 7)
+sEmote2 = 12212201;
+if (ModEmote1 == 8)
+sEmote2 = 12212401;
+
+
+if (ModEmote1 == 0)
+sEmote3 = 2200301;
+if (ModEmote1 == 1)
+sEmote3 = 12212601;
+if (ModEmote1 == 2)
+sEmote3 = 12213201;
+if (ModEmote1 == 3)
+sEmote3 = 12219715;
+if (ModEmote1 == 4)
+sEmote3 = 12219814;
+if (ModEmote1 == 5)
+sEmote3 = 12213601;
+if (ModEmote1 == 6)
+sEmote3 = 12213801;
+if (ModEmote1 == 7)
+sEmote3 = 12214001;
+if (ModEmote1 == 8)
+sEmote3 = 12214201;
+
+
+
+  if (preferences.Config.Skin.Parachute == 0)
+    new_Skin.Parachute = 703001;
+  if (preferences.Config.Skin.Parachute == 16)
+    new_Skin.Parachute = 1401619; //Pharaoh's Scarab Parachute
+  if (preferences.Config.Skin.Parachute == 1)
+    new_Skin.Parachute = 1401619; //Pharaoh's Scarab Parachute
+  if (preferences.Config.Skin.Parachute == 2)
+    new_Skin.Parachute = 1401625; // Enigmatic Nomad Parachute
+  if (preferences.Config.Skin.Parachute == 3)
+    new_Skin.Parachute = 1401624; //parashot Parachute
+  if (preferences.Config.Skin.Parachute == 4)
+    new_Skin.Parachute = 1401836; //Paperfold Gambit Parachute
+  if (preferences.Config.Skin.Parachute == 5)
+    new_Skin.Parachute = 1401833; //Labyrinth Beast Parachute
+  if (preferences.Config.Skin.Parachute == 6)
+    new_Skin.Parachute = 1401287; //Flamewraith Parachute
+  if (preferences.Config.Skin.Parachute == 7)
+    new_Skin.Parachute = 1401282; //Mega Kitty Parachute
+  if (preferences.Config.Skin.Parachute == 8)
+    new_Skin.Parachute = 1401385; //Mega Yeti Parachute
+  if (preferences.Config.Skin.Parachute == 9)
+    new_Skin.Parachute = 1401549; //Endless Glory Parachute
+  if (preferences.Config.Skin.Parachute == 10)
+    new_Skin.Parachute = 1401336; //Magma Skull Parachute
+  if (preferences.Config.Skin.Parachute == 11)
+    new_Skin.Parachute = 1401335; //Aquatic Fury Parachute
+  if (preferences.Config.Skin.Parachute == 12)
+    new_Skin.Parachute = 1401629; //CyberGen: Zero Parachute
+  if (preferences.Config.Skin.Parachute == 13)
+    new_Skin.Parachute = 1401628; //Radiant Phoenix Adarna Parachute
+  if (preferences.Config.Skin.Parachute == 14)
+    new_Skin.Parachute = 1401615; //Will of Horus
+  if (preferences.Config.Skin.Parachute == 15)
+    new_Skin.Parachute = 1401613; //Anubian Magistrate Parachute
+
+  if (preferences.Config.Skin.Pan == 0)
+    new_Skin.Pan = 108004; // 108004 - Pan
+  if (preferences.Config.Skin.Pan == 1)
+    new_Skin.Pan = 1108004125; // Honeypot - Pan
+  if (preferences.Config.Skin.Pan == 2)
+    new_Skin.Pan = 1108004145; // Night of Rock - Pan
+  if (preferences.Config.Skin.Pan == 3)
+    new_Skin.Pan = 1108004160; // Crocodile - Pan
+  if (preferences.Config.Skin.Pan == 4)
+    new_Skin.Pan = 1108004283; // Accolade - Pan
+  if (preferences.Config.Skin.Pan == 5)
+    new_Skin.Pan = 1108004337; // Break Pad - Pan
+  if (preferences.Config.Skin.Pan == 6)
+    new_Skin.Pan = 1108004356; // Chicken Hot - Pan
+  if (preferences.Config.Skin.Pan == 7)
+    new_Skin.Pan = 1108004365; // Faerie Luster - Pan
+  if (preferences.Config.Skin.Pan == 8)
+    new_Skin.Pan = 1108004054; // Chicken Hot - Pan
+  if (preferences.Config.Skin.Pan == 9)
+    new_Skin.Pan = 1108004008; 
+	
+	
+  if (preferences.Config.Skin.XSuits == 0) {
+    new_Skin.XSuits = 403003;
+    new_Skin.XSuits1 = 40604002;
+  }
+  if (preferences.Config.Skin.XSuits == 1) {
+    new_Skin.XSuits = 1405628;
+    new_Skin.XSuits1 = 1402578;
+  }
+  if (preferences.Config.Skin.XSuits == 2) {
+    new_Skin.XSuits = 1405870;
+    new_Skin.XSuits1 = 1403257;
+  }
+  if (preferences.Config.Skin.XSuits == 3) {
+    new_Skin.XSuits = 1405983;
+    new_Skin.XSuits1 = 1402874;
+  }
+  if (preferences.Config.Skin.XSuits == 4) {
+    new_Skin.XSuits = 1406152;
+    new_Skin.XSuits1 = 1403393;
+  }
+  if (preferences.Config.Skin.XSuits == 5) {
+    new_Skin.XSuits = 1406311;
+    new_Skin.XSuits1 = 1410011; //Mặt nạ 1.403.414
+  }
+  if (preferences.Config.Skin.XSuits == 6) {
+    new_Skin.XSuits = 1406475;
+    new_Skin.XSuits1 = 1410131;
+  }
+  if (preferences.Config.Skin.XSuits == 7) {
+    new_Skin.XSuits = 1406638;
+    new_Skin.XSuits1 = 1410242;
+  }
+  if (preferences.Config.Skin.XSuits == 8) {
+    new_Skin.XSuits = 1406872;
+    //new_Skin.XSuits1 = 1410346; // khung
+    new_Skin.XSuits1 = 402133;
+  }
+  if (preferences.Config.Skin.XSuits == 9) {
+    new_Skin.XSuits = 1406971;
+    new_Skin.XSuits1 = 402147;
+  }
+  if (preferences.Config.Skin.XSuits == 10) {
+    new_Skin.XSuits = 1407103;
+    new_Skin.XSuits1 = 40604002;
+  }
+  if (preferences.Config.Skin.XSuits == 11) {
+    new_Skin.XSuits = 1405174;
+    new_Skin.XSuits1 = 40604012;
+  }
+  if (preferences.Config.Skin.XSuits == 12) {
+    new_Skin.XSuits = 1407195;
+  }
+  if (preferences.Config.Skin.XSuits == 13) {
+    new_Skin.XSuits = 1407194;
+    new_Skin.XSuits1 = 1410436;
+  }
+if (preferences.Config.Skin.XSuits == 14) {
+    new_Skin.XSuits = 1406891;
+  }
+  if (preferences.Config.Skin.XSuits == 15) {
+    new_Skin.XSuits = 1400687;
+  }
+  if (preferences.Config.Skin.XSuits == 16) {
+    new_Skin.XSuits = 1407196;
+  }
+  if (preferences.Config.Skin.XSuits == 17) {
+    new_Skin.XSuits = 1407049;
+  }
+  if (preferences.Config.Skin.XSuits == 18) {
+    new_Skin.XSuits = 1406897;
+  }
+  
+  if (preferences.Config.Skin.XSuits == 19) {
+    new_Skin.XSuits = 1406892;
+  }
+  if (preferences.Config.Skin.XSuits == 20) {
+    new_Skin.XSuits = 1407049;
+  }
+  if (preferences.Config.Skin.XSuits == 21) {
+    new_Skin.XSuits = 1407188;
+  }
+  
+  
+
+  if (preferences.Config.Skin.AKM == 0) {
+    new_Skin.AKM = 101001;
+    new_Skin.AKM_Mag = 205005;
+  }
+  if (preferences.Config.Skin.AKM == 1) {
+    new_Skin.AKM = 1101001089;
+    new_Skin.AKM_Mag = 1010010891;
+  }
+  if (preferences.Config.Skin.AKM == 2) {
+    new_Skin.AKM = 1101001103;
+    new_Skin.AKM_Mag = 1010011031;
+  }
+  if (preferences.Config.Skin.AKM == 3) {
+    new_Skin.AKM = 1101001116;
+    new_Skin.AKM_Mag = 1010011161;
+  }
+  if (preferences.Config.Skin.AKM == 4) {
+    new_Skin.AKM = 1101001128;
+    new_Skin.AKM_Mag = 1010011281;
+  }
+  if (preferences.Config.Skin.AKM == 5) {
+    new_Skin.AKM = 1101001143;
+    new_Skin.AKM_Mag = 1010011431;
+  }
+  if (preferences.Config.Skin.AKM == 6) {
+    new_Skin.AKM = 1101001154;
+    new_Skin.AKM_Mag = 1010011541;
+  }
+  if (preferences.Config.Skin.AKM == 7) {
+    new_Skin.AKM = 1101001174;
+    new_Skin.AKM_Mag = 1010011741;
+  }
+  if (preferences.Config.Skin.AKM == 8) {
+    new_Skin.AKM = 1101001213;
+    new_Skin.AKM_Mag = 1010012131;
+  }
+  if (preferences.Config.Skin.AKM == 9) {
+    new_Skin.AKM = 1101001231;
+    new_Skin.AKM_Mag = 1010012311;
+  }
+  if (preferences.Config.Skin.AKM == 10) {
+    new_Skin.AKM = 1101001242;
+    new_Skin.AKM_Mag = 1010012421;
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (preferences.Config.Skin.M16A4 == 0) {
+    new_Skin.M16A4 = 101002;
+    new_Skin.M16A4_Stock = 205007;
+    new_Skin.M16A4_Mag = 291002;
+  }
+  if (preferences.Config.Skin.M16A4 == 1) {
+    new_Skin.M16A4 = 1101002029;
+    new_Skin.M16A4_Stock = 1010020292;
+    new_Skin.M16A4_Mag = 1010020291;
+  }
+  if (preferences.Config.Skin.M16A4 == 2) {
+    new_Skin.M16A4 = 1101002056;
+    new_Skin.M16A4_Stock = 1010020562;
+    new_Skin.M16A4_Mag = 1010020561;
+  }
+  if (preferences.Config.Skin.M16A4 == 3) {
+    new_Skin.M16A4 = 1101002068;
+    new_Skin.M16A4_Stock = 1010020682;
+    new_Skin.M16A4_Mag = 1010020681;
+  }
+  if (preferences.Config.Skin.M16A4 == 4) {
+    new_Skin.M16A4 = 1101002081;
+    new_Skin.M16A4_Stock = 1010020812;
+    new_Skin.M16A4_Mag = 1010020811;
+  }
+  if (preferences.Config.Skin.M16A4 == 5) {
+    new_Skin.M16A4 = 1101002103;
+    new_Skin.M16A4_Stock = 1010021032;
+    new_Skin.M16A4_Mag = 1010021031;
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (preferences.Config.Skin.Scar == 0) {
+    new_Skin.Scar = 101003;
+    new_Skin.Scar_Mag = 291003;
+  }
+  if (preferences.Config.Skin.Scar == 1) {
+    new_Skin.Scar = 1101003057;
+    new_Skin.Scar_Mag = 1010030571;
+  }
+  if (preferences.Config.Skin.Scar == 2) {
+    new_Skin.Scar = 1101003070;
+    new_Skin.Scar_Mag = 1010030701;
+  }
+  if (preferences.Config.Skin.Scar == 3) {
+    new_Skin.Scar = 1101003080;
+    new_Skin.Scar_Mag = 1010030801;
+  }
+  if (preferences.Config.Skin.Scar == 4) {
+    new_Skin.Scar = 1101003119;
+    new_Skin.Scar_Mag = 1010031191;
+  }
+  if (preferences.Config.Skin.Scar == 5) {
+    new_Skin.Scar = 1101003146;
+    new_Skin.Scar_Mag = 1010031461;
+  }
+  if (preferences.Config.Skin.Scar == 6) {
+    new_Skin.Scar = 1101003167;
+    new_Skin.Scar_Mag = 1010031671;
+  }
+  if (preferences.Config.Skin.Scar == 7) {
+    new_Skin.Scar = 1101003181;
+    new_Skin.Scar_Mag = 1010031811;
+  }
+  ///////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (preferences.Config.Skin.M416 == 0) {
+    new_Skin.M416_1 = 101004;
+    new_Skin.M416_2 = 291004;
+    new_Skin.M416_3 = 203008;
+    new_Skin.M416_4 = 205005;
+    new_Skin.M416_flash = 201010;
+    new_Skin.M416_compe = 201009;
+    new_Skin.M416_silent = 201011;
+    new_Skin.M416_reddot = 203001;
+    new_Skin.M416_holo = 203002;
+    new_Skin.M416_x2 = 203003;
+    new_Skin.M416_x3 = 203014;
+    new_Skin.M416_x4 = 203004;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 204012;
+    new_Skin.M416_extendedMag = 204011;
+    new_Skin.M416_quickNextended = 204013;
+    new_Skin.M416_stock = 205002;
+    new_Skin.M416_verical = 203015;
+    new_Skin.M416_angle = 202001;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 1) {
+    new_Skin.M416_1 = 1101004046;
+    new_Skin.M416_2 = 1010040461;
+    new_Skin.M416_3 = 1010040462;
+    new_Skin.M416_4 = 1010040463;
+    new_Skin.M416_flash = 1010040474;
+    new_Skin.M416_compe = 1010040475;
+    new_Skin.M416_silent = 1010040476;
+    new_Skin.M416_reddot = 1010040470;
+    new_Skin.M416_holo = 1010040469;
+    new_Skin.M416_x2 = 1010040468;
+    new_Skin.M416_x3 = 1010040467;
+    new_Skin.M416_x4 = 1010040466;
+    new_Skin.M416_x6 = 1010040481;
+    new_Skin.M416_quickMag = 1010040471;
+    new_Skin.M416_extendedMag = 1010040472;
+    new_Skin.M416_quickNextended = 1010040473;
+    new_Skin.M416_stock = 1010040480;
+    new_Skin.M416_verical = 1010040479;
+    new_Skin.M416_thumb = 1010040478;
+    new_Skin.M416_angle = 1010040477;
+    new_Skin.M416_lightgrip = 1010040482;
+    new_Skin.M416_pink = 1010040483;
+    new_Skin.M416_lazer = 1010040484;
+  }
+  if (preferences.Config.Skin.M416 == 2) {
+    new_Skin.M416_1 = 1101004062;
+    new_Skin.M416_2 = 1010040611;
+    new_Skin.M416_3 = 1010040612;
+    new_Skin.M416_4 = 1010040613;
+    new_Skin.M416_flash = 201010;
+    new_Skin.M416_compe = 201009;
+    new_Skin.M416_silent = 201011;
+    new_Skin.M416_reddot = 203001;
+    new_Skin.M416_holo = 203002;
+    new_Skin.M416_x2 = 203003;
+    new_Skin.M416_x3 = 203014;
+    new_Skin.M416_x4 = 203004;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 204012;
+    new_Skin.M416_extendedMag = 204011;
+    new_Skin.M416_quickNextended = 204013;
+    new_Skin.M416_stock = 205002;
+    new_Skin.M416_verical = 203015;
+    new_Skin.M416_angle = 202001;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 3) {
+    new_Skin.M416_1 = 1101004078;
+    new_Skin.M416_2 = 1010040781;
+    new_Skin.M416_3 = 1010040782;
+    new_Skin.M416_4 = 1010040783;
+    new_Skin.M416_flash = 201010;
+    new_Skin.M416_compe = 201009;
+    new_Skin.M416_silent = 201011;
+    new_Skin.M416_reddot = 203001;
+    new_Skin.M416_holo = 203002;
+    new_Skin.M416_x2 = 203003;
+    new_Skin.M416_x3 = 203014;
+    new_Skin.M416_x4 = 203004;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 204012;
+    new_Skin.M416_extendedMag = 204011;
+    new_Skin.M416_quickNextended = 204013;
+    new_Skin.M416_stock = 205002;
+    new_Skin.M416_verical = 203015;
+    new_Skin.M416_angle = 202001;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 4) {
+    new_Skin.M416_1 = 1101004086;
+    new_Skin.M416_2 = 1010040861;
+    new_Skin.M416_3 = 1010040862;
+    new_Skin.M416_4 = 1010040863;
+    new_Skin.M416_flash = 201010;
+    new_Skin.M416_compe = 201009;
+    new_Skin.M416_silent = 201011;
+    new_Skin.M416_reddot = 203001;
+    new_Skin.M416_holo = 203002;
+    new_Skin.M416_x2 = 203003;
+    new_Skin.M416_x3 = 203014;
+    new_Skin.M416_x4 = 203004;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 204012;
+    new_Skin.M416_extendedMag = 204011;
+    new_Skin.M416_quickNextended = 204013;
+    new_Skin.M416_stock = 205002;
+    new_Skin.M416_verical = 203015;
+    new_Skin.M416_angle = 202001;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 5) {
+    new_Skin.M416_1 = 1101004098;
+    new_Skin.M416_2 = 1010040981;
+    new_Skin.M416_3 = 1010040982;
+    new_Skin.M416_4 = 1010040983;
+    new_Skin.M416_flash = 201010;
+    new_Skin.M416_compe = 201009;
+    new_Skin.M416_silent = 201011;
+    new_Skin.M416_reddot = 203001;
+    new_Skin.M416_holo = 203002;
+    new_Skin.M416_x2 = 203003;
+    new_Skin.M416_x3 = 203014;
+    new_Skin.M416_x4 = 203004;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 204012;
+    new_Skin.M416_extendedMag = 204011;
+    new_Skin.M416_quickNextended = 204013;
+    new_Skin.M416_stock = 205002;
+    new_Skin.M416_verical = 203015;
+    new_Skin.M416_angle = 202001;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 6) {
+    new_Skin.M416_1 = 1101004138;
+    new_Skin.M416_2 = 1010041381;
+    new_Skin.M416_3 = 1010041382;
+    new_Skin.M416_4 = 1010041383;
+    new_Skin.M416_flash = 1010041136;
+    new_Skin.M416_compe = 1010041137;
+    new_Skin.M416_silent = 1010041138;
+    new_Skin.M416_reddot = 1010041128;
+    new_Skin.M416_holo = 1010041127;
+    new_Skin.M416_x2 = 1010041126;
+    new_Skin.M416_x3 = 1010041125;
+    new_Skin.M416_x4 = 1010041124;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 1010041134;
+    new_Skin.M416_extendedMag = 1010041129;
+    new_Skin.M416_quickNextended = 1010041135;
+    new_Skin.M416_stock = 1010041146;
+    new_Skin.M416_verical = 1010041145;
+    new_Skin.M416_angle = 1010041139;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 7) {
+    new_Skin.M416_1 = 1101004163;
+    new_Skin.M416_2 = 1010041631;
+    new_Skin.M416_3 = 1010041632;
+    new_Skin.M416_4 = 1010041633;
+    new_Skin.M416_flash = 201010;
+    new_Skin.M416_compe = 1010041574;
+    new_Skin.M416_silent = 1010041575;
+    new_Skin.M416_reddot = 1010041566;
+    new_Skin.M416_holo = 1010041565;
+    new_Skin.M416_x2 = 1010041564;
+    new_Skin.M416_x3 = 1010041560;
+    new_Skin.M416_x4 = 1010041554;
+    new_Skin.M416_x6 = 203015;
+    new_Skin.M416_quickMag = 1010041568;
+    new_Skin.M416_extendedMag = 1010041569;
+    new_Skin.M416_quickNextended = 1010041567;
+    new_Skin.M416_stock = 1010041579;
+    new_Skin.M416_verical = 1010041578;
+    new_Skin.M416_angle = 1010041576;
+    new_Skin.M416_lightgrip = 20200400;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 1010041577;
+  }
+  if (preferences.Config.Skin.M416 == 8) {
+    new_Skin.M416_1 = 1101004201;
+    new_Skin.M416_2 = 1010042011;
+    new_Skin.M416_3 = 1010042012;
+    new_Skin.M416_4 = 1010042013;
+    new_Skin.M416_flash = 1010041956;
+    new_Skin.M416_compe = 1010041957;
+    new_Skin.M416_silent = 1010041958;
+    new_Skin.M416_reddot = 1010041948;
+    new_Skin.M416_holo = 1010041947;
+    new_Skin.M416_x2 = 1010041946;
+    new_Skin.M416_x3 = 1010041945;
+    new_Skin.M416_x4 = 1010041944;
+    new_Skin.M416_x6 = 1010041967;
+    new_Skin.M416_quickMag = 1010041949;
+    new_Skin.M416_extendedMag = 1010041950;
+    new_Skin.M416_quickNextended = 1010041955;
+    new_Skin.M416_stock = 1010041966;
+    new_Skin.M416_verical = 1010041965;
+    new_Skin.M416_angle = 1010041959;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 9) {
+    new_Skin.M416_1 = 1101004209;
+    new_Skin.M416_2 = 1010042073;
+    new_Skin.M416_3 = 1010042083;
+    new_Skin.M416_4 = 1010042093;
+    new_Skin.M416_flash = 20101000;
+    new_Skin.M416_compe = 1010042037;
+    new_Skin.M416_silent = 1010042039;
+    new_Skin.M416_reddot = 1010042029;
+    new_Skin.M416_holo = 1010042028;
+    new_Skin.M416_x2 = 1010042027;
+    new_Skin.M416_x3 = 1010042026;
+    new_Skin.M416_x4 = 1010042025;
+    new_Skin.M416_x6 = 1010042024;
+    new_Skin.M416_quickMag = 1010042034;
+    new_Skin.M416_extendedMag = 1010042035;
+    new_Skin.M416_quickNextended = 1010042036;
+    new_Skin.M416_stock = 1010042047;
+    new_Skin.M416_verical = 1010042046;
+    new_Skin.M416_angle = 1010042044;
+    new_Skin.M416_lightgrip = 202004;
+    new_Skin.M416_pink = 202005;
+    new_Skin.M416_lazer = 203015;
+    new_Skin.M416_thumb = 202006;
+  }
+  if (preferences.Config.Skin.M416 == 10) {
+    new_Skin.M416_1 = 1101004218;
+    new_Skin.M416_2 = 1010042153;
+    new_Skin.M416_3 = 1010042163;
+    new_Skin.M416_4 = 1010042173;
+    new_Skin.M416_flash = 1010042128;
+    new_Skin.M416_compe = 1010042127;
+    new_Skin.M416_silent = 1010042129;
+    new_Skin.M416_reddot = 1010042119;
+    new_Skin.M416_holo = 1010042118;
+    new_Skin.M416_x2 = 1010042117;
+    new_Skin.M416_x3 = 1010042116;
+    new_Skin.M416_x4 = 1010042115;
+    new_Skin.M416_x6 = 1010042114;
+    new_Skin.M416_quickMag = 1010042124;
+    new_Skin.M416_extendedMag = 1010042125;
+    new_Skin.M416_quickNextended = 1010042126;
+    new_Skin.M416_stock = 1010042137;
+    new_Skin.M416_verical = 1010042136;
+    new_Skin.M416_angle = 1010042134;
+    new_Skin.M416_lightgrip = 1010042138;
+    new_Skin.M416_pink = 1010042139;
+    new_Skin.M416_lazer = 1010042144;
+    new_Skin.M416_thumb = 1010042135;
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.Groza == 0) {
+    new_Skin.Groza = 101005;
+  }
+  if (preferences.Config.Skin.Groza == 1) {
+    new_Skin.Groza = 1101005019;
+  }
+  if (preferences.Config.Skin.Groza == 2) {
+    new_Skin.Groza = 1101005025;
+  }
+  if (preferences.Config.Skin.Groza == 3) {
+    new_Skin.Groza = 1101005038;
+  }
+  if (preferences.Config.Skin.Groza == 4) {
+    new_Skin.Groza = 1101005043;
+  }
+  if (preferences.Config.Skin.Groza == 5) {
+    new_Skin.Groza = 1101005052;
+  }
+  if (preferences.Config.Skin.Groza == 6) {
+    new_Skin.Groza = 1101005082;
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.AUG == 0)
+    new_Skin.AUG = 101006;
+  if (preferences.Config.Skin.AUG == 1)
+    new_Skin.AUG = 1101006033;
+  if (preferences.Config.Skin.AUG == 2)
+    new_Skin.AUG = 1101006044;
+  if (preferences.Config.Skin.AUG == 3)
+    new_Skin.AUG = 1101006062;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.QBZ == 0)
+    new_Skin.QBZ = 101007;
+  if (preferences.Config.Skin.QBZ == 1)
+    new_Skin.QBZ = 1101007025;
+  if (preferences.Config.Skin.QBZ == 2)
+    new_Skin.QBZ = 1101007036;
+  if (preferences.Config.Skin.QBZ == 3)
+    new_Skin.QBZ = 1101007046;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.M762 == 0) {
+    new_Skin.M762 = 101008;
+    new_Skin.M762_Mag = 291008;
+  }
+  if (preferences.Config.Skin.M762 == 1) {
+    new_Skin.M762 = 1101008026;
+    new_Skin.M762_Mag = 1010080261;
+  }
+  if (preferences.Config.Skin.M762 == 2) {
+    new_Skin.M762 = 1101008051;
+    new_Skin.M762_Mag = 1010080511;
+  }
+  if (preferences.Config.Skin.M762 == 3) {
+    new_Skin.M762 = 1101008061;
+    new_Skin.M762_Mag = 1010080611;
+  }
+  if (preferences.Config.Skin.M762 == 4) {
+    new_Skin.M762 = 1101008081;
+    new_Skin.M762_Mag = 1010080811;
+  }
+  if (preferences.Config.Skin.M762 == 5) {
+    new_Skin.M762 = 1101008104;
+    new_Skin.M762_Mag = 1010081041;
+  }
+  if (preferences.Config.Skin.M762 == 6) {
+    new_Skin.M762 = 1101008116;
+    new_Skin.M762_Mag = 1010081161;
+  }
+  if (preferences.Config.Skin.M762 == 7) {
+    new_Skin.M762 = 1101008126;
+    new_Skin.M762_Mag = 1010081261;
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.ACE32 == 0)
+    new_Skin.ACE32 = 101102;
+  if (preferences.Config.Skin.ACE32 == 1)
+    new_Skin.ACE32 = 1101102007;
+  if (preferences.Config.Skin.ACE32 == 2)
+    new_Skin.ACE32 = 1101102017;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.UZI == 0)
+    new_Skin.UZI = 102001;
+  if (preferences.Config.Skin.UZI == 1)
+    new_Skin.UZI = 1102001024;
+  if (preferences.Config.Skin.UZI == 2)
+    new_Skin.UZI = 1102001036;
+  if (preferences.Config.Skin.UZI == 3)
+    new_Skin.UZI = 1102001058;
+  if (preferences.Config.Skin.UZI == 4)
+    new_Skin.UZI = 1102001069;
+  if (preferences.Config.Skin.UZI == 5)
+    new_Skin.UZI = 1102001089;
+  if (preferences.Config.Skin.UZI == 6)
+    new_Skin.UZI = 1102001102;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.UMP == 0)
+    new_Skin.UMP = 102002;
+  if (preferences.Config.Skin.UMP == 1)
+    new_Skin.UMP = 1102002043;
+  if (preferences.Config.Skin.UMP == 2)
+    new_Skin.UMP = 1102002061;
+  if (preferences.Config.Skin.UMP == 3)
+    new_Skin.UMP = 1102002090;
+  if (preferences.Config.Skin.UMP == 4)
+    new_Skin.UMP = 1102002117;
+  if (preferences.Config.Skin.UMP == 5)
+    new_Skin.UMP = 1102002124;
+  if (preferences.Config.Skin.UMP == 6)
+    new_Skin.UMP = 1102002129;
+  if (preferences.Config.Skin.UMP == 7)
+    new_Skin.UMP = 1102002136;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.Vector == 0)
+    new_Skin.Vector = 102003;
+  if (preferences.Config.Skin.Vector == 1)
+    new_Skin.Vector = 1102003020;
+  if (preferences.Config.Skin.Vector == 2)
+    new_Skin.Vector = 1102003031;
+  if (preferences.Config.Skin.Vector == 3)
+    new_Skin.Vector = 1102003065;
+  if (preferences.Config.Skin.Vector == 4)
+    new_Skin.Vector = 1102003080;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.Thompson == 0)
+    new_Skin.Thompson = 102004;
+  if (preferences.Config.Skin.Thompson == 1)
+    new_Skin.Thompson = 1102004018;
+  if (preferences.Config.Skin.Thompson == 2)
+    new_Skin.Thompson = 1102004034;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.Bizon == 0)
+    new_Skin.Bizon = 102005;
+  if (preferences.Config.Skin.Bizon == 1)
+    new_Skin.Bizon = 1102005007;
+  if (preferences.Config.Skin.Bizon == 2)
+    new_Skin.Bizon = 1102005020;
+  if (preferences.Config.Skin.Bizon == 3)
+    new_Skin.Bizon = 1102005041;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.K98 == 0)
+    new_Skin.K98 = 103001;
+  if (preferences.Config.Skin.K98 == 1)
+    new_Skin.K98 = 1103001060;
+  if (preferences.Config.Skin.K98 == 2)
+    new_Skin.K98 = 1103001079;
+  if (preferences.Config.Skin.K98 == 3)
+    new_Skin.K98 = 1103001101;
+  if (preferences.Config.Skin.K98 == 4)
+    new_Skin.K98 = 1103001145;
+  if (preferences.Config.Skin.K98 == 5)
+    new_Skin.K98 = 1103001160;
+  if (preferences.Config.Skin.K98 == 6)
+    new_Skin.K98 = 1103001179;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (new_Skin.M24 == 0)
+    new_Skin.M24 = 103002;
+  if (preferences.Config.Skin.M24 == 1)
+    new_Skin.M24 = 1103002018;
+  if (preferences.Config.Skin.M24 == 2)
+    new_Skin.M24 = 1103002030;
+  if (preferences.Config.Skin.M24 == 3)
+    new_Skin.M24 = 1103002048;
+  if (preferences.Config.Skin.M24 == 4)
+    new_Skin.M24 = 1103002056;
+  if (preferences.Config.Skin.M24 == 5)
+    new_Skin.M24 = 1103002087;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.AWM == 0)
+    new_Skin.AWM = 103003;
+  if (preferences.Config.Skin.AWM == 1)
+    new_Skin.AWM = 1103003022;
+  if (preferences.Config.Skin.AWM == 2)
+    new_Skin.AWM = 1103003030;
+  if (preferences.Config.Skin.AWM == 3)
+    new_Skin.AWM = 1103003042;
+  if (preferences.Config.Skin.AWM == 4)
+    new_Skin.AWM = 1103003051;
+  if (preferences.Config.Skin.AWM == 5)
+    new_Skin.AWM = 1103003062;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (preferences.Config.Skin.DP28 == 0)
+    new_Skin.DP28 = 105002;
+  if (preferences.Config.Skin.DP28 == 1)
+    new_Skin.DP28 = 1105002018;
+  if (preferences.Config.Skin.DP28 == 2)
+    new_Skin.DP28 = 1105002035;
+  if (preferences.Config.Skin.DP28 == 3)
+    new_Skin.DP28 = 1105002058;
+  if (preferences.Config.Skin.DP28 == 4)
+    new_Skin.DP28 = 1105002063;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (new_Skin.M249 == 0)
+    new_Skin.M249 = 105001;
+	new_Skin.M249s = 205009;
+  if (preferences.Config.Skin.M249 == 1)
+    new_Skin.M249 = 1105001020;
+	new_Skin.M249s = 1050010351;
+  if (preferences.Config.Skin.M249 == 2)
+    new_Skin.M249 = 1105001034;
+	new_Skin.M249s = 1050010412;
+  if (preferences.Config.Skin.M249 == 3)
+    new_Skin.M249 = 1105001048;
+	new_Skin.M249s = 1050010482;
+  if (preferences.Config.Skin.M249 == 4)
+    new_Skin.M249 = 1105001054;
+	new_Skin.M249s = 1050010542;
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   if (preferences.Config.Skin.Bigfoot == 0)
+    new_Skin.Bigfoot = 1953001;
+  if (preferences.Config.Skin.Bigfoot == 1)
+    new_Skin.Bigfoot = 1953004;
+	
+  if (preferences.Config.Skin.OMirado == 0)
+    new_Skin.OMirado = 1915001;
+  if (preferences.Config.Skin.OMirado == 1)
+    new_Skin.OMirado = 1915011;
+  if (preferences.Config.Skin.OMirado == 2)
+    new_Skin.OMirado = 1915099;
+	
+  if (preferences.Config.Skin.Mirado == 0)
+    new_Skin.Mirado = 1914001;
+  if (preferences.Config.Skin.Mirado == 1)
+    new_Skin.Mirado = 1914011;
+	
+  if (preferences.Config.Skin.Moto == 0)
+    new_Skin.Moto = 1901001;
+  if (preferences.Config.Skin.Moto == 1)
+    new_Skin.Moto = 1901073;
+  if (preferences.Config.Skin.Moto == 2)
+    new_Skin.Moto = 1901074;
+  if (preferences.Config.Skin.Moto == 3)
+    new_Skin.Moto = 1901075;
+  if (preferences.Config.Skin.Moto == 4)
+    new_Skin.Moto = 1901047;
+  if (preferences.Config.Skin.Moto == 5)
+    new_Skin.Moto = 1901085;
+  if (preferences.Config.Skin.Moto == 6)
+    new_Skin.Moto = 1901076;
+  if (preferences.Config.Skin.Moto == 7)
+    new_Skin.Moto = 1901027;
+  if (preferences.Config.Skin.Moto == 8)
+    new_Skin.Moto = 1901018;
+  if (preferences.Config.Skin.Moto == 9)
+    new_Skin.Moto = 1901085;
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+if (preferences.Config.Skin.Buggy == 0)
+    new_Skin.Buggy = 1907001;
+  if (preferences.Config.Skin.Buggy == 1)
+    new_Skin.Buggy = 1907047;
+  if (preferences.Config.Skin.Buggy == 2)
+    new_Skin.Buggy = 1907009;
+if (preferences.Config.Skin.Buggy == 3)
+    new_Skin.Buggy = 1907010;
+if (preferences.Config.Skin.Buggy == 4)
+    new_Skin.Buggy = 1907011;
+if (preferences.Config.Skin.Buggy == 5)
+    new_Skin.Buggy = 1907012;
+if (preferences.Config.Skin.Buggy == 6)
+    new_Skin.Buggy = 1907013;
+if (preferences.Config.Skin.Buggy == 7)
+    new_Skin.Buggy = 1907014;
+if (preferences.Config.Skin.Buggy == 8)
+    new_Skin.Buggy = 1907015;
+if (preferences.Config.Skin.Buggy == 9)
+    new_Skin.Buggy = 1907016;
+if (preferences.Config.Skin.Buggy == 10)
+    new_Skin.Buggy = 1907017;
+if (preferences.Config.Skin.Buggy == 11)
+    new_Skin.Buggy = 1907018;
+if (preferences.Config.Skin.Buggy == 12)
+    new_Skin.Buggy = 1907019;
+if (preferences.Config.Skin.Buggy == 13)
+    new_Skin.Buggy = 1907020;
+if (preferences.Config.Skin.Buggy == 14)
+    new_Skin.Buggy = 1907021;
+if (preferences.Config.Skin.Buggy == 15)
+    new_Skin.Buggy = 1907022;
+if (preferences.Config.Skin.Buggy == 16)
+    new_Skin.Buggy = 1907023;
+if (preferences.Config.Skin.Buggy == 17)
+    new_Skin.Buggy = 1907024;
+if (preferences.Config.Skin.Buggy == 18)
+    new_Skin.Buggy = 1907025;
+if (preferences.Config.Skin.Buggy == 19)
+    new_Skin.Buggy = 1907026;
+if (preferences.Config.Skin.Buggy == 20)
+    new_Skin.Buggy = 1907027;
+if (preferences.Config.Skin.Buggy == 21)
+    new_Skin.Buggy = 1907028;
+if (preferences.Config.Skin.Buggy == 22)
+    new_Skin.Buggy = 1907029;
+if (preferences.Config.Skin.Buggy == 23)
+    new_Skin.Buggy = 1907030;
+if (preferences.Config.Skin.Buggy == 24)
+    new_Skin.Buggy = 1907031;
+if (preferences.Config.Skin.Buggy == 25)
+    new_Skin.Buggy = 1907032;
+if (preferences.Config.Skin.Buggy == 26)
+    new_Skin.Buggy = 1907033;
+if (preferences.Config.Skin.Buggy == 27)
+    new_Skin.Buggy = 1907034;
+if (preferences.Config.Skin.Buggy == 28)
+    new_Skin.Buggy = 1907035;
+if (preferences.Config.Skin.Buggy == 29)
+    new_Skin.Buggy = 1907036;
+if (preferences.Config.Skin.Buggy == 30)
+    new_Skin.Buggy = 1907037;
+if (preferences.Config.Skin.Buggy == 31)
+    new_Skin.Buggy = 1907038;
+if (preferences.Config.Skin.Buggy == 32)
+    new_Skin.Buggy = 1907039;
+if (preferences.Config.Skin.Buggy == 33)
+    new_Skin.Buggy = 1907040;
+	
+  if (preferences.Config.Skin.Dacia == 0)
+    new_Skin.Dacia = 1903001;
+  if (preferences.Config.Skin.Dacia == 1)
+    new_Skin.Dacia = 1903076;
+  if (preferences.Config.Skin.Dacia == 2)
+    new_Skin.Dacia = 1903079;
+  if (preferences.Config.Skin.Dacia == 3)
+    new_Skin.Dacia = 1903071;
+  if (preferences.Config.Skin.Dacia == 4)
+    new_Skin.Dacia = 1903014;
+  if (preferences.Config.Skin.Dacia == 5)
+    new_Skin.Dacia = 1903017;
+  if (preferences.Config.Skin.Dacia == 6)
+    new_Skin.Dacia = 1903035;
+  if (preferences.Config.Skin.Dacia == 7)
+    new_Skin.Dacia = 1903087;
+  if (preferences.Config.Skin.Dacia == 8)
+    new_Skin.Dacia = 1903088;
+  if (preferences.Config.Skin.Dacia == 9)
+    new_Skin.Dacia = 1903089;
+  if (preferences.Config.Skin.Dacia == 10)
+    new_Skin.Dacia = 1903090;
+  if (preferences.Config.Skin.Dacia == 11)
+    new_Skin.Dacia = 1903074;
+  if (preferences.Config.Skin.Dacia == 12)
+    new_Skin.Dacia = 1903075;
+  if (preferences.Config.Skin.Dacia == 13)
+    new_Skin.Dacia = 1903072;
+  if (preferences.Config.Skin.Dacia == 14)
+    new_Skin.Dacia = 1903073;
+  if (preferences.Config.Skin.Dacia == 15)
+    new_Skin.Dacia = 1903080;
+  if (preferences.Config.Skin.Dacia == 16)
+    new_Skin.Dacia = 1903189;
+  if (preferences.Config.Skin.Dacia == 17)
+    new_Skin.Dacia = 1903190;
+  if (preferences.Config.Skin.Dacia == 18)
+    new_Skin.Dacia = 1903191;
+  if (preferences.Config.Skin.Dacia == 19)
+    new_Skin.Dacia = 1903192;
+  if (preferences.Config.Skin.Dacia == 20)
+    new_Skin.Dacia = 1903193;
+  if (preferences.Config.Skin.Dacia == 21)
+    new_Skin.Dacia = 1903197;
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  
+if (preferences.Config.Skin.MiniBus == 0)
+    new_Skin.MiniBus = 1904001;
+  if (preferences.Config.Skin.MiniBus == 1)
+    new_Skin.MiniBus = 1904005;
+  if (preferences.Config.Skin.MiniBus == 2)
+    new_Skin.MiniBus = 1904006;
+if (preferences.Config.Skin.MiniBus == 3)
+    new_Skin.MiniBus = 1904007;
+if (preferences.Config.Skin.MiniBus == 4)
+    new_Skin.MiniBus = 1904008;
+if (preferences.Config.Skin.MiniBus == 5)
+    new_Skin.MiniBus = 1904009;
+if (preferences.Config.Skin.MiniBus == 6)
+    new_Skin.MiniBus = 1904010;
+if (preferences.Config.Skin.MiniBus == 7)
+    new_Skin.MiniBus = 1904011;
+if (preferences.Config.Skin.MiniBus == 8)
+    new_Skin.MiniBus = 1904012;
+if (preferences.Config.Skin.MiniBus == 9)
+    new_Skin.MiniBus = 1904013;
+if (preferences.Config.Skin.MiniBus == 10)
+    new_Skin.MiniBus = 1904014;
+if (preferences.Config.Skin.MiniBus == 11)
+    new_Skin.MiniBus = 1904015;
+if (preferences.Config.Skin.MiniBus == 12)
+    new_Skin.MiniBus = 1904004;
+  
+  if (preferences.Config.Skin.CoupeRP == 0)
+    new_Skin.CoupeRP = 1961001;
+  if (preferences.Config.Skin.CoupeRP == 1)
+    new_Skin.CoupeRP = 1961024;
+  if (preferences.Config.Skin.CoupeRP == 2)
+    new_Skin.CoupeRP = 1961047;
+  if (preferences.Config.Skin.CoupeRP == 3)
+    new_Skin.CoupeRP = 1961034;
+  if (preferences.Config.Skin.CoupeRP == 4)
+    new_Skin.CoupeRP = 1961018;
+  if (preferences.Config.Skin.CoupeRP == 5)
+    new_Skin.CoupeRP = 1961007;
+  if (preferences.Config.Skin.CoupeRP == 6)
+    new_Skin.CoupeRP = 1961010;
+  if (preferences.Config.Skin.CoupeRP == 7)
+    new_Skin.CoupeRP = 1961049;
+  if (preferences.Config.Skin.CoupeRP == 8)
+    new_Skin.CoupeRP = 1961048;
+  if (preferences.Config.Skin.CoupeRP == 9)
+    new_Skin.CoupeRP = 1961012;
+  if (preferences.Config.Skin.CoupeRP == 10)
+    new_Skin.CoupeRP = 1961013;
+  if (preferences.Config.Skin.CoupeRP == 11)
+    new_Skin.CoupeRP = 1961014;
+  if (preferences.Config.Skin.CoupeRP == 12)
+    new_Skin.CoupeRP = 1961015;
+  if (preferences.Config.Skin.CoupeRP == 13)
+    new_Skin.CoupeRP = 1961016;
+  if (preferences.Config.Skin.CoupeRP == 14)
+    new_Skin.CoupeRP = 1961017;
+  if (preferences.Config.Skin.CoupeRP == 15)
+    new_Skin.CoupeRP = 1961020;
+  if (preferences.Config.Skin.CoupeRP == 16)
+    new_Skin.CoupeRP = 1961021;
+  if (preferences.Config.Skin.CoupeRP == 17)
+    new_Skin.CoupeRP = 1961025;
+  if (preferences.Config.Skin.CoupeRP == 18)
+    new_Skin.CoupeRP = 1961029;
+  if (preferences.Config.Skin.CoupeRP == 19)
+    new_Skin.CoupeRP = 1961030;
+  if (preferences.Config.Skin.CoupeRP == 20)
+    new_Skin.CoupeRP = 1961031;
+  if (preferences.Config.Skin.CoupeRP == 21)
+    new_Skin.CoupeRP = 1961032;
+  if (preferences.Config.Skin.CoupeRP == 22)
+    new_Skin.CoupeRP = 1961033;
+  if (preferences.Config.Skin.CoupeRP == 23)
+    new_Skin.CoupeRP = 1961035;
+  if (preferences.Config.Skin.CoupeRP == 24)
+    new_Skin.CoupeRP = 1961036;
+  if (preferences.Config.Skin.CoupeRP == 22)
+    new_Skin.CoupeRP = 1961037;
+  if (preferences.Config.Skin.CoupeRP == 26)
+    new_Skin.CoupeRP = 1961038;
+  if (preferences.Config.Skin.CoupeRP == 27)
+    new_Skin.CoupeRP = 1961039;
+  if (preferences.Config.Skin.CoupeRP == 28)
+    new_Skin.CoupeRP = 1961040;
+  if (preferences.Config.Skin.CoupeRP == 29)
+    new_Skin.CoupeRP = 1961041;
+  if (preferences.Config.Skin.CoupeRP == 30)
+    new_Skin.CoupeRP = 1961042;
+  if (preferences.Config.Skin.CoupeRP == 31)
+    new_Skin.CoupeRP = 1961043;
+  if (preferences.Config.Skin.CoupeRP == 32)
+    new_Skin.CoupeRP = 1961044;
+  if (preferences.Config.Skin.CoupeRP == 33)
+    new_Skin.CoupeRP = 1961045;
+  if (preferences.Config.Skin.CoupeRP == 34)
+    new_Skin.CoupeRP = 1961046;
+  if (preferences.Config.Skin.CoupeRP == 35)
+    new_Skin.CoupeRP = 1961050;
+  if (preferences.Config.Skin.CoupeRP == 36)
+    new_Skin.CoupeRP = 1961051;
+  if (preferences.Config.Skin.CoupeRP == 37)
+    new_Skin.CoupeRP = 1961052;
+  if (preferences.Config.Skin.CoupeRP == 38)
+    new_Skin.CoupeRP = 1961053;
+  if (preferences.Config.Skin.CoupeRP == 39)
+    new_Skin.CoupeRP = 1961054;
+  if (preferences.Config.Skin.CoupeRP == 40)
+    new_Skin.CoupeRP = 1961055;
+  if (preferences.Config.Skin.CoupeRP == 41)
+    new_Skin.CoupeRP = 1961056;
+  if (preferences.Config.Skin.CoupeRP == 42)
+    new_Skin.CoupeRP = 1961057;
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (preferences.Config.Skin.UAZ == 0)
+    new_Skin.UAZ = 1908001;
+  if (preferences.Config.Skin.UAZ == 1)
+    new_Skin.UAZ = 1908067;
+  if (preferences.Config.Skin.UAZ == 2)
+    new_Skin.UAZ = 1908061;
+  if (preferences.Config.Skin.UAZ == 3)
+    new_Skin.UAZ = 1908032;
+  if (preferences.Config.Skin.UAZ == 4)
+    new_Skin.UAZ = 1908068;
+  if (preferences.Config.Skin.UAZ == 5)
+    new_Skin.UAZ = 1908066;
+  if (preferences.Config.Skin.UAZ == 6)
+    new_Skin.UAZ = 1908075;
+  if (preferences.Config.Skin.UAZ == 7)
+    new_Skin.UAZ = 1908076;
+  if (preferences.Config.Skin.UAZ == 8)
+    new_Skin.UAZ = 1908077;
+  if (preferences.Config.Skin.UAZ == 9)
+    new_Skin.UAZ = 1908078;
+  if (preferences.Config.Skin.UAZ == 10)
+    new_Skin.UAZ = 1908084;
+  if (preferences.Config.Skin.UAZ == 11)
+    new_Skin.UAZ = 1908085;
+  if (preferences.Config.Skin.UAZ == 12)
+    new_Skin.UAZ = 1908086;
+  if (preferences.Config.Skin.UAZ == 13)
+    new_Skin.UAZ = 1908088;
+  if (preferences.Config.Skin.UAZ == 14)
+    new_Skin.UAZ = 1908089;
+  if (preferences.Config.Skin.UAZ == 15)
+    new_Skin.UAZ = 1908188;
+  if (preferences.Config.Skin.UAZ == 16)
+    new_Skin.UAZ = 1908189;
+  if (preferences.Config.Skin.UAZ == 17)
+    new_Skin.UAZ = 1957001;
+ 
+ if (preferences.Config.Skin.Boat == 0)
+    new_Skin.Boat = 1911001;
+  if (preferences.Config.Skin.Boat == 1)
+    new_Skin.Boat = 1911013;
+  if (preferences.Config.Skin.Boat == 2)
+    new_Skin.Boat = 1911003;
+if (preferences.Config.Skin.Boat == 3)
+    new_Skin.Boat = 1911004;
+if (preferences.Config.Skin.Boat == 4)
+    new_Skin.Boat = 1911005;
+if (preferences.Config.Skin.Boat == 5)
+    new_Skin.Boat = 1911006;
+if (preferences.Config.Skin.Boat == 6)
+    new_Skin.Boat = 1911007;
+if (preferences.Config.Skin.Boat == 7)
+    new_Skin.Boat = 1911008;
+if (preferences.Config.Skin.Boat == 8)
+    new_Skin.Boat = 1911009;
+if (preferences.Config.Skin.Boat == 9)
+    new_Skin.Boat = 1911010;
+if (preferences.Config.Skin.Boat == 10)
+    new_Skin.Boat = 1911011;
+if (preferences.Config.Skin.Boat == 11)
+    new_Skin.Boat = 1911012;
+
+}
+
+
+
+int m4v[] = { 101004, 1101004046, 1101004062, 1101004078, 1101004086, 1101004098, 1101004138, 1101004163,1101004201,1101004209,1101004218
+};
+int scar[] = { 101003, 1101003057, 1101003070, 1101003080, 1101003119, 1101003146, 1101003167, 1101003181};
+int akmv[] = { 101001,1101001089, 1101001103, 1101001116, 1101001128, 1101001143, 1101001154, 1101001174,1101001213,1101001231,1101001242
+};
+int m7[] = { 101008, 1101008026, 1101008051, 1101008061, 1101008081, 1101008104, 1101008116, 1101008126};
+int awm[] = { 103003, 1103003022, 1103003030, 1103003042, 1103003051, 1103003062};
+int kar[] = { 103001, 1103001060, 1103001079, 1103001101, 1103001145, 1103001160, 1103001179};
+int m24[] = { 103002, 1103002018, 1103002030, 1103002048, 1103002056, 1103002087};
+int dp[] = { 105002, 1105002018, 1105002035, 1105002058, 1105002063};
+int m249[] = { 105001, 1105001020, 1105001034, 1105001048, 1105001054};
+int groza[] = { 101005, 1101005019, 1101005025, 1101005038, 1101005043, 1101005052, 1101005082};
+int aug[] = { 101006, 1101006033, 1101006044, 1101006062};
+int m16[] = { 101002, 1101002029, 1101002056, 1101002068, 1101002081, 1101002103};
+int uzi[] = { 102001, 1102001024, 1102001036, 1102001058, 1102001069, 1102001089, 1102001102};
+int ump[] = { 102002, 1102002043, 1102002061, 1102002090, 1102002117, 1102002124, 1102002129, 1102002136};
+int vectorr[] = { 102003, 1102003020, 1102003031, 1102003065, 1102003080};
+int tommy[] = { 102004, 1102004018, 1102004034};
+int bizon[] = { 102005, 1102005007, 1102005020, 1102005041};
+int ace32[] = { 101102, 1101102007, 1101102017};
+int pan[] = { 108004, 1108004125, 1108004145, 1108004160, 1108004283, 1108004337, 1108004356, 1108004365, 1108004054, 1108004008};
+
+int m249s[] = { 205009, 1050010351, 1050010412, 1050010482, 1050010542};
+int akmmag[] = { 291001,204013,204011,204012,1010010891, 1010011031, 1010011161, 1010011281, 1010011431, 1010011541, 1010011741,1010012131,1010012311,1010012421
+};
+int m7mag[] = { 291008,204013,204011,204012,1010080261, 1010080511, 1010080611, 1010080811, 1010081041, 1010081161, 1010081261};
+int scarmag[] = { 291003,204013,204011,204012,1010030571, 1010030701, 1010030801, 1010031191, 1010031461, 1010031671, 1010031811};
+int m4mag[] = { 291004,204013,204011,204012,1010040461,1010040611,1010040781,1010040861,1010040981,1010041381,1010041631,1010042011,1010042073,1010042153  };
+
+int m4sight[] = { 203008,1010040462,1010040612,1010040782,1010040862,1010040982,1010041382,1010041632,1010042012,1010042083,1010042163  };
+
+int m4stock[] = { 205005,1010040463,1010040613,1010040783,1010040863,1010040983,1010041383,1010041633,1010042013,1010042093,1010042173  };
+
+int m4stock1[] = { 205002,1010040480,205002,205002,205002,205002,1010041146,1010041579,1010041966,1010042137,1010042173  };
+
+int m4reddot[] = { 203001,1010040470,203001,203001,203001,203001,1010041128,1010041566,1010041948,1010042029,1010042119  };
+
+int m16s[] = { 205007, 1010020292, 1010020562, 1010020682, 1010020812, 1010021032};
+int m16mag[] = { 291002,204013,204011,204012, 1010020291, 1010020561, 1010020681, 1010020811, 1010021031};
+
+
+int emote1[] = { 2200101,12220023,12219677,12219716,12209401,12220028,12209701,12209801,12209901 };
+int emote2[] = { 2200201,12210201,12210601,12220028,12219819,12211801,12212001,12212201,12212401 };
+int emote3[] = { 2200301,12212601,12213201,12219715,12219814,12213601,12213801,12214001,12214201 };
+
+int SuitX[] = { 403003,1405628,1405870,1405983,1406152,1406311,1406475,1406638,1406872 };
+
+int Bag[] = { 501006,501005,501004,501003,501002,501001,1501003550,1501003277,1501003321,1501003443,1501003265,1501003051,1501003220,1501003174 };
+
+int Helmet[] = { 502001,502002,502003,1502003014,1502003028,1502003023,1501002443,1502003031,1502003033,1502003069,1502003261 };
+
+static int prevXSuits = preferences.Config.Skin.XSuits;
+
+static bool callFunction = false;
+#pragma mark - MTKViewDelegate
+namespace Variables {
+    int ActiveTab = 1;
+}
+bool callNotify = false;
+
+- (void)drawInMTKView:(MTKView*)view
+{
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize.x = view.bounds.size.width;
+    io.DisplaySize.y = view.bounds.size.height;
+    
+    
+    
+#if TARGET_OS_OSX
+    CGFloat framebufferScale = view.window.screen.backingScaleFactor ?: NSScreen.mainScreen.backingScaleFactor;
+#else
+    CGFloat framebufferScale = view.window.screen.nativeScale;
+#endif
+    io.DisplayFramebufferScale = ImVec2(framebufferScale, framebufferScale);
+    io.DeltaTime = 1 / float(view.preferredFramesPerSecond ?: 60);
+    
+    
+    id<MTLCommandBuffer> commandBuffer = [self.commandQueue commandBuffer];
+    
+    
+    
+    
+    
+    
+    
+    if (MenDeal == true) {
+        [self.view setUserInteractionEnabled:YES];
+    } else if (MenDeal == false) {
+        [self.view setUserInteractionEnabled:NO];
+    }
+    
+    MTLRenderPassDescriptor* renderPassDescriptor = view.currentRenderPassDescriptor;
+    if (renderPassDescriptor != nil)
+    {
+        id <MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+        [renderEncoder pushDebugGroup:@""];
+        
+        ImGui_ImplMetal_NewFrame(renderPassDescriptor);
+        ImGui::NewFrame();
+        
+      
+        
+        CGFloat x = (([UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.width) - 360) / 2;
+        CGFloat y = (([UIApplication sharedApplication].windows[0].rootViewController.view.frame.size.height) - 360) /2;
+        static ImVec4 active = to_vec4(158, 158, 158, 255);
+		static ImVec4 inactive = to_vec4(66, 66, 66, 255);
+
+
+if (elapsedd < 1000 && !callNotify) {
+ ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Welcome User !", "" });
+   
+ callNotify = true;
+ }
+        ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(480, 300), ImGuiCond_FirstUseEver);
+        
+            if (MenDeal == true)
+            {
+                
+                
+                ImGui::Begin("欢颜 IOS" /*nameshow3*/, &MenDeal, ImGuiWindowFlags_NoCollapse);
+                
+
+                if (ImGui::BeginTabBar(("Tab"),
+                                       ImGuiTabBarFlags_FittingPolicyScroll)) {
+                    if (ImGui::BeginTabItem(("绘制菜单"))) {
+						if (ImGui::BeginTable("split", 4));
+                    {
+                    ImGui::TableNextColumn();
+                        ImGui::Checkbox((" 射线"), &Config.ESPMenu.Line);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 3D方框"), &Config.ESPMenu.Box);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 血条"), &Config.ESPMenu.Health);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 名字"), &Config.ESPMenu.Name);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 骨骼"), &Config.ESPMenu.Skeleton);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 距离"), &Config.ESPMenu.Distance);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 手持"), &Config.ESPMenu.Weapon);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 360 背敌"), &Config.ESPMenu.Alert);
+ImGui::TableNextColumn();
+ImGui::Checkbox((" 忽略人机"), &Config.ESPMenu.IgnoreBot);
+
+                        }
+                        ImGui::EndTable();
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem(("瞄准菜单"))) {
+
+                        
+                        ImGui::Spacing();
+                        if (ImGui::Checkbox(("函数追踪"),
+                                            &preferences.Config.SilentAim.Enable)) {
+                        }
+                        
+                        if (ImGui::Checkbox(("自动瞄准"),
+                                            &preferences.Config.SilentAim.AimBot)) {
+                        }
+                        
+                        ImGui::Text(("范围圈 : "));
+                        ImGui::SameLine();
+                        
+                        ImGui::SliderInt("##foov", &preferences.Config.SilentAim.Cross, 1.0f, 370.0f);
+                        ImGui::Text(("打击距离 : "));
+                        ImGui::SameLine();
+                        
+                        ImGui::SliderFloat("##distance", &g_disstance, 1.0f, 300.f);
+                        ImGui::Text(("打击部位 : "));
+                        ImGui::SameLine();
+                        static const char *targets[] = {("头部"),
+                                                        ("身体")};
+                        if (ImGui::Combo(("##Target"),
+                                         (int *) &preferences.Config.SilentAim.Target, targets, 2,
+                                         -1)) {
+                            
+                        }
+
+                        ImGui::Text(("瞄准方式 :"));
+                        ImGui::SameLine();
+                        static const char *triggers[] = {("None"),
+                                                         ("开火"),
+                                                         ("开镜"),
+                                                         ("开火开镜")};                                                            
+                        if (ImGui::Combo(("##Trigger"),
+                                         (int *) &preferences.Config.SilentAim.Trigger, triggers, 5,
+                                         -1)) {
+                            
+                        }
+                        ImGui::Checkbox("无后 ", &preferences.Config.SilentAim.ReCo);
+                        
+                        ImGui::SameLine();
+                        if (ImGui::Checkbox(("倒地不瞄"),
+                                            &preferences.Config.SilentAim.IgnoreKnocked)) {
+                            
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Checkbox(("不瞄人机"),
+                                            &preferences.Config.SilentAim.IgnoreBot)) {
+                            
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Checkbox(("VisCheck"),
+                                            &preferences.Config.SilentAim.VisCheck)) {
+                            
+                        }
+
+
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem(("内存功能"))) {
+
+
+                        if (ImGui::Checkbox(("无后坐力"),
+                                            &preferences.Config.SilentAim.Norecoil)) {
+                            
+                        }
+                        ImGui::Checkbox("人物广角", &WideView);
+                        if (WideView){
+                         ImGui::SliderInt("广角范围", &WideValue, 90, 140);
+     }
+                        if (ImGui::Checkbox(("打击显血"),
+                                            &preferences.Config.SilentAim.InstantHit)) {
+                            
+                        }
+                        if (ImGui::Checkbox(("子弹顺击"),
+                                            &preferences.Config.SilentAim.FastShoot)) {
+                            
+                        }
+                        if (ImGui::Checkbox(("打击特效"),
+                                            &preferences.Config.SilentAim.HitX)) {
+                            
+                        }
+                        ImGui::EndTabItem();
+                    }// 
+                    if (ImGui::BeginTabItem(("美化菜单"))) {
+                        ImGui::Spacing();
+						
+						if (ImGui::BeginTable("##Type", 3, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner)) {
+					ImGui::TableSetupColumn("美化初始化", 0, 50);
+					ImGui::TableSetupColumn("淘汰盒子", 0, 50);
+					ImGui::TableSetupColumn("淘汰播放", 0, 50);
+					ImGui::TableHeadersRow();
+					ImGui::TableNextRow();
+					
+					ImGui::TableNextColumn();
+					if (ImGui::Checkbox("###01", &ModSkinn)){
+                                        if (ModSkinn)
+                                        ImGui::InsertNotification({ ImGuiToastType_Success, 3000, "Mod Skin Activated !", "" });
+                                        }
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###02", &DeadBox);
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("####2", &KillMessage);
+					ImGui::EndTable();
+					}
+					const float buttonWidth = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2) / 3;
+						ImGui::BeginGroup();
+						ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
+						ImGui::PushStyleColor(ImGuiCol_Button, Settings::Tab == 0 ? active : inactive);
+						if (ImGui::Button("人物", ImVec2(buttonWidth, 0)))
+						Settings::Tab = 0;
+						ImGui::SameLine();
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x);
+						ImGui::PushStyleColor(ImGuiCol_Button, Settings::Tab == 1 ? active : inactive);
+						if(ImGui::Button("枪械", ImVec2(buttonWidth, 0)))
+						Settings::Tab = 1;
+						ImGui::SameLine();
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x);
+						ImGui::PushStyleColor(ImGuiCol_Button, Settings::Tab == 2 ? active : inactive);
+						if(ImGui::Button("载具", ImVec2(buttonWidth, 0)))
+							Settings::Tab = 2;
+						ImGui::PopStyleVar();
+						ImGui::PopStyleColor(3);
+						ImGui::EndGroup();
+					
+					if (ModSkinn){
+					//Player
+						if (Settings::Tab == 0) {
+					if (ImGui::BeginTable("##ModSkin", 3, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner)) {
+					ImGui::TableSetupColumn("Enable", 0, 20);
+					ImGui::TableSetupColumn("Name", 0, 30);
+					ImGui::TableSetupColumn("Skin", 0, 60);
+					ImGui::TableHeadersRow();
+					ImGui::TableNextRow();
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###0", &preferences.Outfit);
+					ImGui::TableNextColumn();
+					ImGui::Text("Outfit");
+					ImGui::TableNextColumn();
+					if (ImGui::InputInt("##Suit", &preferences.Config.Skin.XSuits)) {
+					if (prevXSuits != preferences.Config.Skin.XSuits) {
+					start = std::chrono::high_resolution_clock::now();
+					callFunction = true;
+					prevXSuits = preferences.Config.Skin.XSuits;
+					}
+				}
+				
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###1", &preferences.Face);
+					ImGui::TableNextColumn();
+					ImGui::Text("Face");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##face", &preferences.Config.Skin.XSuits);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###2", &preferences.Bagg);
+					ImGui::TableNextColumn();
+					ImGui::Text("Bag");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##bag", &preferences.bag);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###3", &preferences.Helmett);
+					ImGui::TableNextColumn();
+					ImGui::Text("Helmet");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##helmet", &preferences.helmet);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###4", &preferences.Emote);
+					ImGui::TableNextColumn();
+					ImGui::Text("Emote");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##emote", &ModEmote1);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###5", &preferences.Parachute);
+					ImGui::TableNextColumn();
+					ImGui::Text("Parachute");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##Parachute", &preferences.Config.Skin.Parachute);
+					//ImGui::TableNextColumn();
+					
+					ImGui::EndTable();
+					}
+				}
+				    if (Settings::Tab == 1) {
+					if (ImGui::BeginTable("##ModGun", 3, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner)) {
+					ImGui::TableSetupColumn("Enable", 0, 20);
+					ImGui::TableSetupColumn("Name", 0, 30);
+					ImGui::TableSetupColumn("Skin", 0, 60);
+					ImGui::TableHeadersRow();
+					ImGui::TableNextRow();
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###0", &preferences.M416);
+					ImGui::TableNextColumn();
+					ImGui::Text("M416");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##m4", &preferences.Config.Skin.M416);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###1", &preferences.AKM);
+					ImGui::TableNextColumn();
+					ImGui::Text("AKM");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##ak", &preferences.Config.Skin.AKM);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###2", &preferences.SCARL);
+					ImGui::TableNextColumn();
+					ImGui::Text("SCAR-L");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##scar", &preferences.Config.Skin.Scar);
+					ImGui::TableNextColumn();
+					
+				
+					ImGui::Checkbox("###3", &preferences.M762);
+					ImGui::TableNextColumn();
+					ImGui::Text("M762");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##M762", &preferences.Config.Skin.M762);
+					ImGui::TableNextColumn();
+					
+					ImGui::Checkbox("###23", &preferences.GROZA);
+					ImGui::TableNextColumn();
+					ImGui::Text("GROZA");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##GR", &preferences.Config.Skin.Groza);
+					ImGui::TableNextColumn();
+					
+				
+					ImGui::Checkbox("###32", &preferences.AUG);
+					ImGui::TableNextColumn();
+					ImGui::Text("AUG");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##AUG", &preferences.Config.Skin.AUG);
+					ImGui::TableNextColumn();
+					
+					ImGui::Checkbox("###3U2", &preferences.M16);
+					ImGui::TableNextColumn();
+					ImGui::Text("M16A4");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##M16A4", &preferences.Config.Skin.M16A4);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###3Ui2", &preferences.ACE32);
+					ImGui::TableNextColumn();
+					ImGui::Text("ACE32");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##ACE", &preferences.Config.Skin.ACE32);
+					ImGui::TableNextColumn();
+					
+					ImGui::Checkbox("###19", &preferences.KAR98);
+					ImGui::TableNextColumn();
+					ImGui::Text("Kar98-k");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##rak", &preferences.Config.Skin.K98);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###20", &preferences.M24);
+					ImGui::TableNextColumn();
+					ImGui::Text("M24");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##M24", &preferences.Config.Skin.M24);
+					ImGui::TableNextColumn();
+					
+				
+					ImGui::Checkbox("###21", &preferences.AWM);
+					ImGui::TableNextColumn();
+					ImGui::Text("AWM");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##AWM", &preferences.Config.Skin.AWM);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###19T", &preferences.DP28);
+					ImGui::TableNextColumn();
+					ImGui::Text("DP-28");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##ra6k", &preferences.Config.Skin.DP28);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###260", &preferences.M249);
+					ImGui::TableNextColumn();
+					ImGui::Text("M249");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##M24g", &preferences.Config.Skin.M249);
+					ImGui::TableNextColumn();
+					
+				
+					ImGui::Checkbox("###21372", &preferences.UZI);
+					ImGui::TableNextColumn();
+					ImGui::Text("UZI");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##UZI", &preferences.Config.Skin.UZI);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###20UI", &preferences.UMP);
+					ImGui::TableNextColumn();
+					ImGui::Text("UMP");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##UNP", &preferences.Config.Skin.UMP);
+					ImGui::TableNextColumn();
+					
+				
+					ImGui::Checkbox("###TT21", &preferences.TOMMY);
+					ImGui::TableNextColumn();
+					ImGui::Text("Thompson");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##Thompson", &preferences.Config.Skin.Thompson);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###19TV", &preferences.VECTOR);
+					ImGui::TableNextColumn();
+					ImGui::Text("Vector");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##Vector", &preferences.Config.Skin.Vector);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###26y0", &preferences.BIZON);
+					ImGui::TableNextColumn();
+					ImGui::Text("Bizon");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##M24yg", &preferences.Config.Skin.Bizon);
+					ImGui::TableNextColumn();
+					
+					ImGui::Checkbox("###26gy0", &preferences.PAN);
+					ImGui::TableNextColumn();
+					ImGui::Text("Pan");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##M24ygy", &preferences.Config.Skin.Pan);
+					ImGui::EndTable();
+					}
+				}
+				
+				    if (Settings::Tab == 2) {
+					if (ImGui::BeginTable("##ModCar", 3, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner)) {
+					ImGui::TableSetupColumn("Enable", 0, 20);
+					ImGui::TableSetupColumn("Name", 0, 30);
+					ImGui::TableSetupColumn("Skin", 0, 60);
+					ImGui::TableHeadersRow();
+					ImGui::TableNextRow();
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###0", &preferences.Dacia);
+					ImGui::TableNextColumn();
+					ImGui::Text("Dacia");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##dacia", &preferences.Config.Skin.Dacia);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###1", &preferences.CoupeRB);
+					ImGui::TableNextColumn();
+					ImGui::Text("Coupe RB");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##coupe", &preferences.Config.Skin.CoupeRP);
+					ImGui::TableNextColumn();
+					
+					
+					ImGui::Checkbox("###2", &preferences.UAZ);
+					ImGui::TableNextColumn();
+					ImGui::Text("UAZ");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##uaz", &preferences.Config.Skin.UAZ);
+					ImGui::TableNextColumn();
+					
+					ImGui::Checkbox("###23", &preferences.Moto);
+					ImGui::TableNextColumn();
+					ImGui::Text("MotoBike");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##moto", &preferences.Config.Skin.Moto);
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###235", &preferences.BigFoot);
+					ImGui::TableNextColumn();
+					ImGui::Text("BigFoot");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##Bigfoot", &preferences.Config.Skin.Bigfoot);
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###2345", &preferences.Mirado);
+					ImGui::TableNextColumn();
+					ImGui::Text("Mirado");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##OMirado", &preferences.Config.Skin.Mirado);
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###2365", &preferences.Buggy);
+					ImGui::TableNextColumn();
+					ImGui::Text("Buggy");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##Buggy", &preferences.Config.Skin.Buggy);
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###234995", &preferences.MiniBus);
+					ImGui::TableNextColumn();
+					ImGui::Text("MiniBus");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##miniB", &preferences.Config.Skin.MiniBus);
+					
+					ImGui::TableNextColumn();
+					ImGui::Checkbox("###23650", &preferences.Boat);
+					ImGui::TableNextColumn();
+					ImGui::Text("PG-117");
+					ImGui::TableNextColumn();
+					ImGui::InputInt("##bg77", &preferences.Config.Skin.Boat);
+					
+					ImGui::EndTable();
+					}
+				}
+			}//
+						
+                        ImGui::EndTabItem();
+                    }
+                    ImGui::EndTabBar();//
+                }
+                ImGui::End();
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+	ImGui::RenderNotifications();
+	ImGui::PopStyleVar(1); // Don't forget to Pop()
+	ImGui::PopStyleColor(1);
+                
+            }
+        
+            
+            ImGui::Render();
+            ImDrawData* draw_data = ImGui::GetDrawData();
+            ImGui_ImplMetal_RenderDrawData(draw_data, commandBuffer, renderEncoder);
+            
+            
+            [renderEncoder popDebugGroup];
+            [renderEncoder endEncoding];
+            
+            [commandBuffer presentDrawable:view.currentDrawable];
+            
+        }
+        
+        
+        
+        
+        
+        [commandBuffer commit];
+        
+        
+        
+        
+    }
+    
+
+
+
+
+- (void)mtkView:(MTKView*)view drawableSizeWillChange:(CGSize)size
+{
+    
+}
+
+
+
+#pragma mark - Interaction
+
+- (void)updateIOWithTouchEvent:(UIEvent *)event
+{
+    UITouch *anyTouch = event.allTouches.anyObject;
+    CGPoint touchLocation = [anyTouch locationInView:self.view];
+    ImGuiIO &io = ImGui::GetIO();
+    io.MousePos = ImVec2(touchLocation.x, touchLocation.y);
+    
+    BOOL hasActiveTouch = NO;
+    for (UITouch *touch in event.allTouches)
+    {
+        if (touch.phase != UITouchPhaseEnded && touch.phase != UITouchPhaseCancelled)
+        {
+            hasActiveTouch = YES;
+            break;
+        }
+    }
+    io.MouseDown[0] = hasActiveTouch;
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self updateIOWithTouchEvent:event];
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self updateIOWithTouchEvent:event];
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self updateIOWithTouchEvent:event];
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self updateIOWithTouchEvent:event];
+}
+
+#pragma esp method ------------------------------------------------------------------------------------
+
+
+typedef uintptr_t kaddr;
+using namespace std;
+using namespace SDK;
+
+
+
+
+
+string encryptDecrypt(string toEncrypt) {
+    char key[3] = {'K', 'C', 'Q'}; //Any chars will work, in an array of any size
+    string output = toEncrypt;
+    for (int i = 0; i < toEncrypt.size(); i++)
+        output[i] = toEncrypt[i] ^ key[i % (sizeof(key) / sizeof(char))];
+    return output;
+}
+
+kaddr getRealOffset(kaddr offset){
+    return (unsigned long)_dyld_get_image_vmaddr_slide(1)+offset;
+}
+long obbbbl() {
+
+    return getRealOffset(gObject);
+};
+UWorld *GEWorld;
+int GWorldNum = 0;
+TUObjectArray gobjects;
+UWorld *GetFullWorld()
+{
+    if(GWorldNum == 0) {
+        gobjects = UObject::GUObjectArray->ObjObjects;
+        for (int i=0; i< gobjects.Num(); i++)
+            if (auto obj = gobjects.GetByIndex(i)) {
+                if(obj->IsA(UEngine::StaticClass())) {
+                    auto GEngine = (UEngine *) obj;
+                    if(GEngine) {
+                        tslFont = GEngine->MediumFont;
+            robotoTinyFont = GEngine->MediumFont;
+            robotoFont = GEngine->MediumFont;
+                        auto ViewPort = GEngine->GameViewport;
+                        if (ViewPort)
+                        {
+                            GEWorld = ViewPort->World;
+                            GWorldNum = i;
+                            return ViewPort->World;
+                        }
+                    }
+                }
+            }
+    }else {
+        auto GEngine = (UEngine *) (gobjects.GetByIndex(GWorldNum));
+        if(GEngine) {
+           tslFont = GEngine->MediumFont;
+            robotoTinyFont = GEngine->MediumFont;
+            robotoFont = GEngine->MediumFont;
+            auto ViewPort = GEngine->GameViewport;
+            if(ViewPort) {
+                GEWorld = ViewPort->World;
+                return ViewPort->World;
+            }
+        }
+    }
+    return 0;
+}
+
+TNameEntryArray *GetGNames() {
+
+    return ((TNameEntryArray * (*)())(
+        (unsigned long)_dyld_get_image_vmaddr_slide(1) + gName))();
+}
+
+std::vector<AActor *> getActors() {
+auto World = GetFullWorld();
+if (!World)
+return std::vector<AActor *>();
+
+auto PersistentLevel = World->PersistentLevel;
+if (!PersistentLevel)
+return std::vector<AActor *>();
+
+auto Actors = *(TArray<AActor *> *)((uintptr_t) PersistentLevel + 0xa0);
+
+std::vector<AActor *> actors;
+for (int i = 0; i < Actors.Num(); i++) {
+auto Actor = Actors[i];
+if (Actor) {
+actors.push_back(Actor);
+}
+}
+return actors;
+}
+template <class T> void GetAllActors(std::vector<T*>& Actors) {
+    UGameplayStatics* gGameplayStatics = (UGameplayStatics*)gGameplayStatics->StaticClass();
+    auto GWorld = GetFullWorld();
+    if (GWorld) {
+        TArray<AActor*> Actors2;
+        gGameplayStatics->GetAllActorsOfClass((UObject*)GWorld, T::StaticClass(), &Actors2);
+        for (int i = 0; i < Actors2.Num(); i++) {
+            Actors.push_back((T*)Actors2[i]);
+        }
+    }
+}
+FVector GetBoneLocationByName(ASTExtraPlayerCharacter *Actor, const char *BoneName) {
+    return Actor->GetBonePos(BoneName, FVector());
+}
+
+struct sRegion
+{
+    kaddr start, end;
+};
+
+std::vector<sRegion> trapRegions;
+
+bool isObjectInvalid(UObject *obj)
+{
+    if (!Tools::IsPtrValid(obj))
+    {
+        return true;
+    }
+    if (!Tools::IsPtrValid(obj->ClassPrivate))
+    {
+        return true;
+    }
+    if (obj->InternalIndex <= 0)
+    {
+        return true;
+    }
+    if (obj->NamePrivate.ComparisonIndex <= 0)
+    {
+        return true;
+    }
+    if ((kaddr)(obj) % sizeof(kaddr) != 0x0 && (kaddr)(obj) % sizeof(kaddr) != 0x4)
+    {
+        return true;
+    }
+    if (std::any_of(trapRegions.begin(), trapRegions.end(), [&](const sRegion& region) { return ((kaddr)obj) >= region.start && ((kaddr)obj) <= region.end; }) || std::any_of(trapRegions.begin(), trapRegions.end(), [&](const sRegion& region) { return ((kaddr)obj->ClassPrivate) >= region.start && ((kaddr)obj->ClassPrivate) <= region.end; }))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool WriteAddr(void *addr, void *buffer, size_t length) {
+    unsigned long page_size = sysconf(_SC_PAGESIZE);
+    unsigned long size = page_size * sizeof(kaddr);
+    return mprotect((void *) ((kaddr) addr - ((kaddr) addr % page_size) - page_size), (size_t) size, PROT_EXEC | PROT_READ | PROT_WRITE) == 0 && memcpy(addr, buffer, length) != 0;
+}
+template<typename T>
+void Write(kaddr addr, T value) {
+    WriteAddr((void *) addr, &value, sizeof(T));
+}
+
+class Rect2 {
+public:
+    float x;
+    float y;
+    float width;
+    float height;
+
+    Rect2() {
+        this->x = 0;
+        this->y = 0;
+        this->width = 0;
+        this->height = 0;
+    }
+
+    Rect2(float x, float y, float width, float height) {
+        this->x = x;
+        this->y = y;
+        this->width = width;
+        this->height = height;
+    }
+
+    bool operator==(const Rect2 &src) const {
+        return (src.x == this->x && src.y == this->y && src.height == this->height &&
+                src.width == this->width);
+    }
+
+    bool operator!=(const Rect2 &src) const {
+        return (src.x != this->x && src.y != this->y && src.height != this->height &&
+                src.width != this->width);
+    }
+};
+struct FLinearColor visCol;
+ASTExtraPlayerCharacter *g_LocalPlayer;
+ASTExtraPlayerController *g_PlayerController;
+#define COLOR_BLACK FLinearColor(0, 0, 0, 1.f)
+#define COLOR_WHITE FLinearColor(1.f, 1.f, 1.f, 1.f)
+#define COLOR_RED   FLinearColor(1.f, 0, 0, 1.f)
+#define COLOR_LIME  FLinearColor(0, 1.f, 0, 1.f)
+#define COLOR_BLUE  FLinearColor(0, 0, 1.f, 1.f)
+#define COLOR_CAR   FLinearColor(1.f, 0.5f, 1.f, 1.f)
+#define GREEN       FLinearColor(0 / 255.f, 153 / 255.f, 0 / 255.f, 1.f)
+#define ABU         FLinearColor(0 / 255.f, 204 / 255.f, 204 / 255.f, 1.f)
+#define COLOR_GREEN FLinearColor(0, 0.5f, 0, 1.f)
+#define COLOR_PLAYER FLinearColor(1.000f, 0.620f, 0.150f, 1.000f)
+
+
+void DrawRectangle(AHUD *HUD, FVector2D Pos, float Width, float Height, float Thickness, FLinearColor Color) {
+    HUD->DrawLine(Pos.X, Pos.Y, Pos.X + Width, Pos.Y, Color, Thickness);
+    HUD->DrawLine(Pos.X, Pos.Y, Pos.X, Pos.Y + Height, Color, Thickness);
+    HUD->DrawLine(Pos.X + Width, Pos.Y, Pos.X + Width, Pos.Y + Height, Color, Thickness);
+    HUD->DrawLine(Pos.X, Pos.Y + Height, Pos.X + Width, Pos.Y + Height, Color, Thickness);
+}
+
+void DrawFilledRectangle(AHUD *HUD, FVector2D Pos, float Width, float Height, FLinearColor Color) {
+    HUD->DrawRect(Color, Pos.X, Pos.Y, Width, Height);
+}
+
+void DrawLine(AHUD *HUD, FVector2D posFrom, FVector2D posTo, float Thickness, FLinearColor Color) {
+    HUD->DrawLine(posFrom.X, posFrom.Y, posTo.X, posTo.Y, Color, Thickness);
+}
+void drawVerticalHealthBar(AHUD *HUD, Vector2 screenPos, float height, float maxHealth, float currentHealth) {
+    // Add the offset to screenPos by creating a new FVector2D
+    screenPos += Vector2(8.0f, 0.0f);
+
+    // Draw the background rectangle
+    HUD->DrawRect(FLinearColor(0.08f, 0.08f, 0.08f, 0.78f), screenPos.X, screenPos.Y, 5.0f, height + 2);
+
+    // Add the offset to screenPos by creating a new FVector2D
+    screenPos += Vector2(1.0f, 1.0f);
+    FLinearColor clr = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green color
+
+    float barHeight = (currentHealth / maxHealth) * height;
+
+    // Change color based on health percentage
+    if (currentHealth <= (maxHealth * 0.6)) {
+        clr = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f); // Magenta color
+    }
+
+    if (currentHealth < (maxHealth * 0.3)) {
+        clr = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red color
+    }
+
+    // Draw the health bar rectangle
+    HUD->DrawRect(clr, screenPos.X, screenPos.Y, 3.0f, barHeight);
+}
+void Box4Line(AHUD *HUD, float thicc, int x, int y, int w, int h, FLinearColor color) {
+    int iw = w / 4;
+    int ih = h / 4;
+
+    // Convert color from int to FLinearColor if necessary
+    // FLinearColor color = IntToColor(colorInt);
+
+    // top
+    HUD->DrawLine(x, y, x + iw, y, color, thicc);
+    HUD->DrawLine(x + w - iw, y, x + w, y, color, thicc);
+    HUD->DrawLine(x, y, x, y + ih, color, thicc);
+    HUD->DrawLine(x + w - 1, y, x + w - 1, y + ih, color, thicc);
+
+    // bottom
+    HUD->DrawLine(x, y + h, x + iw, y + h, color, thicc);
+    HUD->DrawLine(x + w - iw, y + h, x + w, y + h, color, thicc);
+    HUD->DrawLine(x, y + h - ih, x, y + h, color, thicc);
+    HUD->DrawLine(x + w - 1, y + h - ih, x + w - 1, y + h, color, thicc);
+}
+#define TSL_FONT_DEFAULT_SIZE 20
+static UFont *robotoFont = 0, *robotoTinyFont = 0,*tslFont = 0;
+
+void DrawOutlinedText(AHUD *HUD, FString Text, FVector2D Pos, FLinearColor Color, FLinearColor OutlineColor, bool isCenter = false) {
+    UCanvas *Canvas = HUD->Canvas;
+    Canvas->K2_DrawText(robotoFont, Text, Pos, Color, 1.f, {}, {}, isCenter, isCenter, true, OutlineColor);
+}
+
+void DrawText(AHUD *HUD, FString Text, FVector2D Pos, FLinearColor Color, bool isCenter = false) {
+    UCanvas *Canvas = HUD->Canvas;
+    Canvas->K2_DrawText(robotoFont, Text, Pos, Color, 1.f, {}, {}, isCenter, isCenter, false, {});
+}
+
+void DrawSmallOutlinedText(AHUD *HUD, FString Text, FVector2D Pos, FLinearColor Color, FLinearColor OutlineColor, bool isCenter = false) {
+    UCanvas *Canvas = HUD->Canvas;
+    Canvas->K2_DrawText(robotoTinyFont, Text, Pos, Color, 1.f, {}, {}, isCenter, isCenter, true, OutlineColor);
+}
+
+void DrawSmallText(AHUD *HUD, FString Text, FVector2D Pos, FLinearColor Color, bool isCenter = false) {
+    UCanvas *Canvas = HUD->Canvas;
+    Canvas->K2_DrawText(robotoTinyFont, Text, Pos, Color, 1.f, {}, {}, isCenter, isCenter, false, {});
+}
+void DrawTextcan(AHUD *HUD, FString Text, FVector2D Pos, FLinearColor Color, FLinearColor OutlineColor, bool isCenter = true) {
+ UCanvas *Canvas = HUD->Canvas;   
+ Canvas->K2_DrawText(tslFont, Text, Pos, Color, 1.f, {}, {}, isCenter, isCenter, true, OutlineColor);
+}
+void DrawCircle(AHUD *HUD, int x, int y, int radius, int numsides, FLinearColor OutlineColor){
+    float Step = M_PI * 2.0 / numsides;
+    int Count = 0;
+    FVector2D V[128];
+    for (float a = 0; a < M_PI * 2.0; a += Step)
+    {
+        float X1 = radius * cos(a) + x;
+        float Y1 = radius * sin(a) + y;
+        float X2 = radius * cos(a + Step) + x;
+        float Y2 = radius * sin(a + Step) + y;
+        V[Count].X = X1;
+        V[Count].Y = Y1;
+        V[Count + 1].X = X2;
+        V[Count + 1].Y = Y2;
+        HUD->Canvas->K2_DrawLine(FVector2D({ V[Count].X, V[Count].Y }), FVector2D({ X2, Y2 }), 1.f, OutlineColor);
+    }
+}
+void DrawFilledCircle(AHUD *HUD, int x, int y, int radius, int numsides, FLinearColor OutlineColor, FLinearColor FillColor){
+    float Step = M_PI * 2.0 / numsides;
+    FVector2D Center(x, y);
+    FVector2D V[128];
+    for (int i = 0; i < numsides; ++i)
+    {
+        // Calculate vertices for the i-th triangle
+        float Angle = Step * i;
+        V[i].X = Center.X + radius * cos(Angle);
+        V[i].Y = Center.Y + radius * sin(Angle);
+
+        // Draw lines from the center to the vertices
+        HUD->Canvas->K2_DrawLine(Center, V[i], 1.f, FillColor);
+    }
+
+    // Optionally, draw the outline by connecting the vertices
+    for (int i = 0; i < numsides; ++i)
+    {
+        HUD->Canvas->K2_DrawLine(V[i], V[(i+1) % numsides], 1.f, OutlineColor);
+    }
+}
+void *LoadFont() {
+    while (!robotoFont || !robotoTinyFont || !tslFont) {
+        tslFont = UObject::FindObject<UFont>("Font TSLFont.TSLFont");
+        robotoFont = UObject::FindObject<UFont>("Font Roboto.Roboto");
+        robotoTinyFont = UObject::FindObject<UFont>("Font RobotoTiny.RobotoTiny");
+        sleep(1);
+    }
+    return 0;
+}
+bool _read(kaddr addr, void *buffer, int len)
+{
+    if (!IsValidAddress(addr)) return false;
+    vm_size_t size = 0;
+    kern_return_t error = vm_read_overwrite(mach_task_self(), (vm_address_t)addr, len, (vm_address_t)buffer, &size);
+    if(error != KERN_SUCCESS || size != len)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool _write(kaddr addr, void *buffer, int len)
+{
+    if (!IsValidAddress(addr)) return false;
+    kern_return_t error = vm_write(mach_task_self(), (vm_address_t)addr, (vm_offset_t)buffer, (mach_msg_type_number_t)len);
+    if(error != KERN_SUCCESS)
+    {
+        return false;
+    }
+    return true;
+}
+kaddr GetRealOffset(kaddr offset) {
+    if (module == 0) {
+        return 0;
+    }
+    return (module + offset);
+}
+template<typename T> T Read(kaddr addr) {
+    T data;
+    _read(addr, reinterpret_cast<void *>(&data), sizeof(T));
+    return data;
+}
+
+
+#define W2S(w, s) UGameplayStatics::ProjectWorldToScreen(g_PlayerController, w, false, s)
+ 
+FVector WorldToRadar(float Yaw, FVector Origin, FVector LocalOrigin, float PosX, float PosY, Vector3 Size, bool &outbuff) {
+ bool flag = false;
+ double num = (double)Yaw;
+ double num2 = num * 0.017453292519943295;
+ float num3 = (float)std::cos(num2);
+ float num4 = (float)std::sin(num2);
+ float num5 = Origin.X - LocalOrigin.X;
+ float num6 = Origin.Y - LocalOrigin.Y;
+ struct FVector Xector;
+ Xector.X = (num6 * num3 - num5 * num4) / 150.f;
+ Xector.Y = (num5 * num3 + num6 * num4) / 150.f;
+ struct FVector Xector2;
+ Xector2.X = Xector.X + PosX + Size.X / 2.f;
+ Xector2.Y = -Xector.Y + PosY + Size.Y / 2.f;
+ bool flag2 = Xector2.X > PosX + Size.X;
+ if (flag2) {
+  Xector2.X = PosX + Size.X;
+ }else{
+  bool flag3 = Xector2.X < PosX;
+  if (flag3) {
+   Xector2.X = PosX;
+  }
+ }
+ bool flag4 = Xector2.Y > PosY + Size.Y;
+ if (flag4) {
+  Xector2.Y = PosY + Size.Y;
+ }else{
+  bool flag5 = Xector2.Y < PosY;
+  if (flag5){
+   Xector2.Y = PosY;
+  }
+ }
+ bool flag6 = Xector2.Y == PosY || Xector2.X == PosX;
+ if (flag6){
+  flag = true;
+ }
+ outbuff = flag;
+ return Xector2;
+}
+void VectorAnglesRadar(Vector3 & forward, FVector & angles) {
+ if (forward.X == 0.f && forward.Y == 0.f) {
+  angles.X = forward.Z > 0.f ? -90.f : 90.f;
+  angles.Y = 0.f;
+ } else {
+  angles.X = RAD2DEG(atan2(-forward.Z, forward.Magnitude(forward)));
+  angles.Y = RAD2DEG(atan2(forward.Y, forward.X));
+ }
+ angles.Z = 0.f;
+}
+FRotator ToRotator(FVector local, FVector target) {
+    FVector rotation;
+    rotation.X = local.X - target.X;
+    rotation.Y = local.Y - target.Y;
+    rotation.Z = local.Z - target.Z;
+
+    FRotator newViewAngle = {0};
+
+    float hyp = sqrt(rotation.X * rotation.X + rotation.Y * rotation.Y);
+
+    newViewAngle.Pitch = -atan(rotation.Z / hyp) * (180.f / (float) 3.14159265358979323846);
+    newViewAngle.Yaw = atan(rotation.Y / rotation.X) * (180.f / (float) 3.14159265358979323846);
+    newViewAngle.Roll = (float) 0.f;
+
+    if (rotation.X >= 0.f)
+        newViewAngle.Yaw += 180.0f;
+
+    return newViewAngle;
+}
+void RotateTriangle(std::array<Vector3, 3> & points, float rotation) {
+ const auto points_center = (points.at(0) + points.at(1) + points.at(2)) / 3;
+ for (auto & point : points) {
+  point = point - points_center;
+  const auto temp_x = point.X;
+  const auto temp_y = point.Y;
+  const auto theta = DEG2RAD(rotation);
+  const auto c = cosf(theta);
+  const auto s = sinf(theta);
+  point.X = temp_x * c - temp_y * s;
+  point.Y = temp_x * s + temp_y * c;
+  point = point + points_center;
+ }
+ }
+UGameplayStatics* iosde = (UGameplayStatics*)UGameplayStatics::StaticClass();
+
+
+static std::unordered_set<uint32_t> AlreadyChangedSet;
+uintptr_t GetVirtualFunctionAddress(uintptr_t clazz, uintptr_t index)
+{
+    if (!clazz)
+    {
+        return 0;
+    }
+    uintptr_t vtablePtr = *(uintptr_t*)clazz;
+    if (!vtablePtr)
+    {
+        return 0;
+    }
+    // Ensure index is within bounds of the vtable
+    if (index < 0)
+    {
+        return 0;
+    }
+    return *((uintptr_t*)vtablePtr + index);
+}
+void ChangeItemAVc(uintptr_t thiz, int InItemID)
+{
+    if (thiz)
+    {
+        auto PrechangeitemAvatar_addr = GetVirtualFunctionAddress(thiz, 182); //vtable idx
+        if (PrechangeitemAvatar_addr)
+        {
+            return ((void(*)(uintptr_t, int, bool))PrechangeitemAvatar_addr)(thiz, InItemID, true);
+        }
+    }
+}
+int glWidth, glHeight;
+bool isInsideFOV(int x, int y) {
+    if (!preferences.Config.SilentAim.Cross)
+        return true;
+    int circle_x = screenWidth / 2;
+    int circle_y = screenHeight / 2;
+    int rad = (int) preferences.Config.SilentAim.Cross * 2.0f;
+    return (x - circle_x) * (x - circle_x) + (y - circle_y) * (y - circle_y) <= rad * rad;
+}
+
+auto GetTargetByCrossDist() {
+    ASTExtraPlayerCharacter *result = 0;
+    float max = std::numeric_limits<float>::infinity();
+
+    auto localPlayer = g_LocalPlayer;
+    auto localController = g_PlayerController;
+
+    if (localPlayer && localController) {
+        std::vector<ASTExtraPlayerCharacter *> PlayerCharacter;
+        GetAllActors(PlayerCharacter);
+        for (auto actor = PlayerCharacter.begin(); actor != PlayerCharacter.end(); actor++) {
+            auto Player = *actor;
+
+            if (Player->PlayerKey == localPlayer->PlayerKey)
+                continue;
+
+            if (Player->TeamID == localPlayer->TeamID)
+                continue;
+
+            if (Player->bDead)
+                continue;
+
+            if (Player->bHidden) //
+                continue;
+
+            //if (!Player->Mesh) //
+            //    continue;
+
+            if (!Player->RootComponent) //
+                continue;
+
+            if (preferences.Config.SilentAim.IgnoreKnocked) {
+                if (Player->Health == 0.0f)
+                    continue;
+            }
+
+            if (preferences.Config.SilentAim.IgnoreBot) {
+                if (Player->bEnsure)
+                    continue;
+            }
+            
+            float dist = localPlayer->GetDistanceTo(Player) / 100.0f;           
+				if (dist > g_disstance)
+				continue;
+            
+            if (preferences.Config.SilentAim.VisCheck) {
+                if (!localController->LineOfSightTo(Player, {0, 0, 0}, true))
+                    continue;
+            }
+            auto Root = Player->GetBonePos("Root", {});
+            auto Head = Player->GetBonePos("Head", {});
+
+            FVector2D RootSc, HeadSc;
+            if (W2S(Root, &RootSc) && W2S(Head, &HeadSc)) {
+                float height = abs(HeadSc.Y - RootSc.Y);
+                float width = height * 0.65f;
+
+                FVector middlePoint = {HeadSc.X + (width / 2), HeadSc.Y + (height / 2), 0};
+                if ((middlePoint.X >= 0 && middlePoint.X <= (float) glWidth) &&
+                    (middlePoint.Y >= 0 && middlePoint.Y <= (float) glHeight)) {
+                    FVector2D v2Middle = FVector2D((float) (glWidth / 2), (float) (glHeight / 2));
+                    FVector2D v2Loc = FVector2D(middlePoint.X, middlePoint.Y);
+                    if(isInsideFOV((int)middlePoint.X, (int)middlePoint.Y )) {
+                    float distance = FVector2D::Distance(v2Middle, v2Loc);
+                    if (distance < max) {
+                        max = distance;
+                        result = Player;
+                    }
+                  }
+                }
+            }
+        }
+    }
+    return result;
+}
+auto GetCurrentWeaponReplicated(ASTExtraPlayerCharacter * mode) {
+    auto WeaponManagerComponent = mode->WeaponManagerComponent;
+    if (WeaponManagerComponent) {
+        auto propSlot = WeaponManagerComponent->GetCurrentUsingPropSlot();
+        if ((int)propSlot.GetValue() >= 1 && (int)propSlot.GetValue() <= 3) {
+            return (ASTExtraShootWeapon *)WeaponManagerComponent->CurrentWeaponReplicated;
+        }
+    }
+}
+void (*orig_shoot_event)(USTExtraShootWeaponComponent *thiz, FVector start, FRotator rot, void *unk1, int unk2) = 0;
+
+void shoot_event(USTExtraShootWeaponComponent *thiz, FVector start, FRotator rot, ASTExtraShootWeapon *weapon, int unk1) {
+		//if (!g_Token.empty() && !g_Auth.empty() && g_Token == g_Auth && _version == modVersion) {
+    
+    if (preferences.Config.SilentAim.Enable) {
+        
+        ASTExtraPlayerCharacter *Target = GetTargetByCrossDist();
+        
+        if (Target) {
+            bool triggerOk = false;
+                                    if (preferences.Config.SilentAim.Trigger !=
+                                        JsonPreferences::EAimTrigger::None) {
+                                        if (preferences.Config.SilentAim.Trigger ==
+                                            JsonPreferences::EAimTrigger::Shooting) {
+                                            triggerOk = g_LocalPlayer->bIsWeaponFiring;
+                                        } else if (preferences.Config.SilentAim.Trigger ==
+                                                   JsonPreferences::EAimTrigger::Scoping) {
+                                            triggerOk = g_LocalPlayer->bIsGunADS;
+                                        } else if (preferences.Config.SilentAim.Trigger ==
+                                                   JsonPreferences::EAimTrigger::Both) {
+                                            triggerOk =
+                                                    g_LocalPlayer->bIsWeaponFiring &&
+                                                    g_LocalPlayer->bIsGunADS;
+                                        } else if (preferences.Config.SilentAim.Trigger ==
+                                                   JsonPreferences::EAimTrigger::Any) {
+                                            triggerOk =
+                                                    g_LocalPlayer->bIsWeaponFiring ||
+                                                    g_LocalPlayer->bIsGunADS;
+                                        }
+                                    } else triggerOk = true;
+                                    if (triggerOk) {
+                
+                FVector targetAimPos = Target->GetBonePos("Head", {});
+                targetAimPos.Z += 15.f;
+                if (preferences.Config.SilentAim.Target == JsonPreferences::EAimTarget::Chest) {
+                    targetAimPos.Z -= 25.0f;
+                }
+			
+                UShootWeaponEntity *ShootWeaponEntityComponent = thiz->ShootWeaponEntityComponent;
+                if (ShootWeaponEntityComponent) {
+                       if (preferences.Config.SilentAim.Prediction) {
+                                ASTExtraVehicleBase *CurrentVehicle = Target->CurrentVehicle;
+                                        if (CurrentVehicle) {
+                                            FVector LinearVelocity = CurrentVehicle->ReplicatedMovement.LinearVelocity;
+
+                                            float dist = FVector::Distance(g_LocalPlayer->GetBonePos("Root", {}), Target->GetBonePos("Root", {}));
+                                            auto timeToTravel = dist / ShootWeaponEntityComponent->BulletRange;
+
+                                            targetAimPos = UKismetMathLibrary::Add_VectorVector(targetAimPos, UKismetMathLibrary::Multiply_VectorFloat(LinearVelocity, timeToTravel));
+                                        } else {
+                                    FVector LinearVelocity = CurrentVehicle->ReplicatedMovement.LinearVelocity;
+
+                                            float dist = FVector::Distance(g_LocalPlayer->GetBonePos("Root", {}), Target->GetBonePos("Root", {}));
+                                            auto timeToTravel = dist / ShootWeaponEntityComponent->BulletRange;
+
+                                            targetAimPos = UKismetMathLibrary::Add_VectorVector(targetAimPos, UKismetMathLibrary::Multiply_VectorFloat(LinearVelocity, timeToTravel));
+                     
+                                }
+                            }
+                    
+
+                    FVector fDir = UKismetMathLibrary::Subtract_VectorVector(targetAimPos, g_PlayerController->PlayerCameraManager->CameraCache.POV.Location);
+                    rot = UKismetMathLibrary::Conv_VectorToRotator(fDir);
+                    
+           
+                }
+            }
+        }
+    }
+    return orig_shoot_event(thiz, start, rot, weapon, unk1);
+}
+
+void RenderESP(AHUD *HUD, int ScreenWidth, int ScreenHeight) {
+    updateSkin();
+        ASTExtraPlayerCharacter *localPlayer = 0;
+        ASTExtraPlayerController *localPlayerController = 0;
+        glWidth = ScreenWidth;
+        glHeight = ScreenHeight;
+        UCanvas *Canvas = HUD->Canvas;
+        if (Canvas) {
+
+            static bool loadFont = false;
+        if (!loadFont) {
+            LoadFont();
+            loadFont = true;
+        }
+        
+            if (!robotoFont || !tslFont || !robotoTinyFont)
+                return;
+            tslFont->LegacyFontSize = 20;
+std::wstring name = L"Zoom IOS";
+            DrawTextcan(HUD, FString(name), {(float) screenWidth/2, 80}, COLOR_WHITE, COLOR_BLACK);
+            UGameplayStatics *gGameplayStatics = (UGameplayStatics *) UGameplayStatics::StaticClass();
+auto Actors = getActors();
+
+    auto GWorlld = GetFullWorld();
+           // UGameplayStatics *gGameplayStatics = (UGameplayStatics *) UGameplayStatics::StaticClass();
+    if (GWorlld)
+    {
+
+for (int i = 0; i < Actors.size(); i++)
+                {
+                    auto Actor = Actors[i];
+                    if (isObjectInvalid(Actor))
+                        continue;
+std::wstring name = L"Zoom";
+            DrawTextcan(HUD, FString(name), {(float) screenWidth/2, 180}, COLOR_WHITE, COLOR_BLACK);
+     std::string classname = Actor->GetName();
+               if (classname.find("AirAttackBomb_C") != std::string::npos || classname.find("AirAttackBomb_Livik_C") != std::string::npos) {
+                FVector2D LootPos;
+       FVector PosV = Actor->K2_GetActorLocation();
+       float Distance = Actor->GetDistanceTo(localPlayer) / 100.f;
+       std::wstring tmp = L"!! [警报]空袭 !!";
+      DrawText(HUD, FString(tmp), {(float) screenWidth / 2, 150},
+                                         COLOR_RED, true);
+                                    if (gGameplayStatics->ProjectWorldToScreen(
+                                            localPlayerController,
+                                            Actor->RootComponent->RelativeLocation,
+                                            false, &LootPos)) {
+                                        std::string s = "炸弹";
+                                       s += " (";
+                                       s += std::to_string((int) Distance);
+                                       s += "m)";
+   //    DrawBorderString(font3, 20, s.c_str(), LootPos.X, LootPos.Y, ImColor(255, 255, 0), true);
+     //     RenderCircle3D(FVector(PosV.X, PosV.Y, PosV.Z - 100), 50.f, 600.f, ImColor(255, 255, 255));
+       ///draw->AddImage(Rocket.textureID, ImVec2(LootPos.X - 20, LootPos.Y - 25), ImVec2(LootPos.X + 20, LootPos.Y - 5));
+        }
+    }
+}
+}
+            auto GWorld = GetFullWorld();
+            if (GWorld) {
+                UNetDriver *NetDriver = GWorld->NetDriver;
+                if (NetDriver) {
+                    UNetConnection *ServerConnection = NetDriver->ServerConnection;
+                    if (ServerConnection) {
+                        localPlayerController = (ASTExtraPlayerController *) ServerConnection->PlayerController;
+                    }
+                }
+
+                if (localPlayerController) {
+                    //localPlayerController->AntiCheatManagerComp = 0;
+                    //localPlayerController->bShouldReportAntiCheat = false;
+                    //localPlayerController->CheatClass =0;
+                    //localPlayerController->CheatManager =0;
+
+                    
+                    std::vector<ASTExtraPlayerCharacter *> PlayerCharacter;
+                    GetAllActors(PlayerCharacter);
+                    for (auto actor = PlayerCharacter.begin();
+                         actor != PlayerCharacter.end(); actor++) {
+                        auto Actor = *actor;
+
+                        if (Actor->PlayerKey ==
+                            ((ASTExtraPlayerController *) localPlayerController)->PlayerKey) {
+                            localPlayer = Actor;
+                            break;
+                        }
+                    }
+
+                    {
+                        if (localPlayer) {
+                         if (WideView) {
+                auto ThirdPersonCameraComponent = localPlayer->ThirdPersonCameraComponent;
+                if (ThirdPersonCameraComponent) {
+                    *(float *) ((uintptr_t) &ThirdPersonCameraComponent->OrthoWidth - sizeof(float)) = WideValue;
+                }
+            }
+                         auto WeaponManagerComponent = localPlayer->WeaponManagerComponent;
+                         
+                        if (preferences.Config.SilentAim.AimBot) {
+                                ASTExtraPlayerCharacter *Target = GetTargetByCrossDist();
+                                
+                                if (Target && Target->RootComponent) {
+                                
+                                  
+                                    bool triggerOk = false;
+                                    if (preferences.Config.SilentAim.Trigger !=
+                                        JsonPreferences::EAimTrigger::None) {
+                                        if (preferences.Config.SilentAim.Trigger ==
+                                            JsonPreferences::EAimTrigger::Shooting) {
+                                            triggerOk = localPlayer->bIsWeaponFiring;
+                                        } else if (preferences.Config.SilentAim.Trigger ==
+                                                   JsonPreferences::EAimTrigger::Scoping) {
+                                            triggerOk = localPlayer->bIsGunADS;
+                                        } else if (preferences.Config.SilentAim.Trigger ==
+                                                   JsonPreferences::EAimTrigger::Both) {
+                                            triggerOk =
+                                                    localPlayer->bIsWeaponFiring &&
+                                                    localPlayer->bIsGunADS;
+                                        } else if (preferences.Config.SilentAim.Trigger ==
+                                                   JsonPreferences::EAimTrigger::Any) {
+                                            triggerOk =
+                                                    localPlayer->bIsWeaponFiring ||
+                                                    localPlayer->bIsGunADS;
+                                        }
+                                    } else triggerOk = true;
+                                    if (triggerOk) {
+                                        FVector targetAimPos;
+                                        if (preferences.Config.SilentAim.Target ==
+                                            JsonPreferences::EAimTarget::Head) {
+                                            targetAimPos = Target->GetBonePos("Head", {});
+                                        }
+                                        if (preferences.Config.SilentAim.Target ==
+                                            JsonPreferences::EAimTarget::Chest) {
+                                            targetAimPos = Target->GetBonePos("Pelvis", {});
+                                        }
+                                        if (preferences.Config.SilentAim.ReCo) {
+                                                    if (g_LocalPlayer->bIsGunADS) {
+                                                        if (g_LocalPlayer->bIsWeaponFiring) {
+                                                            float dist = g_LocalPlayer->GetDistanceTo(Target) / 100.f;                                                                                 
+                                                            targetAimPos.Z -= dist * preferences.Config.SilentAim.Recc;
+                                                        }  
+                                                    }
+                                                }
+                                        if (WeaponManagerComponent) {
+                                            auto propSlot = WeaponManagerComponent->GetCurrentUsingPropSlot();
+                                            if ((int) propSlot.GetValue() >= 1 &&
+                                                (int) propSlot.GetValue() <= 3) {
+                                                auto CurrentWeaponReplicated = (ASTExtraShootWeapon *) WeaponManagerComponent->CurrentWeaponReplicated;
+                                                if (CurrentWeaponReplicated) {
+                                                    auto ShootWeaponComponent = CurrentWeaponReplicated->ShootWeaponComponent;
+                                                    if (ShootWeaponComponent) {
+                                                        UShootWeaponEntity *ShootWeaponEntityComponent = ShootWeaponComponent->ShootWeaponEntityComponent;
+                                                        if (ShootWeaponEntityComponent) {
+                                                            if (preferences.Config.SilentAim.Prediction) {
+                                                                ASTExtraVehicleBase *CurrentVehicle = Target->CurrentVehicle;
+                                                                if (CurrentVehicle) {
+                                                                    FVector LinearVelocity = CurrentVehicle->ReplicatedMovement.LinearVelocity;
+                                                                    float dist = localPlayer->GetDistanceTo(
+                                                                            Target);
+                                                                    auto timeToTravel = dist /
+                                                                                        ShootWeaponEntityComponent->BulletRange;
+                                                                    targetAimPos = UKismetMathLibrary::Add_VectorVector(
+                                                                            targetAimPos,
+                                                                            UKismetMathLibrary::Multiply_VectorFloat(
+                                                                                    LinearVelocity,
+                                                                                    timeToTravel));
+                                                                } else {
+                                                                    FVector Velocity = Target->GetVelocity();
+                                                                    float dist = localPlayer->GetDistanceTo(
+                                                                            Target);
+                                                                    auto timeToTravel = dist /
+                                                                                        ShootWeaponEntityComponent->BulletRange;
+
+                                                                    targetAimPos = UKismetMathLibrary::Add_VectorVector(
+                                                                            targetAimPos,
+                                                                            UKismetMathLibrary::Multiply_VectorFloat(
+                                                                                    Velocity,
+                                                                                    timeToTravel));
+                                                                }
+                                                            }
+                                                            localPlayerController->SetControlRotation(
+                                                                    ToRotator(
+                                                                            localPlayerController->PlayerCameraManager->CameraCache.POV.Location,
+                                                                            targetAimPos), "");
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            	if (preferences.Config.SilentAim.Enable) {
+                    auto WeaponManagerComponent = localPlayer->WeaponManagerComponent;
+                    if (WeaponManagerComponent) {
+                        auto propSlot = WeaponManagerComponent->GetCurrentUsingPropSlot();
+                        if ((int) propSlot.GetValue() >= 1 && (int) propSlot.GetValue() <= 3) {
+                            auto CurrentWeaponReplicated = (ASTExtraShootWeapon *) WeaponManagerComponent->CurrentWeaponReplicated;
+                            if (CurrentWeaponReplicated) {
+                                auto ShootWeaponComponent = CurrentWeaponReplicated->ShootWeaponComponent;
+                                if (ShootWeaponComponent) {
+                                    int shoot_event_idx = 168;
+                                    auto VTable = (void **) ShootWeaponComponent->VTable;
+                                    if (VTable && (VTable[shoot_event_idx] != shoot_event)) {
+                                        orig_shoot_event = decltype(orig_shoot_event)(
+                                                VTable[shoot_event_idx]);
+                                        VTable[shoot_event_idx] = (void *) shoot_event;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (preferences.Config.SilentAim.Enable || preferences.Config.SilentAim.AimBot){
+                DrawCircle(HUD, ScreenWidth/2, ScreenHeight/2, preferences.Config.SilentAim.Cross, 100, COLOR_RED);
+                    }
+                        if (ModSkinn){
+                       if (DeadBox){
+                       std::vector<APlayerTombBox *> TombBox;
+                        GetAllActors(TombBox);
+                        for (auto actor = TombBox.begin();
+                             actor != TombBox.end(); actor++) {
+                            auto TombBoxx = *actor;
+                            if (TombBoxx && TombBoxx->DamageCauser && TombBoxx->TargetPlayer && g_PlayerController) // Check pointers before dereferencing
+                            {
+                                if (TombBoxx->DamageCauser->PlayerKey == g_PlayerController->PlayerKey)
+                                {
+                                    auto PlayerKey = TombBoxx->TargetPlayer->PlayerKey;
+                                    if (AlreadyChangedSet.find(PlayerKey) == AlreadyChangedSet.end())
+                                    {
+                                        if (g_LocalPlayer && g_LocalPlayer->WeaponManagerComponent) // Check pointers before dereferencing
+                                        {
+                                            auto DeadBoxAvatarCompPtr = (uintptr_t*)((uintptr_t)TombBoxx + 0x628); //DeadBoxAvatarComponent_BP_C* DeadBoxAvatarComponent_BP
+                                            if (DeadBoxAvatarCompPtr)
+                                            {
+                                                auto DeadBoxAvatarComp = *DeadBoxAvatarCompPtr;
+                                                auto CurrentWeaponReplicated = g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated;
+                                                if (CurrentWeaponReplicated)
+                                                {
+                                               
+                                                        auto Weaponid = g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponID();
+       if (Weaponid == 101004) {
+       ChangeItemAVc(DeadBoxAvatarComp, new_Skin.M416_1);
+       AlreadyChangedSet.insert(PlayerKey);
+       } else if (Weaponid == 101001) {
+       ChangeItemAVc(DeadBoxAvatarComp, new_Skin.AKM);
+       AlreadyChangedSet.insert(PlayerKey);
+       } else if (Weaponid == 101003) {
+       ChangeItemAVc(DeadBoxAvatarComp, new_Skin.Scar);
+       AlreadyChangedSet.insert(PlayerKey);
+       } else if (Weaponid == 101008) {
+       ChangeItemAVc(DeadBoxAvatarComp, new_Skin.M762);
+       AlreadyChangedSet.insert(PlayerKey);
+       }       
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            
+                        }
+		}					
+					
+		
+	 if (localPlayer->WeaponManagerComponent != 0) {
+     if (localPlayer->WeaponManagerComponent->CurrentWeaponReplicated != 0 ) {
+         int weapowep = localPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponID();
+		auto currentTime = std::chrono::steady_clock::now();
+         auto landchud = localPlayer->WeaponManagerComponent->CurrentWeaponReplicated->synData;
+         auto timeDiff = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastWeaponChangeTime).count();
+         if (timeDiff > 1000) {
+         for (int j = 0; j < landchud.Num(); j++) {
+             auto& weaponInfo = landchud[j];
+             auto weaponid = weaponInfo.DefineID.TypeSpecificID;
+             if (weaponid != 0)
+             {
+				 if (preferences.AKM && weapowep == 101001){
+				 for (int i = 0; i < sizeof(akmv) / sizeof(akmv[0]); i++) {
+                 if (weaponid == akmv[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.AKM;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(akmmag) / sizeof(akmmag[0]); i++) {
+                 if (weaponid == akmmag[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.AKM_Mag;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.KAR98 && weapowep == 103001){
+				 for (int i = 0; i < sizeof(kar) / sizeof(kar[0]); i++) {
+                 if (weaponid == kar[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.K98;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.M24 && weapowep == 103002){
+				 for (int i = 0; i < sizeof(m24) / sizeof(m24[0]); i++) {
+                 if (weaponid == m24[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M24;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.AWM && weapowep == 103003){
+				 for (int i = 0; i < sizeof(awm) / sizeof(awm[0]); i++) {
+                 if (weaponid == awm[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.AWM;
+                     break;
+                  }
+				 }
+				}
+				
+				
+				if (preferences.TOMMY && weapowep == 102004){
+				 for (int i = 0; i < sizeof(tommy) / sizeof(tommy[0]); i++) {
+                 if (weaponid == tommy[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Thompson;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.ACE32 && weapowep == 101102){
+				 for (int i = 0; i < sizeof(ace32) / sizeof(ace32[0]); i++) {
+                 if (weaponid == ace32[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.ACE32;
+                     break;
+                  }
+				 }
+				}
+				
+				if (preferences.BIZON && weapowep == 102005){
+				 for (int i = 0; i < sizeof(bizon) / sizeof(bizon[0]); i++) {
+                 if (weaponid == bizon[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Bizon;
+                     break;
+                  }
+				 }
+				}
+				
+				if (preferences.VECTOR && weapowep == 102003){
+				 for (int i = 0; i < sizeof(vectorr) / sizeof(vectorr[0]); i++) {
+                 if (weaponid == vectorr[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Vector;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.UMP && weapowep == 102002){
+				 for (int i = 0; i < sizeof(ump) / sizeof(ump[0]); i++) {
+                 if (weaponid == ump[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.UMP;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.UZI && weapowep == 102001){
+				 for (int i = 0; i < sizeof(uzi) / sizeof(uzi[0]); i++) {
+                 if (weaponid == uzi[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.UZI;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.M16 && weapowep == 101002){
+				 for (int i = 0; i < sizeof(m16) / sizeof(m16[0]); i++) {
+                 if (weaponid == m16[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M16A4;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m16s) / sizeof(m16s[0]); i++) {
+                 if (weaponid == m16s[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M16A4_Stock;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m16mag) / sizeof(m16mag[0]); i++) {
+                 if (weaponid == m16mag[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M16A4_Mag;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.PAN && weapowep == 108004){
+				 for (int i = 0; i < sizeof(pan) / sizeof(pan[0]); i++) {
+                 if (weaponid == pan[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Pan;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.AUG && weapowep == 101006){
+				 for (int i = 0; i < sizeof(aug) / sizeof(aug[0]); i++) {
+                 if (weaponid == aug[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.AUG;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.GROZA && weapowep == 101005){
+				 for (int i = 0; i < sizeof(groza) / sizeof(groza[0]); i++) {
+                 if (weaponid == groza[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Groza;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.DP28 && weapowep == 105002){
+				 for (int i = 0; i < sizeof(dp) / sizeof(dp[0]); i++) {
+                 if (weaponid == dp[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.DP28;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.M249 && weapowep == 105001){
+				 for (int i = 0; i < sizeof(m249) / sizeof(m249[0]); i++) {
+                 if (weaponid == m249[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M249;
+                     break;
+                  }
+				 }
+				/* for (int i = 0; i < sizeof(m249s) / sizeof(m249s[0]); i++) {
+                 if (weaponid == m249s[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M249s;
+                     break;
+                  }
+				 }*/
+				}
+				
+				if (preferences.SCARL && weapowep == 101003){
+				 for (int i = 0; i < sizeof(scar) / sizeof(scar[0]); i++) {
+                 if (weaponid == scar[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Scar;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(scarmag) / sizeof(scarmag[0]); i++) {
+                 if (weaponid == scarmag[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.Scar_Mag;
+                     break;
+                  }
+				 }
+				}
+				
+				if (preferences.M762 && weapowep == 101008){
+				 for (int i = 0; i < sizeof(m7) / sizeof(m7[0]); i++) {
+                 if (weaponid == m7[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M762;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m7mag) / sizeof(m7mag[0]); i++) {
+                 if (weaponid == m7mag[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M762_Mag;
+                     break;
+                  }
+				 }
+				}
+				
+				if (preferences.M416 && weapowep == 101004){
+				 for (int i = 0; i < sizeof(m4v) / sizeof(m4v[0]); i++) {
+                 if (weaponid == m4v[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M416_1;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m4mag) / sizeof(m4mag[0]); i++) {
+                 if (weaponid == m4mag[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M416_2;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m4sight) / sizeof(m4sight[0]); i++) {
+                 if (weaponid == m4sight[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M416_3;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m4stock) / sizeof(m4stock[0]); i++) {
+                 if (weaponid == m4stock[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M416_4;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m4stock1) / sizeof(m4stock1[0]); i++) {
+                 if (weaponid == m4stock1[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M416_stock;
+                     break;
+                  }
+				 }
+				 for (int i = 0; i < sizeof(m4reddot) / sizeof(m4reddot[0]); i++) {
+                 if (weaponid == m4reddot[i]) {
+                     weaponInfo.DefineID.TypeSpecificID = new_Skin.M416_reddot;
+                     break;
+                  }
+				 }
+				}
+                 localPlayer->WeaponManagerComponent->CurrentWeaponReplicated->DelayHandleAvatarMeshChanged();
+                 lastWeaponChangeTime = currentTime;
+             }
+         }
+     }
+ }
+}
+//
+
+if (localPlayer -> CurrentVehicle) {
+        if (localPlayer -> CurrentVehicle -> VehicleAvatar) {
+          std::string SkinIDStr = std::to_string((int) localPlayer -> CurrentVehicle -> VehicleAvatar -> GetDefaultAvatarID());
+          Active::SkinCarDefault = localPlayer -> CurrentVehicle -> GetAvatarId();
+
+		  
+          if (preferences.Moto && strstr(SkinIDStr.c_str(), "1901")) {
+            Active::SkinCarMod = new_Skin.Moto;
+            Active::SkinCarNew = true;
+          } else if (preferences.Dacia && strstr(SkinIDStr.c_str(), "1903")) {
+            Active::SkinCarMod = new_Skin.Dacia;
+            Active::SkinCarNew = true;
+          } else if (preferences.Boat && strstr(SkinIDStr.c_str(), "1911")) {
+            Active::SkinCarMod = new_Skin.Boat;
+            Active::SkinCarNew = true;
+          } else if (preferences.MiniBus && strstr(SkinIDStr.c_str(), "1904")) {
+            Active::SkinCarMod = new_Skin.MiniBus;
+            Active::SkinCarNew = true;
+          } else if (preferences.Mirado && strstr(SkinIDStr.c_str(), "1914")) {
+            Active::SkinCarMod = new_Skin.Mirado;
+            Active::SkinCarNew = true;
+          } else if (preferences.Mirado && strstr(SkinIDStr.c_str(), "1915")) {
+            Active::SkinCarMod = new_Skin.Mirado;
+            Active::SkinCarNew = true;
+          } else if (preferences.Buggy && strstr(SkinIDStr.c_str(), "1907")) {
+            Active::SkinCarMod = new_Skin.Buggy;
+            Active::SkinCarNew = true;
+          }else if (preferences.CoupeRB && strstr(SkinIDStr.c_str(), "1961")) {
+            Active::SkinCarMod = new_Skin.CoupeRP;
+            Active::SkinCarNew = true;
+          } else if (preferences.BigFoot && strstr(SkinIDStr.c_str(), "1953")) {
+            Active::SkinCarMod = new_Skin.Bigfoot;
+            Active::SkinCarNew = true;
+          } else if (preferences.UAZ && strstr(SkinIDStr.c_str(), "1908")) {
+            Active::SkinCarMod = new_Skin.UAZ;
+            Active::SkinCarNew = true;
+          } else Active::SkinCarNew = false;
+
+          if (Active::SkinCarDefault != Active::SkinCarMod && Active::SkinCarNew) {
+            
+            localPlayer -> CurrentVehicle -> VehicleAvatar -> ChangeItemAvatar(Active::SkinCarMod, true);
+          }
+        }
+      }
+
+ if (localPlayerController->BackpackComponent){
+	 auto data = localPlayerController->BackpackComponent->ItemListNet;
+	 auto bag = data.IncArray;
+	 for (int j = 0; j < bag.Num(); j++) {
+	 int ID = bag[j].Unit.DefineID.TypeSpecificID;
+	 if (preferences.Outfit){
+ for (int i = 0; i < sizeof(SuitX) / sizeof(SuitX[0]); i++) {
+                 if (ID == SuitX[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.XSuits;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.Bagg){
+for (int i = 0; i < sizeof(Bag) / sizeof(Bag[0]); i++) {
+                 if (ID == Bag[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = bag3;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.Helmett){
+for (int i = 0; i < sizeof(Helmet) / sizeof(Helmet[0]); i++) {
+                 if (ID == Helmet[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = helmett3;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.Emote){
+for (int i = 0; i < sizeof(emote1) / sizeof(emote1[0]); i++) {
+                 if (ID == emote1[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = sEmote1;
+                     break;
+                  }
+				 }
+for (int i = 0; i < sizeof(emote2) / sizeof(emote2[0]); i++) {
+                 if (ID == emote2[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = sEmote2;
+                     break;
+                  }
+				 }
+for (int i = 0; i < sizeof(emote3) / sizeof(emote3[0]); i++) {
+                 if (ID == emote3[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = sEmote3;
+                     break;
+                  }
+				 }
+				}
+				/*
+				if (preferences.PAN){
+				 for (int i = 0; i < sizeof(pan) / sizeof(pan[0]); i++) {
+                 if (ID == pan[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.Pan;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.KAR98){
+				 for (int i = 0; i < sizeof(kar) / sizeof(kar[0]); i++) {
+                 if (ID == kar[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.K98;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.M24){
+				 for (int i = 0; i < sizeof(m24) / sizeof(m24[0]); i++) {
+                 if (ID == m24[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.M24;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.AWM){
+				 for (int i = 0; i < sizeof(awm) / sizeof(awm[0]); i++) {
+                 if (ID == awm[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.AWM;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.M416){
+				 for (int i = 0; i < sizeof(m4v) / sizeof(m4v[0]); i++) {
+                 if (ID == m4v[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.M416_1;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.AKM){
+				 for (int i = 0; i < sizeof(akmv) / sizeof(akmv[0]); i++) {
+                 if (ID == akmv[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.AKM;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.SCARL){
+				 for (int i = 0; i < sizeof(scar) / sizeof(scar[0]); i++) {
+                 if (ID == scar[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.Scar;
+                     break;
+                  }
+				 }
+				}
+				if (preferences.M762){
+				 for (int i = 0; i < sizeof(m7) / sizeof(m7[0]); i++) {
+                 if (ID == m7[i]) {
+                     bag[j].Unit.DefineID.TypeSpecificID = new_Skin.M762;
+                     break;
+                  }
+				 }
+				}
+				 /*
+ auto itr = weaponDefinitions.find(ID);
+                 if (itr != weaponDefinitions.end()) {
+                     auto innerItr = itr->second.find(ID);
+                     if (innerItr != itr->second.end()) {
+                         bag[j].Unit.DefineID.TypeSpecificID = innerItr->second;
+                     }
+                 }*/
+      }
+   }
+
+ 
+   if (localPlayer -> AvatarComponent2) {
+
+                                   auto AvatarComp = localPlayer -> AvatarComponent2;
+                                   
+                                   FNetAvatarSyncData NetAvatarComp = * (FNetAvatarSyncData * )((uintptr_t) AvatarComp + 0x388); //if u use 64bit change this offset
+                                   auto Slotsybc = NetAvatarComp.SlotSyncData;
+		if (preferences.Parachute){
+        Slotsybc[11].ItemId = new_Skin.Parachute;
+		}
+		if (preferences.Outfit){
+		Slotsybc[5].ItemId = new_Skin.XSuits;
+		}
+		if (preferences.Bagg){
+		Slotsybc[8].ItemId = bag3;
+		}
+		if (preferences.Helmett){
+		Slotsybc[9].ItemId = helmett3;
+		}
+   auto now = std::chrono::high_resolution_clock::now();
+auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
+
+if (elapsed < 1 && callFunction) {
+    localPlayer->AvatarComponent2->OnRep_BodySlotStateChanged();
+    localPlayerController->BackpackComponent->OnRep_ItemListNet();
+} else {
+    callFunction = false;
+}
+
+    }
+ }
+                            int totalEnemies = 0, totalBots = 0;
+                            std::vector<ASTExtraPlayerCharacter *> PlayerCharacter;
+                            GetAllActors(PlayerCharacter);
+                            for (auto actor = PlayerCharacter.begin();
+                                 actor != PlayerCharacter.end(); actor++) {
+                                auto Player = *actor;
+
+                                if (Player->PlayerKey == localPlayer->PlayerKey)
+                                    continue;
+
+                                if (Player->TeamID == localPlayer->TeamID)
+                                    continue;
+
+                                if (Player->bDead)
+                                    continue;
+
+                                if (Player->bHidden)
+                                    continue;
+
+                                //if (!Player->Mesh)
+                                //    continue;
+
+                                if (!Player->RootComponent)
+                                    continue;
+
+                                if (Player->Health < 0.0f || Player->Health > 100.0f) { continue; }
+
+                                if (Config.ESPMenu.IgnoreBot) {
+                                    if (Player->bEnsure)
+                                        continue;
+                                }
+
+
+                                if (Player->bEnsure)
+                                    totalBots++;
+                                else totalEnemies++;
+
+                                FVector Head = GetBoneLocationByName(Player, "Head");
+                                Head.Z += 12.5f;
+                                FVector Root = GetBoneLocationByName(Player, "Root");
+                                FVector upper_r = GetBoneLocationByName(Player, "upperarm_r");
+                                FVector lowerarm_r = GetBoneLocationByName(Player, "lowerarm_r");
+                                FVector hand_r = GetBoneLocationByName(Player, "hand_r");
+                                FVector upper_l = GetBoneLocationByName(Player, "upperarm_l");
+                                FVector lowerarm_l = GetBoneLocationByName(Player, "lowerarm_l");
+                                FVector hand_l = GetBoneLocationByName(Player, "hand_l");
+                                FVector thigh_l = GetBoneLocationByName(Player, "thigh_l");
+                                FVector calf_l = GetBoneLocationByName(Player, "calf_l");
+                                FVector foot_l = GetBoneLocationByName(Player, "foot_l");
+                                FVector thigh_r = GetBoneLocationByName(Player, "thigh_r");
+                                FVector calf_r = GetBoneLocationByName(Player, "calf_r");
+                                FVector foot_r = GetBoneLocationByName(Player, "foot_r");
+                                FVector neck_01 = GetBoneLocationByName(Player, "neck_01");
+                                FVector pelvis = GetBoneLocationByName(Player, "Pelvis");
+
+                                float Distance = Player->GetDistanceTo(localPlayer) / 100.f;
+                                if (Distance < 500.f) {
+                                if(Config.ESPMenu.Alert){
+    bool shit = false;
+    FVector MyPosition, EnemyPosition;
+    ASTExtraVehicleBase * CurrentVehiclea = Player->CurrentVehicle;
+    if (CurrentVehiclea) {
+        MyPosition = CurrentVehiclea->RootComponent->RelativeLocation;
+    } else {
+        MyPosition = Player->RootComponent->RelativeLocation;
+    }
+    ASTExtraVehicleBase * CurrentVehicle = localPlayer->CurrentVehicle;
+    if (CurrentVehicle) {
+        EnemyPosition = CurrentVehicle->RootComponent->RelativeLocation;
+    } else {
+        EnemyPosition = localPlayer->RootComponent->RelativeLocation;
+    }
+    FVector EntityPos = WorldToRadar(localPlayerController->PlayerCameraManager->CameraCache.POV.Rotation.Yaw, MyPosition, EnemyPosition, NULL, NULL, Vector3(glWidth, glHeight, 0), shit);
+    FVector angle = FVector();
+    Vector3 forward = Vector3((float)(glWidth / 2) - EntityPos.X, (float)(glHeight / 2) - EntityPos.Y, 0.0f);
+    VectorAnglesRadar(forward, angle);
+    const auto angle_yaw_rad = DEG2RAD(angle.Y + 180.f);
+    const auto new_point_x = (glWidth / 2) + (55/*alert dist from me*/) / 2 * 8 * cosf(angle_yaw_rad);
+    const auto new_point_y = (glHeight / 2) + (55/*alert dist from me*/) / 2 * 8 * sinf(angle_yaw_rad);
+    std::array<Vector3, 3> points { Vector3(new_point_x - ((90) / 4 + 3.5f) / 2, new_point_y - ((55) / 4 + 3.5f) / 2, 0.f), Vector3(new_point_x + ((90) / 4 + 3.5f) / 4, new_point_y, 0.f), Vector3(new_point_x - ((90) / 4 + 3.5f) / 2, new_point_y + ((55) / 4 + 3.5f) / 2, 0.f)};
+    RotateTriangle(points, angle.Y + 180.f);
+    bool IsVisible = localPlayerController ->LineOfSightTo (Player, {0, 0, 0}, true);
+    std::string s;
+    s += std::to_string((int)Distance);
+    if  (IsVisible) {
+        if  (Player ->bEnsure) {
+         //   DrawCircle(HUD, points.at(0).X, points.at(0).Y, 6, 100, COLOR_LIME);
+		    DrawFilledCircle(HUD, points.at(0).X, points.at(0).Y, 6, 100, COLOR_BLACK, COLOR_LIME);
+        } else {
+            DrawFilledCircle(HUD, points.at(0).X, points.at(0).Y, 6, 100, COLOR_BLACK, COLOR_LIME);
+        }
+    } else {
+        if  (Player ->bEnsure) {
+		    DrawFilledCircle(HUD, points.at(0).X, points.at(0).Y, 6, 100, COLOR_BLACK, COLOR_WHITE);
+          //  DrawCircle(HUD, points.at(0).X, points.at(0).Y, 6, 100, COLOR_WHITE);
+        } else {
+            DrawFilledCircle(HUD, points.at(0).X, points.at(0).Y, 6, 100, COLOR_BLACK, COLOR_RED);
+        }
+    }
+}
+                                    FVector2D HeadSc, RootSc, upper_rPoSC, lowerarm_rPoSC, hand_rPoSC, upper_lPoSC, hand_lPoSC, thigh_lPoSC, calf_lPoSC, foot_lPoSC, thigh_rPoSC, calf_rPoSC, foot_rPoSC, neck_01PoSC, pelvisPoSC, lowerarm_lSC;
+                                    if (gGameplayStatics->ProjectWorldToScreen(
+                                            localPlayerController,
+                                            Head, false, &HeadSc) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                upper_r, false,
+                                                &upper_rPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                upper_l, false,
+                                                &upper_lPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                lowerarm_r, false,
+                                                &lowerarm_rPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                hand_r, false,
+                                                &hand_rPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                lowerarm_l, false,
+                                                &lowerarm_lSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                hand_l, false,
+                                                &hand_lPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                thigh_l, false,
+                                                &thigh_lPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                calf_l, false,
+                                                &calf_lPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                foot_l, false,
+                                                &foot_lPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                thigh_r, false,
+                                                &thigh_rPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                calf_r, false,
+                                                &calf_rPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                foot_r, false,
+                                                &foot_rPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                neck_01, false,
+                                                &neck_01PoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                pelvis, false,
+                                                &pelvisPoSC) &&
+                                        gGameplayStatics->ProjectWorldToScreen(
+                                                localPlayerController,
+                                                Root, false, &RootSc)) {
+
+                                        bool IsVisible = localPlayerController->LineOfSightTo(
+                                                Player,
+                                                {0, 0, 0},
+                                                true);
+                                        FLinearColor Color = {1.0f, 0, 0, 1.0f};
+                                        if (IsVisible)
+                                            Color = {0, 1.0f, 0, 1.0f};
+                                        // ESP LINE
+                                        if (Config.ESPMenu.Line) {
+
+                                            FVector screenPos = localPlayerController->PlayerCameraManager->GetCameraLocation();
+                                            screenPos.Z += 350.0f;
+                                            screenPos.Y += 350.0f;
+                                            screenPos.X += 350.0f;
+                                            if (!localPlayerController->LineOfSightTo(Player, screenPos, true)) {
+
+                                                DrawLine(HUD, {static_cast<float>(screenWidth / 2), 0}, HeadSc, 1.0f, COLOR_WHITE);
+                                            } else {
+                                                DrawLine(HUD, {static_cast<float>(screenWidth / 2), 0}, HeadSc, 1.0f, COLOR_LIME);
+                                            }
+                                        }
+                                        // ESP SKELETON
+                                        if (Config.ESPMenu.Skeleton) {
+                                            static vector<string> right_arm{"spine_03", "clavicle_r", "upperarm_r", "lowerarm_r", "hand_r", "item_r"};
+                                        static vector<string> left_arm{"spine_03", "clavicle_l", "upperarm_l", "lowerarm_l", "hand_l", "item_l"};
+                                        static vector<string> spine{"Head", "neck_01", "spine_03", "spine_02", "spine_01", "Pelvis"};
+                                        static vector<string> lower_right{"Pelvis", "thigh_r", "calf_r", "foot_r"};
+                                        static vector<string> lower_left{"Pelvis", "thigh_l", "calf_l", "foot_l"};
+                                        static vector<vector<string>> skeleton{right_arm, left_arm, spine, lower_right, lower_left};
+                                        for (auto &boneStructure : skeleton) {
+                                            string lastBone;
+                                            for (string &currentBone : boneStructure) {
+                                                if (!lastBone.empty()) {
+                                                    FVector wBoneFrom = GetBoneLocationByName(Player, lastBone.c_str());
+                                                    FVector wBoneTo = GetBoneLocationByName(Player, currentBone.c_str());
+                                                    FVector2D boneFrom, boneTo;
+                                                    if (gGameplayStatics->ProjectWorldToScreen(localPlayerController, wBoneFrom, false, &boneFrom) && gGameplayStatics->ProjectWorldToScreen(localPlayerController, wBoneTo, false, &boneTo)) {
+                                                        bool IsVisibles = g_PlayerController->LineOfSightTo(g_PlayerController->PlayerCameraManager, Player->GetBonePos(currentBone.c_str(), {}), true);
+                                                        if (IsVisibles){
+                                                            if(Player->bEnsure){
+                                                                DrawLine(HUD, boneFrom, boneTo, EspSktonThik, COLOR_LIME);
+                                                   //            pHUD->Canvas->K2_DrawLine(boneFrom, boneTo, EspSktonThik, COLOR_LIME);
+                                                            }else{
+                                                                DrawLine(HUD, boneFrom, boneTo, EspSktonThik, COLOR_LIME);
+                                                         //       pHUD->Canvas->K2_DrawLine(boneFrom, boneTo, EspSktonThik, COLOR_GREEN);
+                                                            }
+                                                        }else{
+                                                            if(Player->bEnsure){
+                                                                DrawLine(HUD, boneFrom, boneTo, EspSktonThik, COLOR_WHITE);
+                                                        //        pHUD->Canvas->K2_DrawLine(boneFrom, boneTo, EspSktonThik, COLOR_WHITE);
+                                                            }else{
+                                                                DrawLine(HUD, boneFrom, boneTo, EspSktonThik, COLOR_RED);
+                                                        //        pHUD->Canvas->K2_DrawLine(boneFrom, boneTo, EspSktonThik, COLOR_RED);
+                                                            }
+                                                        }
+                                                           //EspSktonThik
+                                                    }
+                                                }
+                                                lastBone = currentBone;
+                                            }
+                                        }
+                                    }
+                                        
+                                    if (Config.ESPMenu.Box) {
+                                            float boxHeight = abs(HeadSc.Y - RootSc.Y);
+                                           float boxWidth = boxHeight * 0.65f;
+									       FVector2D vBox = FVector2D(HeadSc.X - (boxWidth / 2), HeadSc.Y);
+                                           Box4Line(HUD, 1.5f, vBox.X, vBox.Y, boxWidth, boxHeight, COLOR_WHITE);
+                                        }
+                                        // ESP HEALTH
+      if (Config.ESPMenu.Health) {
+    int CurHP = (int)std::max(0, std::min((int)Player->Health, (int)Player->HealthMax));
+    int MaxHP = (int)Player->HealthMax;
+
+    if (Player->Health == 0.0f && !Player->bDead) {
+        CurHP = Player->NearDeathBreath;
+        if (Player->NearDeatchComponent) {
+            MaxHP = Player->NearDeatchComponent->BreathMax;
+        }
+    }
+
+    float boxHeight = fabsf(RootSc.Y - HeadSc.Y);
+    float boxWidth = boxHeight * 0.58;
+    Rect2 PlayerRect(HeadSc.X - (boxWidth / 2), HeadSc.Y + boxHeight, boxWidth, boxHeight);
+
+    drawVerticalHealthBar(HUD,Vector2(PlayerRect.x + PlayerRect.width, PlayerRect.y), -boxHeight, MaxHP, CurHP);
+}
+
+                                        // ESP INFO
+						if (Config.ESPMenu.Weapon){
+					//	if (Player->bEnsure){
+					auto WeaponManagerComponent = Player->WeaponManagerComponent;
+        if (WeaponManagerComponent) {
+            {
+          auto CurrentWeaponReplicated = (ASTExtraShootWeapon *)WeaponManagerComponent->CurrentWeaponReplicated;
+          if (CurrentWeaponReplicated) {
+           auto WeaponId = (int)CurrentWeaponReplicated->GetWeaponID();
+           if (WeaponId) {
+            
+
+            std::wstring s; 
+			s += CurrentWeaponReplicated->GetWeaponName().ToWString();
+		robotoFont->LegacyFontSize = 9.2f;
+		 DrawOutlinedText(HUD, FString(s), FVector2D(HeadSc.X - 1, (HeadSc.Y - 7)), FLinearColor(1.0, 0.4980392156862745, 0.0, 1.0), COLOR_BLACK, true);
+							
+           }
+          }
+         }
+        }
+		
+       }
+						if (Config.ESPMenu.Name)
+					{
+						robotoFont->LegacyFontSize = 11.f;
+						std::wstring knockedstr = L"[ Knocked ]";
+						std::wstring Text;
+						 Text = L"[";
+						 if (Player->bEnsure)
+							{
+						Text += L"AI";
+						}else{
+						 Text += Player->PlayerName.ToWString();
+						 }
+						 Text += L"]";
+
+						if (Config.ESPMenu.TeamID)
+						{
+							Text = L"[" + std::to_wstring(Player->TeamID) + L"]" + L" | ";
+							if (Player->bEnsure)
+							{
+						Text += L"AI";
+						}else{
+						 Text += Player->PlayerName.ToWString();
+						 }
+						}
+
+
+						
+						if (Player->Health <= 0)
+						{
+							if (Player->bEnsure)
+							{
+							DrawOutlinedText(HUD, FString(knockedstr), FVector2D(RootSc.X - 1, (RootSc.Y + 3)), COLOR_PLAYER, COLOR_BLACK, true);
+							}
+							else
+							{
+							DrawOutlinedText(HUD, FString(knockedstr), FVector2D(RootSc.X - 1, (RootSc.Y + 3)), FLinearColor(255 / 255.0f, 0 / 255.0f, 0 / 255.0f, 1.0f), COLOR_BLACK, true);
+							}
+						}
+						else
+						{
+							if (!Player->bEnsure)
+							{
+							DrawOutlinedText(HUD, FString(Text), FVector2D(RootSc.X - 1, (RootSc.Y + 3)), COLOR_PLAYER, COLOR_BLACK, true);
+							}
+							else
+							{
+							DrawOutlinedText(HUD, FString(Text), FVector2D(RootSc.X - 1, (RootSc.Y + 3)), COLOR_PLAYER, COLOR_BLACK, true);
+							//DrawBorderString(ubu_0, playernamesize, Text.c_str(), RootPosSC.x, RootPosSC.y + 1, ImColor(PlayerNameColor[0], PlayerNameColor[1], PlayerNameColor[2], PlayerNameColor[3]), true);
+							}
+						}
+					}
+                                        if (Config.ESPMenu.Distance){
+                                        std::wstring distance;
+							distance = std::to_wstring((int) Distance) + L"[M]";
+							robotoFont->LegacyFontSize = 9.f;
+							DrawOutlinedText(HUD, FString(distance), FVector2D(RootSc.X - 1, (RootSc.Y + 17)), COLOR_WHITE, COLOR_BLACK, true);
+							//DrawBorderString(ubu_0, 15, distance.c_str(), RootSc.x, (RootSc.y + 18), , true);
+						}
+                                    }
+                                }
+                            }
+                            // ESP VEHICLE
+
+
+                            if (totalEnemies > 0 || totalBots > 0) {
+    std::wstring numi = L"Enemies Nearby: " + std::to_wstring(totalEnemies) +
+                        L" (Bots " + std::to_wstring(totalBots) + L")";
+    tslFont->LegacyFontSize = 20;
+    DrawTextcan(HUD, FString(numi), {(float) screenWidth / 2, 120},
+                COLOR_RED, COLOR_BLACK);
+}
+                        }
+                    }
+                }
+                g_LocalPlayer = localPlayer;
+                g_PlayerController = localPlayerController;
+            }
+        }
+    }
+
+
+
+
+    //from NSString to wstring
+    std::wstring NStoWS ( NSString* Str )
+    {
+        NSStringEncoding pEncode    =   CFStringConvertEncodingToNSStringEncoding ( kCFStringEncodingUTF32LE );
+        NSData* pSData              =   [ Str dataUsingEncoding : pEncode ];
+        return std::wstring ( (wchar_t*) [ pSData bytes ], [ pSData length] / sizeof ( wchar_t ) );
+    }
+    //from wstring to NSString
+    NSString* WStoNS ( const std::wstring& Str )
+    {
+        NSString* pString = [ [ NSString alloc ]
+                              initWithBytes : (char*)Str.data()
+                              length : Str.size() * sizeof(wchar_t)
+                              encoding : CFStringConvertEncodingToNSStringEncoding ( kCFStringEncodingUTF32LE ) ];
+        return pString;
+    }
+    
+    void *(*oProcessEvent)(UObject *pObj, UFunction *pFunc, void *pArgs);
+    void *hkProcessEvent(UObject *pObj, UFunction *pFunc, void *pArgs) {
+        if (pFunc) {
+            if (pFunc->GetFullName() == ("Function Engine.HUD.ReceiveDrawHUD") ){
+                AHUD *pHUD = (AHUD *) pObj;
+                if (pHUD) {
+                    auto Params = (AHUD_ReceiveDrawHUD_Params *) pArgs;
+                    if (Params) {
+                        RenderESP(pHUD, Params->SizeX, Params->SizeY);
+                      screenWidth = Params->SizeX;
+                     screenHeight = Params->SizeY;
+                    }
+                }
+            }
+        }
+if (ModSkinn && KillMessage){
+const char *pBroadCast = ("Function ShadowTrackerExtra.STExtraPlayerController.BroadcastFatalDamageToClientWithStruct");
+    if (pFunc) {
+        if (pFunc->GetFullName() == pBroadCast) {
+            ASTExtraPlayerController *pController = (ASTExtraPlayerController *) pObj;
+            if (pController) {
+                auto Params = (ASTExtraPlayerController_BroadcastFatalDamageToClientWithStruct_Params *) pArgs;
+                if (Params) {
+if (g_PlayerController->PlayerKey == Params->FatalDamageParameter.CauserKey && !g_PlayerController->STExtraBaseCharacter->CurrentVehicle && g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated){
+    Params->FatalDamageParameter.CauserClothAvatarID = new_Skin.XSuits; 
+        //M416
+     if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "M416")){
+                     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.M416_1;
+      }
+                    if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "AKM")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.AKM;
+     }
+     if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "SCAR-L")){
+                     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.Scar;
+      }
+                    if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "M16A4")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.M16A4;
+     }
+     if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "GROZA")){
+                     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.Groza;
+      }
+                    if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "AUG")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.AUG;
+     }
+     if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "M762")){
+                     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.M762;
+      }
+
+                    if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "Kar98K")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.K98;
+     }
+     if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "M24")){
+                     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.M24;
+      }
+                    if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "AWM")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.AWM;
+     }
+     if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "DP-28")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.DP28;
+     }
+    
+                    if(strstr(g_LocalPlayer->WeaponManagerComponent->CurrentWeaponReplicated->GetWeaponName().ToString(), "M249")){
+     Params->FatalDamageParameter.CauserWeaponAvatarID = new_Skin.M249;
+     }
+     
+  }
+    
+   }
+  }
+ }
+}
+}
+        return oProcessEvent(pObj, pFunc, pArgs);
+    }
+
+
+    void  *RTL_language(){
+        
+        auto MAIN =(FUObjectArray *) (obbbbl());
+        auto gobjects = MAIN->ObjObjects;
+        for (int i=0;i< gobjects.Num(); i++)
+            if (auto obj = gobjects.GetByIndex(i)) {
+                
+                if(obj->IsA(AHUD::StaticClass())) {
+                    auto HUD = (AHUD *) obj;
+                    int its = 75;
+                    auto VTable = (void**)HUD->VTable;
+                    if (VTable && ( VTable[its] != hkProcessEvent)) {
+                        oProcessEvent = decltype(oProcessEvent)(VTable[its]);
+                        VTable[its] = (void *) hkProcessEvent;
+                    }
+                }
+              if(obj->IsA(ASTExtraPlayerController::StaticClass())) {
+                    auto HUD = (ASTExtraPlayerController *) obj;
+                    int its = 75;
+                    auto VTable = (void**)HUD->VTable;
+                    if (VTable && ( VTable[its] != hkProcessEvent)) {
+                        oProcessEvent = decltype(oProcessEvent)(VTable[its]);
+                        VTable[its] = (void *) hkProcessEvent;
+                    }
+                }
+            }
+        return 0;
+    }
+
+#define hook GaYSSS9aAL
+
+
+#define hook GaYSSS9aAL
+
+
+
++ (void)load
+{
+        FName::GNames = GetGNames();
+    while (!FName::GNames) {
+        FName::GNames = GetGNames();
+          sleep(1);
+    }
+    
+    
+    UObject::GUObjectArray = (FUObjectArray *) (obbbbl());
+    
+    while (!UObject::GUObjectArray) {
+    UObject::GUObjectArray = (FUObjectArray *) (obbbbl());
+          sleep(1);
+    }
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5* NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+
+    
+        //start load but not means language
+          [self load1];
+        
+    });
+}
++ (void)load1
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        RTL_language();
+    });
+}
+__attribute__((constructor)) void _init() {
+    pthread_t t;
+    
+  //  pthread_create(&t, 0, bypass_thread, 0);
+  //  pthread_create(&t, 0, box_thread, 0);
+}
+
+@end
+
+
+
