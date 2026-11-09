@@ -698,7 +698,7 @@ std::wstring b2 = j2(m8(std::string([b1 UTF8String])));
 
 std::string finalUrl(b2.begin(), b2.end());
 
-if (ImGui::Button(buttonLabel.c_str(), ImVec2(280, 140))) {
+if (ImGui::Button("Buraya Yazı Gelecek", ImVec2(280, 140))) {
     NSString *urlString = [NSString stringWithUTF8String:finalUrl.c_str()];
     NSURL *url = [NSURL URLWithString:urlString];
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
