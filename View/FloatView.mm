@@ -9,13 +9,12 @@
     BOOL hasOpenedMenuInThisSession; 
 }
 
-
 - (NSString *)decodeBase64:(NSString *)base64String {
     NSData *data = [[NSData alloc] initWithBase64EncodedString:base64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 }
 
-+ (instancetype)sharedInstance :(ModuleControl*)control {
++ (instancetype)sharedInstance:(ModuleControl*)control {
     static FloatView *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -25,21 +24,15 @@
 }
 
 - (instancetype)initWithFrame:(CGRect)frame :(ModuleControl*)control {
+    
+    // HATA VEREN KISIM SİLİNDİ (extern PlayerzSDK vb. ve if (!PlayerzSDK()))
 
-extern bool PlayerzSDK();
-extern bool ComponantSDK();
-extern bool Player1SK();
-extern bool Velocr();
-   
+    self = [super initWithFrame:frame];
+    
+    if (self) {
+        self.moduleControl = control;
+        hasOpenedMenuInThisSession = NO; 
 
-if (!PlayerzSDK()) {
-
-    return 0;
-}
-    self.moduleControl = control;
-    hasOpenedMenuInThisSession = NO; 
-
-    if (self = [super initWithFrame:frame]) {
         self.layer.cornerRadius = frame.size.width * 0.3;
         self.layer.masksToBounds = YES;
         self.backgroundColor = [UIColor clearColor];
@@ -123,6 +116,5 @@ if (!PlayerzSDK()) {
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     self.didMoveLocation = CGPointMake(self.left, self.superview.height - self.bottom);
 }
-
 
 @end
