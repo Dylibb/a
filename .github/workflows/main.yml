@@ -15,22 +15,25 @@ jobs:
 
       - name: Theos ve SDK'ları Manuel Kur
         run: |
-          # Theos'u klonla
+          # 1. Theos'u klonla
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
           
-          # SDK'ları indir ve doğru klasöre çıkart
+          # 2. SDK'ları .zip yerine .tar.gz (sıkıştırılmış arşiv) olarak indir
+          # Bu yöntem, macOS sunucusundaki "symlink error: Permission denied" hatasını engeller.
           cd $HOME/theos
           echo "SDK indiriliyor..."
-          curl -L -o sdks.zip https://codeload.github.com/theos/sdks/zip/refs/heads/master
-          unzip -q sdks.zip
-          mv sdks-master sdks
-          rm sdks.zip
+          curl -L -o sdks.tar.gz https://github.com/theos/sdks/archive/refs/heads/master.tar.gz
           
-          # Theos yolunu ortam değişkenlerine ekle
+          # 3. Arşivi tar ile çıkart
+          tar -xzf sdks.tar.gz
+          mv sdks-master sdks
+          rm sdks.tar.gz
+          
+          # 4. Ortam değişkenlerini ayarla
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: SDK Kontrolü
+      - name: SDK Kontrolü (İsteğe Bağlı)
         run: |
           echo "İndirilen SDK'lar:"
           ls -l $HOME/theos/sdks/
