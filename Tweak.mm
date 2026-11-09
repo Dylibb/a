@@ -1,3 +1,5 @@
+#import "skin.h"
+
 #import <JRMemory/JRMemory.h>
 
 %hook ClassName
