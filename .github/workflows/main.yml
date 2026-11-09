@@ -29,18 +29,19 @@ jobs:
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: Projeyi Derle (Sadece Dylib)
+      - name: Projeyi Derle ve Ana Dizine Tası
         run: |
           make clean
           make
           
-          # Dylib'in oluştuğu yeri bul ve packages klasörüne kopyala
-          mkdir -p packages
-          find .theos/obj -name "*.dylib" -exec cp {} packages/ \;
+          # Derlenen .dylib dosyasını bul ve ana dizine kopyala
+          find .theos/obj -name "*.dylib" -exec cp {} ./ \;
 
-      - name: Dylib Dosyasını Yükle
-        uses: actions/upload-artifact@v4
-        with:
-          name: M7MD-Dylib
-          path: packages/*.dylib
-          if-no-files-found: error
+      - name: Olusan Dylib Dosyasini Commit'le
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # Ana dizindeki .dylib dosyasını repoya ekle ve gönder
+          git add *.dylib
+          git commit -m "Otomatik derlenen Dylib dosyasi eklendi" || echo "Degisiklik yok"
+          git push
