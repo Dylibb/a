@@ -30,7 +30,6 @@ jobs:
           curl -L -o /tmp/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_arm64
           chmod +x /tmp/ldid
           sudo mv /tmp/ldid /usr/local/bin/ldid
-          ldid -v
           
           # 4. Ortam değişkenlerini ayarla
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
