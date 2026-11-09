@@ -1,0 +1,34 @@
+name: Build Tweak
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Kodu Repodan Çek
+        uses: actions/checkout@v4
+
+      - name: Theos'u Kur
+        uses: Randomblock1/theos-action@v1
+        with:
+          theos-sdks: 'https://github.com/theos/sdks'
+
+      - name: Projeyi Derle (Paket Oluştur)
+        run: |
+          make clean
+          make package FINALPACKAGE=1
+
+      - name: Derlenen Dosyaları (Deb ve Dylib) Yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: derlenmis-tweak
+          path: |
+            packages/*.deb
+            .theos/obj/**/*.dylib
+            *.dylib
+          if-no-files-found: warn
