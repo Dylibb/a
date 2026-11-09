@@ -1,4 +1,4 @@
-name: Build Tweak
+name: Build Dylib Only
 
 on:
   push:
@@ -15,37 +15,32 @@ jobs:
 
       - name: Theos, SDK ve ldid Kur
         run: |
-          # 1. Theos'u klonla
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
-          
-          # 2. SDK'ları .tar.gz olarak indir (Symlink hatasını önler)
           cd $HOME/theos
           curl -L -o sdks.tar.gz https://github.com/theos/sdks/archive/refs/heads/master.tar.gz
           tar -xzf sdks.tar.gz
           mv sdks-master sdks
           rm sdks.tar.gz
           
-          # 3. ldid aracını indir ve PATH'e ekle
-          echo "ldid indiriliyor..."
           curl -L -o /tmp/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_arm64
           chmod +x /tmp/ldid
           sudo mv /tmp/ldid /usr/local/bin/ldid
           
-          # 4. Ortam değişkenlerini ayarla
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: Projeyi Derle (Paket Oluştur)
+      - name: Projeyi Derle (Sadece Dylib)
         run: |
           make clean
-          make package FINALPACKAGE=1
+          make
+          
+          # Dylib'in oluştuğu yeri bul ve packages klasörüne kopyala
+          mkdir -p packages
+          find .theos/obj -name "*.dylib" -exec cp {} packages/ \;
 
-      - name: Derlenen Dosyaları Yükle
+      - name: Dylib Dosyasını Yükle
         uses: actions/upload-artifact@v4
         with:
-          name: derlenmis-tweak
-          path: |
-            packages/*.deb
-            .theos/obj/**/*.dylib
-            *.dylib
-          if-no-files-found: warn
+          name: M7MD-Dylib
+          path: packages/*.dylib
+          if-no-files-found: error
