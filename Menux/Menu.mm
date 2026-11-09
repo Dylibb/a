@@ -1559,7 +1559,9 @@ void DrawSettingsTab() {
 std::wstring w2 = j2(m8(w1));
 std::string wnDtu(w2.begin(), w2.end());
 
-if (ImGui::Begin(wnDtu.c_str(), &self.moduleControl->menuStatus, ImGuiWindowFlags_NoCollapse)) {
+static bool dummy_status = true;
+   
+if (ImGui::Begin(wnDtu.c_str(), &dummy_status, ImGuiWindowFlags_NoCollapse)) {
         
         // Top Bar Info
         ImGui::PushStyleColor(ImGuiCol_Text, Colors::Info);
@@ -1651,7 +1653,7 @@ if (ImGui::Begin(wnDtu.c_str(), &self.moduleControl->menuStatus, ImGuiWindowFlag
 
 -(void)readIniConfig {
     // FPS Configuration - using direct value assignment
-    switch(self.moduleControl->fps) {
+    switch(0) {
         case 0:
             overlayView.preferredFramesPerSecond = 60;
             break;
